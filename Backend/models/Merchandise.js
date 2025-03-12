@@ -1,10 +1,9 @@
 const mongoose = require('mongoose');
 
 const merchandiseSchema = new mongoose.Schema({
-    merch_id: { 
+    price: { 
         type: Number, 
-        required: true, 
-        unique: true 
+        required: true 
     },
     image: { 
         type: String,
