@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const yanTemplateSchema = new mongoose.Schema({
+const YanTemplateSchema = new mongoose.Schema({
   yan_template_id: { 
     type: Number, 
     required: true 
@@ -22,4 +22,4 @@ const yanTemplateSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model('YanTemplate', yanTemplateSchema);
+module.exports = mongoose.model('YanTemplate', YanTemplateSchema);
