@@ -18,6 +18,11 @@ const userSchema = new mongoose.Schema({
         unique: true,
         match: [/^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,})$/, 'Please add a valid email']
     },
+    role: {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user'
+    },
     google_account_token: { 
         type: String 
     },
