@@ -5,9 +5,10 @@ const User = require('../models/User');
 //@access   Public
 exports.register = async (req, res, next) => {
     try {
-        const { name, email, password, role } = req.body;
+        console.log(req.body)
+        const { username, email, password, role } = req.body;
         const user = await User.create({
-            name,
+            username,
             email,
             password,
             role
@@ -15,7 +16,7 @@ exports.register = async (req, res, next) => {
 
         sendTokenResponse(user, 200, res);
     } catch (err) {
-        res.status(400).json({ success: false });
+        res.status(400).json({ success: false , msg : err.message});
 
     }
 };
