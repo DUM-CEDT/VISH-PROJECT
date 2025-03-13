@@ -45,9 +45,9 @@ YanTemplateSchema.pre("validate", async function (next) {
 YanTemplateSchema.pre("validate", async function (next) {
   try {
       
-    const existingCategoryCount = await Category.countDocuments({ _id: { $in: this.yan_cateogry} });
+    const existingCategoryCount = await Category.countDocuments({ _id: { $in: this.yan_category} });
 
-    if (existingCategoryCount !== this.category_list.length) {
+    if (existingCategoryCount !== this.yan_category.length) {
       const error = new Error("One or more Category IDs do not exist.");
       error.statusCode = 400;
       return next(error);
