@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const Merchandise = require('./Merchandise');
+const User = require('./User');
 
 const merchandiseTransactionSchema = new mongoose.Schema({
     merch_id: { 
@@ -13,7 +15,8 @@ const merchandiseTransactionSchema = new mongoose.Schema({
     },
     quantity: { 
         type: Number, 
-        required: true }, 
+        required: true 
+    }, 
     selected_merch_prop: { 
         type: String, 
         required: true 
@@ -28,8 +31,9 @@ const merchandiseTransactionSchema = new mongoose.Schema({
     },
     status: { 
         type: String, 
-        enum: ['รอจัดส่ง', 'จัดส่งแล้ว', 'ยกเลิก'], 
-        default: 'รอจัดส่ง' }
+        enum: ['รอจัดส่ง', 'กำลังจัดส่ง', 'จัดส่งแล้ว', 'ยกเลิก'], 
+        default: 'รอจัดส่ง' 
+    }
 });
 
 merchandiseTransactionSchema.pre("validate", async function (next) {
@@ -41,7 +45,34 @@ merchandiseTransactionSchema.pre("validate", async function (next) {
         error.statusCode = 400; 
         return next(error);
       }
-  
+      
+    const merchandiseExists = await Merchandise.exists({ _id: this.merch_id });
+    
+    if (!merchandiseExists) {
+      const error = new Error(`No Merchandise with ID ${this.merch_id}`);
+      error.statusCode = 400;
+      return next(error);
+    }
+
+    const telRegex = /^\d{10}$/;
+    if (!telRegex.test(this.tel)) {
+      const error = new Error('Telephone number must be 10 digits');
+      error.statusCode = 400;
+      return next(error);
+    }
+
+    if (this.quantity <= 0) {
+      const error = new Error('Quantity must be greater than 0');
+      error.statusCode = 400;
+      return next(error);
+    }
+
+    if (!this.address.trim()) {
+      const error = new Error('Address cannot be empty');
+      error.statusCode = 400;
+      return next(error);
+    }
+
       next();
     } catch (error) {
       next(error);
