@@ -2,18 +2,20 @@ const mongoose = require('mongoose');
 const Category = require('./Category');
 
 const YanTemplateSchema = new mongoose.Schema({
-  yan_cateogry: [{
+  yan_category: [{
     type : mongoose.Schema.ObjectId,
     ref : 'Category'
   }],
   yan_template_image_list: [{ 
-    type : [mongoose.Schema.ObjectId], 
+    type : mongoose.Schema.ObjectId, 
     required : true,
+    ref : 'YanTemplateImage',
     validate : v => v.length == 4
   }],
-  background: { 
+  background_color: { 
     type: String, 
-    required: true
+    required: true,
+    match: /^#([0-9A-F]{3}|[0-9A-F]{6})$/i
   },
   export_count: { 
     type: Number, 
