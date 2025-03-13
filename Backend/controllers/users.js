@@ -88,7 +88,6 @@ exports.logout = async (req, res, next) => {
     });
 
     res.status(200).json({ success: true, msg: 'Logged out successfully' });
-    
 };
 
 //@desc     Get current logged in user
@@ -100,7 +99,6 @@ exports.getMe = async (req, res, next) => {
         success: true, 
         data: user 
     });
-        
 };
 
 //Get token from model, create cookie and send response
