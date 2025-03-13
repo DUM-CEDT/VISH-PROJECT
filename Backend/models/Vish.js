@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { validate } = require('./YanTemplateImage');
 const Category = require('./Category');
 const User = require('./User')
 
