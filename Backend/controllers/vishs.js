@@ -6,7 +6,7 @@ const { updateUser } = require('../utils/updateUser')
 const Transaction = require('../models/Transaction')
 
 
-//@desc         Any thing about Merchandise
+//@desc         Any thing about Vish
 
 //@desc         Get All Vish With Pagination
 //@route        GET /api/vish/getallvish/:page
@@ -23,6 +23,9 @@ exports.getVishs = async (req , res, next) => {
     return res.status(200).json(req.query)
 }
 
+//@desc         Create New Vish
+//@route        POST /api/vish/createVish/
+//@access       Private
 exports.createVish = async (req , res , next) => {
     const userId = req.user._id
     const {text, category_list, is_bon, bon_condition, bon_credit, distribution } = req.body
@@ -57,20 +60,20 @@ exports.createVish = async (req , res , next) => {
             category_list,
             is_bon,
             bon_condition,
-            bon_credit,
-            distribution,
+            bon_credit : is_bon == false ? 0 : bon_credit,
+            distribution : is_bon == false ? 1 : distribution,
         }, {session : mongoose_session})
 
         vishCreateDate = newVish.create_at
 
-        createdTransaction = await Transaction.insertOne({
-             user_id: userId, 
-             amount: bon_credit, 
-             trans_category: 'bon',
-             created_at : vishCreateDate
-        }, {session : mongoose_session});
-
         if (is_bon) {
+            createdTransaction = await Transaction.insertOne({
+                 user_id: userId, 
+                 amount: bon_credit, 
+                 trans_category: 'bon',
+                 created_at : vishCreateDate
+            }, {session : mongoose_session})
+
             newTimeStamp = new VishTimeStamp({
                 vish_id : newVish._id,
                 user_id : userId,
@@ -95,26 +98,8 @@ exports.createVish = async (req , res , next) => {
     }
     mongoose_session.endSession()
 
-    res.status(200).json({text : "OK"})
+    res.status(200).json({success : true, vish : newVish})
 }
 
-// createVishTimeStamp = async (userData) => {
 
-//     try {
-//         await VishTimeStamp.insertOne({
-//             user_id : new mongoose.Types.ObjectId(),
-//             vish_id : new mongoose.Types.ObjectId(),
-//             point : 1
-//         })
-//     }
-//     catch (err) {
-//         console.log(err)
-//         if (err.statusCode == 400) {
-//             return res.status(400).json({success : false, msg : err.message})
-//         }
-//     }
-    
 
-//     return res.status(200).json({})
-
-// }

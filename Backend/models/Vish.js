@@ -31,19 +31,24 @@ const VishSchema = new mongoose.Schema({
         required : true
     },
     bon_condition : {
-        type : Number
+        type : Number,
+        default : 0
     },
     bon_vish_target : {
         type : Number,
+        default : 0
     },
     bon_credit : {
-        type : Number
+        type : Number, 
+        default : 0
     },
     distribution : {
-        type : Number
+        type : Number,
+        default : 1
     },
     is_success : {
-        type : Boolean
+        type : Boolean,
+        default : 0
     },
     report_count : {
         type : Number,
