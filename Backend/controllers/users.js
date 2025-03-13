@@ -6,9 +6,9 @@ const User = require('../models/User');
 exports.register = async (req, res, next) => {
     try {
         console.log(req.body)
-        const { username, email, password, role } = req.body;
+        const { name, email, password, role } = req.body;
         const user = await User.create({
-            username,
+            name,
             email,
             password,
             role
@@ -108,7 +108,7 @@ const sendTokenResponse = (user, statusCode, res) => {
     const token = user.getSignedJwtToken();
 
     const options = {
-        expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000),
+        expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE * 60 * 1000), //process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000 คือถ้านับเป็นวัน
         httpOnly: true
     };
 
