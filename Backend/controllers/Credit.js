@@ -4,7 +4,7 @@ const Transaction = require('../models/Transaction');
 const VishTimeStamp = require('../models/VishTimeStamp');
 const Vish = require('../models/Vish');
 
-exports.deposit = async (req, res) => {
+exports.deposit = async (req, res, next) => {
   try {
     const { amount } = req.body;
     if (!amount || amount <= 0) {
