@@ -1,17 +1,20 @@
 const mongoose = require('mongoose');
 const Category = require('./Category');
+const YanTemplateImage = require('./YanTemplateImage');
 
 const YanTemplateSchema = new mongoose.Schema({
   yan_category: [{
     type : mongoose.Schema.ObjectId,
     ref : 'Category'
   }],
-  yan_template_image_list: [{ 
-    type : mongoose.Schema.ObjectId, 
+  yan_template_image_list: {
+    type:[{ 
+      type : mongoose.Schema.ObjectId, 
+      ref : 'YanTemplateImage',
+    }],
     required : true,
-    ref : 'YanTemplateImage',
     validate : v => v.length == 4
-  }],
+  },
   background_color: { 
     type: String, 
     required: true,
@@ -27,10 +30,16 @@ YanTemplateSchema.pre("validate", async function (next) {
   try {
     
     yan_image_list_not_null = this.yan_template_image_list.filter(image => image !== null);
-    const existingImageCount = await YanTemplateImage.countDocuments({ _id: { $in: this.yan_image_list_not_null} });
+    console.log(yan_image_list_not_null);
 
+    yan_image_list_not_null = [...new Set(yan_image_list_not_null.map(id => id.toString()))]; // Convert to string & remove duplicates
+    yan_image_list_not_null = yan_image_list_not_null.map(id => new mongoose.Types.ObjectId(id)); // Convert back to ObjectId
 
-    if (existingImageCount !== this.yan_image_list_not_null.length) {
+    console.log(yan_image_list_not_null);
+    const existingImageCount = await YanTemplateImage.countDocuments({ _id: { $in: yan_image_list_not_null} });
+    console.log(existingImageCount);
+
+    if (existingImageCount !== yan_image_list_not_null.length) {
       const error = new Error("One or more Image IDs do not exist.");
       error.statusCode = 400;
       return next(error);
