@@ -61,4 +61,4 @@ VishTimeStampSchema.pre("validate", async function (next) {
     }
 });
 
-module.exports = mongoose.model('VishRimeStamp', VishTimeStampSchema)
+module.exports = mongoose.model('VishTimeStamp', VishTimeStampSchema)

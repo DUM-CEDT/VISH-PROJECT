@@ -20,7 +20,7 @@ const VishSchema = new mongoose.Schema({
     },
     vish_count : {
         type : Number,
-        required : true
+        default : 0
     },
     create_at : {
         type : Date,

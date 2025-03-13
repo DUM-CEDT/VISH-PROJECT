@@ -19,7 +19,33 @@ exports.getVishs = async (req , res, next) => {
     return res.status(200).json(req.query)
 }
 
-exports.addVishTimeStamp = async (req , res , next) => {
+exports.createVish = async (req , res , next) => {
+    const {user_id, text, category_list, vish_count, is_bon, bon_condition, bon_point, distribution, is_success, report_count } = req.body
+    
+    
+    try {
+        newVish = Vish.create({
+            user_id,
+            text,
+            category_list,
+            vish_count,
+            is_bon,
+            bon_condition,
+            bon_point,
+            distribution,
+            is_success,
+            report_count
+        })
+    }
+    catch (err) {
+        return res.status(400).json({
+            success : false, msg : err.message
+        })
+    }
+    res.status(200).json({text : "OK"})
+}
+
+exports.createVishTimeStamp = async (req , res , next) => {
 
     try {
         await VishTimeStamp.insertOne({

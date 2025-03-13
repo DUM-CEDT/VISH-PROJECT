@@ -1,9 +1,10 @@
 const express = require('express')
-const {getVishs, addVishTimeStamp}= require('../controllers/vishs')
+const {getVishs, createVishTimeStamp, createVish}= require('../controllers/vishs')
 
 const router = express.Router()
 
 router.route('/').get(getVishs)
-router.route('/addvishtimestamp').post(addVishTimeStamp)
+router.route('/createvish').post(createVish)
+router.route('/createvishtimestamp').post(createVishTimeStamp)
 
 module.exports = router
