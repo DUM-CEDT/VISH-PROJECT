@@ -1,6 +1,6 @@
 const Merchandise = require('../models/Merchandise');
 
-//@desc         Any thing about Merchandise
+//@desc         Anything about Merchandise
 
 //@desc         getAllMerch
 //@route        GET /api/merchandise/items
@@ -28,33 +28,37 @@ exports.getOneMerch = async (req, res) => {
 };
 
 //@desc         addMerch 
-//@route        POST /api-informations/users/register
+//@route        POST /api/merchandise/items/
 //@access       Private only ADMIN
 exports.addMerch = async (req, res) => {
-  try {
-    const { merch_id, image, merch_prop, description } = req.body;
-    if (!merch_id || !image || !merch_prop || !description) return res.status(400).json({ success: false, message: 'Invalid data' });
-    const item = new Merchandise({ merch_id, image, merch_prop, description });
-    await item.save();
-    res.status(201).json({ success: true, item });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-};
+    try {
+      const { price, image, merch_prop, description } = req.body;
+      if (!price || !image || !merch_prop || !description) return res.status(400).json({ success: false, message: 'Invalid data' });
+      const item = new Merchandise({ price, image, merch_prop, description });
+      await item.save();
+      res.status(201).json({ success: true, item });
+    } catch (err) {
+      res.status(500).json({ success: false, message: err.message });
+    }
+  };
 
 //@desc         updateMerch 
 //@route        PUT /api/merchandise/items/:id
 //@access       Private only ADMIN
 exports.updateMerch = async (req, res) => {
-  try {
-    const { merch_id, image, merch_prop, description } = req.body;
-    const item = await Merchandise.findByIdAndUpdate(req.params.id, { merch_id, image, merch_prop, description }, { new: true, runValidators: true });
-    if (!item) return res.status(404).json({ success: false, message: 'Item not found' });
-    res.json({ success: true, item });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-};
+    try {
+      const { price, image, merch_prop, description } = req.body;
+      const item = await Merchandise.findByIdAndUpdate(
+        req.params.id, 
+        { price, image, merch_prop, description },
+        { new: true, runValidators: true }
+      );
+      if (!item) return res.status(404).json({ success: false, message: 'Item not found' });
+      res.json({ success: true, item });
+    } catch (err) {
+      res.status(500).json({ success: false, message: err.message });
+    }
+  };
 
 //@desc         deleteMerch
 //@route        DELETE /api/merchandise/items/:id

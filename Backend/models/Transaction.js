@@ -1,13 +1,9 @@
 const mongoose = require('mongoose');
 
 const transactionSchema = new mongoose.Schema({
-    trans_id: { 
-        type: Number, 
-        required: true, 
-        unique: true 
-    },
     user_id: { 
-        type: Number, 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'User', 
         required: true 
     },
     amount: { 
@@ -16,7 +12,7 @@ const transactionSchema = new mongoose.Schema({
     },
     trans_category: { 
         type: String, 
-        enum: ['deposit', 'withdraw', 'reward', 'buyItems'], 
+        enum: ['deposit', 'withdraw', 'reward', 'buyItems', 'refund'], 
         required: true 
     },
     created_at: { 
