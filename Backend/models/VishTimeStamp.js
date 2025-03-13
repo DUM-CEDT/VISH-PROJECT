@@ -32,13 +32,11 @@ const VishTimeStampSchema = new mongoose.Schema({
 VishTimeStampSchema.pre("validate", async function (next) {
     try {
       const userExists = await User.exists({ _id: this.user_id });
-      
       if (!userExists) {
         const error = new Error(`No User with ID ${this.user_id}`);
         error.statusCode = 400; 
         return next(error);
       }
-  
       next();
     } catch (error) {
       next(error);
@@ -47,9 +45,17 @@ VishTimeStampSchema.pre("validate", async function (next) {
 
 VishTimeStampSchema.pre("validate", async function (next) {
     try {
-      const vishExists = await Vish.exists({ _id: this.vish_id });
-      
-      if (!userExists) {
+
+      let vishExists 
+
+      const session = this.$session ? this.$session() : null;
+
+      if (this.$session)
+        vishExists= await Vish.exists({ _id: this.vish_id }).session(session);
+      else 
+        vishExists= await Vish.exists({ _id: this.vish_id })
+
+      if (!vishExists) {
         const error = new Error(`No Vish with ID ${this.vish_id}`);
         error.statusCode = 400; 
         return next(error);
