@@ -8,7 +8,7 @@ const Transaction = require('../models/Transaction');
 //@desc         Anything about Merchandise Transaction
 
 //@desc         getAllMerchTrans
-//@route        GET /api/merchandise/items
+//@route        GET /api/merchandise/transactions
 //@access        Private (User and Admin) Token required
 exports.getAllMerchTrans = async (req, res) => {
   try {
@@ -20,7 +20,7 @@ exports.getAllMerchTrans = async (req, res) => {
 };
 
 //@desc         getOneMerchTrans
-//@route        GET /api/merchandise/items
+//@route        GET /api/merchandise/transactions/:id
 //@access       Private (User and Admin) Token required
 exports.getOneMerchTrans = async (req, res) => {
   try {
@@ -33,7 +33,7 @@ exports.getOneMerchTrans = async (req, res) => {
 };
 
 //@desc         addMerchTrans
-//@route        POST /api/merchandise/items
+//@route        POST /api/merchandise/transactions
 //@access       Private (User and Admin) Token ตรวจ credit ก่อน อันนี้ซื้อของ
 exports.addMerchTrans = async (req, res) => {
     try {
@@ -57,7 +57,7 @@ exports.addMerchTrans = async (req, res) => {
       await Transaction.create({
         user_id: user._id,
         amount: -totalCost,
-        trans_category: 'buyItems'
+        trans_category: 'buytransactions'
       });
 
       const transaction = await MerchandiseTransaction.create({ merch_id, user_id, quantity, selected_merch_prop, tel, address });
@@ -68,7 +68,7 @@ exports.addMerchTrans = async (req, res) => {
   };
 
 //@desc         updateMerchTrans
-//@route        PUT /api/merchandise/items
+//@route        PUT /api/merchandise/transactions/:idg
 //@access       Private only Admin ไว้เปลี่ยน status การจัดส่งสินค้า
 exports.updateMerchTrans = async (req, res) => {
   try {
@@ -111,7 +111,7 @@ exports.updateMerchTrans = async (req, res) => {
 
 
 //@desc         deleteMerchTrans
-//@route        DELETE /api/merchandise/items/:id
+//@route        DELETE /api/merchandise/transactions/:id
 //@access       Private only Admin
 exports.deleteMerchTrans = async (req, res) => {
   try {
