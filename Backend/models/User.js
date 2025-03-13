@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { getThaiTime } = require('../utils/timeUtils');
 
 const UserSchema = new mongoose.Schema({
     name: { 
@@ -60,7 +61,7 @@ const UserSchema = new mongoose.Schema({
     },
     created_at: { 
         type: Date, 
-        default: Date.now 
+        default: () => getThaiTime()
     }
 });
 
