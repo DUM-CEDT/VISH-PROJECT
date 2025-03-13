@@ -8,6 +8,11 @@ connectDB()
 
 const app = express()
 
+const yanTemplateImage = require('./routes/YanTemplateImage')
+
+app.use(express.json())
+app.use('/api/yan/image', yanTemplateImage)
+
 app.get('/', (req , res) => {
     res.status(200).json({success : true, msg : 'Hello World'})
 })

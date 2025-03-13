@@ -1,20 +1,20 @@
 const mongoose = require('mongoose');
 
 const YanTemplateSchema = new mongoose.Schema({
-  yan_template_id: { 
-    type: Number, 
-    required: true 
-  },
-  yan_template: [{ 
-    type : Number, 
-    enum: [0,1,2,3]
-  }],
-  yan_cateogry: [{
-    type : Number
-  }],
-  background: { 
-    type: String, 
+  yan_template_image_list: [{ 
+    type : mongoose.Schema.Types.ObjectId,
+    ref : 'YanTemplateImage',
     required: true
+  }],
+  yan_category: [{
+    type : mongoose.Schema.Types.ObjectId,
+    ref : 'YanCategory',
+    required: true
+  }],
+  background_color: { 
+    type: String, 
+    required: true,
+    match: /^#([0-9A-F]{3}|[0-9A-F]{6})$/i
   },
   export_count: { 
     type: Number, 

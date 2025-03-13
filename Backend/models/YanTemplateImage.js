@@ -1,12 +1,14 @@
 const mongoose = require('mongoose');
 
 const YanTemplateImageSchema = new mongoose.Schema({
-  yan_template_image_id: { 
+  yan_template_image_set_id: { 
     type: Number, 
-    required: true 
+    required: true,   
   },
   yan_category: [{ 
-    type : Number 
+    type : mongoose.Schema.Types.ObjectId,
+    ref : 'YanCategory',
+    required: true
   }],
   yan_level: { 
     type: Number, 
@@ -14,7 +16,8 @@ const YanTemplateImageSchema = new mongoose.Schema({
     required: true 
   },
   yan_image_base64: { 
-    type: String 
+    type: String ,
+    required: true
   },
 });
 
