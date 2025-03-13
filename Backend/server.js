@@ -9,6 +9,9 @@ connectDB()
 const vish = require('./routes/vish')
 const user = require('./routes/user')
 
+const credit = require('./routes/credit');
+const merchandise = require('./routes/merchandise');
+
 const app = express()
 
 const yanTemplateImage = require('./routes/YanTemplateImage')
@@ -17,6 +20,9 @@ const yanTemplate = require('./routes/YanTemplate')
 app.use(express.json())
 app.use('/api/yan/image', yanTemplateImage)
 app.use('/api/yan/template', yanTemplate)
+
+app.use('/api/credit', credit);
+app.use('/api/merchandise', merchandise);
 
 app.get('/', (req , res) => {
     res.status(200).json({success : true, msg : 'Hello World'})

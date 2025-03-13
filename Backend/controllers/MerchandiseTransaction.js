@@ -53,7 +53,13 @@ exports.addMerchTrans = async (req, res) => {
   
       user.credit -= totalCost;
       await user.save();
-  
+
+      await Transaction.create({
+        user_id: user._id,
+        amount: -totalCost,
+        trans_category: 'buyItems'
+      });
+
       const transaction = await MerchandiseTransaction.create({ merch_id, user_id, quantity, selected_merch_prop, tel, address });
       res.json({ success: true, transaction_id: transaction._id, credits: user.credit });
     } catch (err) {

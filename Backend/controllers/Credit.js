@@ -2,15 +2,20 @@ const mongoose = require('mongoose');
 const User = require('../models/User');
 const Transaction = require('../models/Transaction');
 const VishTimeStamp = require('../models/VishTimeStamp');
-
+const Vish = require('../models/Vish');
 
 exports.deposit = async (req, res) => {
   try {
     const { amount } = req.body;
-    if (!amount || amount <= 0) return res.status(400).json({ success: false, message: 'Invalid amount' });
+    if (!amount || amount <= 0) {
+      return res.status(400).json({ success: false, message: 'Invalid amount' });
+    }
 
     const user = await User.findById(req.user.user_id);
-    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
     user.credit += amount;
     await user.save();
 
@@ -24,42 +29,53 @@ exports.deposit = async (req, res) => {
 exports.withdraw = async (req, res) => {
   try {
     const { amount } = req.body;
-    if (!amount || amount <= 0) return res.status(400).json({ success: false, message: 'Invalid amount' });
+    if (!amount || amount < 0) {
+      return res.status(400).json({ success: false, message: 'Invalid amount' });
+    }
+    if (amount < 100) {
+      return res.status(400).json({ success: false, message: 'Minimum withdrawal is 100 credits' });
+    }
 
     const user = await User.findById(req.user.user_id);
-    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
-    const totalDeduction = amount;
-    const distributed = Math.floor(amount * 0.25); // 25% ของจำนวนที่ถอน
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
 
-    if (user.credit < totalDeduction) return res.status(400).json({ success: false, message: 'Insufficient credits' });
+    const totalDeduction = amount;
+    const distributed = Math.floor(amount * 0.25);
+
+    if (user.credit < totalDeduction) {
+      return res.status(400).json({ success: false, message: 'Insufficient credits' });
+    }
 
     user.credit -= totalDeduction;
     await user.save();
 
     await Transaction.create({ user_id: user._id, amount: -totalDeduction, trans_category: 'withdraw' });
 
+    // คำนวณโอกาสแจก Credit ด้วย Aggregation เพื่อเพิ่มประสิทธิภาพ
+    const globalPointsAgg = await VishTimeStamp.aggregate([
+      { $group: { _id: null, totalPoints: { $sum: '$point' } } }
+    ]);
+    const globalPoints = globalPointsAgg.length > 0 ? globalPointsAgg[0].totalPoints : 0;
+
+    const userPointsAgg = await VishTimeStamp.aggregate([
+      { $group: { _id: '$user_id', userPoints: { $sum: '$point' } } }
+    ]);
+
     const users = await User.find();
-    const totalUsers = users.length;
-
-    // ดึงข้อมูล VishTimeStamp ทั้งหมด
-    const allTimestamps = await VishTimeStamp.find();
-    const globalPoints = allTimestamps.reduce((sum, ts) => sum + ts.point, 0); // point ทั้งหมดในระบบ
-
-    // คำนวณโอกาสสำหรับแต่ละผู้ใช้ตามสมการ P(credit)
     const userProbabilities = await Promise.all(users.map(async (u) => {
-      const timestamps = await VishTimeStamp.find({ user_id: u._id });
-      const userPoints = timestamps.reduce((sum, ts) => sum + ts.point, 0); // point จากการบน + การ Vish
+      const userPointsEntry = userPointsAgg.find(up => up._id.toString() === u._id.toString());
+      const userPoints = userPointsEntry ? userPointsEntry.userPoints : 0;
       const probability = globalPoints > 0 ? userPoints / globalPoints : 0;
       return { user: u, probability };
     }));
 
-    // Normalize โอกาสให้รวมกันเท่ากับ 1
     const totalProbability = userProbabilities.reduce((sum, u) => sum + u.probability, 0);
     userProbabilities.forEach(u => {
-      u.probability = totalProbability > 0 ? u.probability / totalProbability : 1 / totalUsers; // ป้องกัน 0
+      u.probability = totalProbability > 0 ? u.probability / totalProbability : 1 / users.length;
     });
 
-    // สุ่มแจก Credit ทีละ 1
     let remainingCreditsToDistribute = distributed;
     const updatedUsers = [];
 
@@ -73,17 +89,16 @@ exports.withdraw = async (req, res) => {
 
       if (selectedUser) {
         const userToUpdate = selectedUser.user;
-        userToUpdate.credit += 1; // แจก 1 Credit
+        userToUpdate.credit += 1;
         await userToUpdate.save();
         updatedUsers.push(userToUpdate);
         await Transaction.create({ user_id: userToUpdate._id, amount: 1, trans_category: 'reward' });
         remainingCreditsToDistribute -= 1;
       } else {
-        break; // หยุดถ้าไม่มีผู้ใช้ที่เหมาะสม
+        break;
       }
     }
-    
-    // แปลง Credit เป็นบาท (1 Credit = 0.5 บาท ตาม Business Plan)
+
     const receivedBaht = amount * 0.5;
     const distributedBaht = (distributed - remainingCreditsToDistribute) * 0.5;
 
@@ -101,106 +116,120 @@ exports.withdraw = async (req, res) => {
 
 exports.reward = async (req, res) => {
   try {
-    const { vish_id } = req.body; // รับ vish_id จาก Body
+    const { vish_id } = req.body;
     if (!mongoose.Types.ObjectId.isValid(vish_id)) {
       return res.status(400).json({ success: false, message: 'Invalid Vish ID' });
     }
 
-    // ดึงข้อมูล Vish
     const vish = await Vish.findById(vish_id);
-    if (!vish) return res.status(404).json({ success: false, message: 'Vish not found' });
-   
-    // ตรวจสอบว่าเป็นการบน (Bon) หรือไม่
-    if (!vish.is_bon) return res.status(400).json({ success: false, message: 'This Vish is not a Bon' });
-
-    // ตรวจสอบว่า Vish สำเร็จหรือยัง (ถ้า bon_condition เป็น success)
-    if (vish.bon_condition === false && !vish.is_success) {
-      return res.status(400).json({ success: false, message: 'Vish has not succeeded yet' });
+    if (!vish) {
+      return res.status(404).json({ success: false, message: 'Vish not found' });
+    }
+    if (!vish.is_bon) {
+      return res.status(400).json({ success: false, message: 'This Vish is not a Bon' });
     }
 
-    // ตรวจสอบเงื่อนไข Like (ถ้า bon_condition เป็น like)
-    if (vish.bon_condition === true && vish.vish_count < 10) { // สมมติว่าเงื่อนไข Like ต้องถึง 10
-      return res.status(400).json({ success: false, message: 'Not enough Vish count to distribute rewards' });
+    // ตรวจสอบเงื่อนไขตาม bon_condition
+    if (vish.bon_condition === false) { // Success: ต้องให้ผู้โพสกดเปลี่ยน is_success
+      if (!vish.is_success) {
+        return res.status(403).json({ success: false, message: 'Only the poster can mark this Vish as successful' });
+      }
+      // ตรวจสอบว่าเป็นผู้โพส
+      if (vish.user_id.toString() !== req.user.user_id.toString()) {
+        return res.status(403).json({ success: false, message: 'Only the poster can trigger reward for success condition' });
+      }
+    } else if (vish.bon_condition === true) { // Like: ตรวจสอบ vish_count กับ bon_vish_target
+      if (vish.vish_count < vish.bon_vish_target) {
+        return res.status(400).json({ success: false, message: `Vish count (${vish.vish_count}) must reach ${vish.bon_vish_target} to distribute rewards` });
+      }
+      // อัปเดต is_success ถ้ายังไม่สำเร็จ
+      if (!vish.is_success) {
+        vish.is_success = true;
+        await vish.save();
+      }
     }
 
-    // ดึงรายชื่อผู้ใช้ที่กด Vish โพสนี้ (status: true)
+    // ป้องกันการแจกซ้ำ
+    if (vish.is_success && vish.bon_condition === true) {
+      return res.status(400).json({ success: false, message: 'This Vish has already been rewarded' });
+    }
+
+    // ดึงรายชื่อผู้ใช้ที่กด Vish
     const vishTimestamps = await VishTimeStamp.find({ vish_id, status: true });
     if (vishTimestamps.length === 0) {
       return res.status(400).json({ success: false, message: 'No users have Vished this post' });
     }
 
     const vishers = vishTimestamps.map(ts => ts.user_id.toString());
-    const uniqueVishers = [...new Set(vishers)]; // ลบผู้ใช้ซ้ำ
+    const uniqueVishers = [...new Set(vishers)];
 
-    // คำนวณจำนวน Credit ที่แต่ละคนจะได้รับ
-    const pointsPerUser = Math.floor(vish.bon_point / vish.distribution);
-    if (pointsPerUser <= 0) {
-      return res.status(400).json({ success: false, message: 'Invalid distribution or bon_point' });
+    // คำนวณจำนวน Credit ต่อคน
+    const creditsPerUser = Math.floor(vish.bon_credit / vish.distribution);
+    const remainingCredits = vish.bon_credit % vish.distribution; // ส่วนที่เหลือ
+    if (creditsPerUser <= 0) {
+      return res.status(400).json({ success: false, message: 'Invalid distribution or bon_credit' });
     }
 
-    // ตรวจสอบว่ามีคนเพียงพอที่จะแจกหรือไม่
+    // ตรวจสอบจำนวนผู้ใช้ที่เพียงพอ
     if (uniqueVishers.length < vish.distribution) {
       return res.status(400).json({ success: false, message: 'Not enough users to distribute rewards' });
     }
 
     // สุ่มเลือกผู้ใช้
-    const shuffledVishers = uniqueVishers.sort(() => 0.5 - Math.random()); // สุ่มเรียงลำดับ
-    const selectedVishers = shuffledVishers.slice(0, vish.distribution); // เลือกตามจำนวน distribution
+    const shuffledVishers = uniqueVishers.sort(() => 0.5 - Math.random());
+    const selectedVishers = shuffledVishers.slice(0, vish.distribution);
 
-    // แจก Credit ให้ผู้ใช้ที่ถูกเลือก
+    // แจก Credit
     const updatedUsers = [];
-    for (const userId of selectedVishers) {
+    for (let i = 0; i < selectedVishers.length; i++) {
+      const userId = selectedVishers[i];
       const userToUpdate = await User.findById(userId);
       if (userToUpdate) {
-        userToUpdate.credit += pointsPerUser;
+        const creditsToAdd = creditsPerUser + (i === selectedVishers.length - 1 ? remainingCredits : 0);
+        userToUpdate.credit += creditsToAdd;
         await userToUpdate.save();
-        updatedUsers.push(userToUpdate);
+        updatedUsers.push({ user_id: userToUpdate._id, credits_added: creditsToAdd });
         await Transaction.create({ 
           user_id: userToUpdate._id, 
-          amount: pointsPerUser, 
+          amount: creditsToAdd, 
           trans_category: 'reward' 
         });
       }
     }
 
-    // อัปเดต Vish ว่าแจกสำเร็จแล้ว (ถ้าต้องการ)
-    vish.is_success = true;
-    await vish.save();
-
     res.json({ 
       success: true, 
-      distributed_points: pointsPerUser,
-      distributed_users: updatedUsers.map(u => ({ user_id: u._id, points_added: pointsPerUser }))
+      distributed_credits: creditsPerUser,
+      distributed_users: updatedUsers.map(u => ({ user_id: u._id, credits_added: creditsPerUser }))
     });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
 };
 
-exports.buyItems = async (req, res) => {
-  try {
-    const { quantity } = req.body;
-    const _id = req.params.item_id;
-    if (!mongoose.Types.ObjectId.isValid(_id) || !quantity || quantity <= 0) {
-      return res.status(400).json({ success: false, message: 'Invalid data' });
-    }
+// exports.buyItems = async (req, res) => {
+//   try {
+//     const { quantity } = req.body;
+//     const _id = req.params.item_id;
+//     if (!mongoose.Types.ObjectId.isValid(_id) || !quantity || quantity <= 0) {
+//       return res.status(400).json({ success: false, message: 'Invalid data' });
+//     }
 
-    const user = await User.findById(req.user.user_id);
-    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+//     const user = await User.findById(req.user.user_id);
+//     if (!user) return res.status(404).json({ success: false, message: 'User not found' });
 
-    // สมมติว่า MerchandiseModel ยังไม่พร้อม ใช้ price แบบตัวอย่าง
-    const item = { price: 10 }; // เปลี่ยนเป็น Merchandise.findById(_id) เมื่อมี Model
-    if (!item) return res.status(404).json({ success: false, message: 'Item not found' });
+//     const item = { price: 10 }; // เปลี่ยนเป็น Merchandise.findById(_id) เมื่อมี Model
+//     if (!item) return res.status(404).json({ success: false, message: 'Item not found' });
 
-    const totalCost = item.price * quantity;
-    if (user.credit < totalCost) return res.status(400).json({ success: false, message: 'Insufficient credits' });
+//     const totalCost = item.price * quantity;
+//     if (user.credit < totalCost) return res.status(400).json({ success: false, message: 'Insufficient credits' });
 
-    user.credit -= totalCost;
-    await user.save();
+//     user.credit -= totalCost;
+//     await user.save();
 
-    const transaction = await Transaction.create({ user_id: user._id, amount: -totalCost, trans_category: 'buyItems' });
-    res.json({ success: true, remain_credits: user.credit, order_id: transaction._id });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-};
+//     const transaction = await Transaction.create({ user_id: user._id, amount: -totalCost, trans_category: 'buyItems' });
+//     res.json({ success: true, remain_credits: user.credit, order_id: transaction._id });
+//   } catch (err) {
+//     res.status(500).json({ success: false, message: err.message });
+//   }
+// };
