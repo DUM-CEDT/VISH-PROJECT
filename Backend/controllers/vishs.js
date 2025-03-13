@@ -12,15 +12,9 @@ exports.getVishs = async (req , res, next) => {
     let query 
 
     let reqQuery = { ...req.query }
-    const removeFields = ['page']
+    const removeFields = ['page', 'type']
+
     removeFields.forEach((param) => delete reqQuery[param])
-
-    let queryStr = JSON.stringify(reqQuery)
-
-    queryStr = queryStr.replace(
-      /\b(gt|gte|lt|lte|in)\b/g,
-      (match) => `$${match}`
-    )
 
     return res.status(200).json(req.query)
 }
