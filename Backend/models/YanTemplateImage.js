@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const YanTemplateImageSchema = new mongoose.Schema({
-  yan_template_image_id: { 
+  yan_template_image_set_id: { 
     type: Number, 
     required: true 
   },

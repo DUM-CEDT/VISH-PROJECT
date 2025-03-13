@@ -1,16 +1,14 @@
 const mongoose = require('mongoose');
+const Category = require('./Category');
 
 const YanTemplateSchema = new mongoose.Schema({
-  yan_template_id: { 
-    type: Number, 
-    required: true 
-  },
-  yan_template: [{ 
-    type : Number, 
-    enum: [0,1,2,3]
-  }],
   yan_cateogry: [{
-    type : Number
+    type : mongoose.Schema.ObjectId,
+    ref : 'Category'
+  }],
+  yan_template_image_list: [{ 
+    type : [mongoose.Schema.ObjectId], 
+    required : true
   }],
   background: { 
     type: String, 
@@ -19,6 +17,42 @@ const YanTemplateSchema = new mongoose.Schema({
   export_count: { 
     type: Number, 
     default: 0
+  }
+});
+
+YanTemplateSchema.pre("validate", async function (next) {
+  try {
+    
+    yan_image_list_not_null = this.yan_template_image_list.filter(image => image !== null);
+    const existingImageCount = await YanTemplateImage.countDocuments({ _id: { $in: this.yan_image_list_not_null} });
+
+
+    if (existingImageCount !== this.yan_image_list_not_null.length) {
+      const error = new Error("One or more Image IDs do not exist.");
+      error.statusCode = 400;
+      return next(error);
+    }
+
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+YanTemplateSchema.pre("validate", async function (next) {
+  try {
+      
+    const existingCategoryCount = await Category.countDocuments({ _id: { $in: this.yan_cateogry} });
+
+    if (existingCategoryCount !== this.category_list.length) {
+      const error = new Error("One or more Category IDs do not exist.");
+      error.statusCode = 400;
+      return next(error);
+    }
+
+    next();
+  } catch (error) {
+    next(error);
   }
 });
 

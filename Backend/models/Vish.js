@@ -1,14 +1,12 @@
 const mongoose = require('mongoose');
 const { validate } = require('./YanTemplateImage');
+const Category = require('./Category');
+const User = require('./User')
 
 const VishSchema = new mongoose.Schema({
-    vish_id : {
-        type : Number,
-        required : true,
-        unique : true
-    },
     user_id : {
-        type : Number,
+        type : mongoose.Schema.ObjectId,
+        ref : "User",
         required : true
     },
     text : {
@@ -16,7 +14,8 @@ const VishSchema = new mongoose.Schema({
         required : true
     },
     category_list : {
-        type : [Number],
+        type : [mongoose.Schema.ObjectId],
+        ref : "Category",
         required : true,
         validate : v => v.length >= 1
     },
@@ -49,5 +48,39 @@ const VishSchema = new mongoose.Schema({
         default : 0
     }
 })
+
+VishSchema.pre("validate", async function (next) {
+    try {
+      const userExists = await User.exists({ _id: this.user_id });
+      
+      if (!userExists) {
+        const error = new Error(`No User with ID ${this.user_id}`);
+        error.statusCode = 400; 
+        return next(error);
+      }
+  
+      next();
+    } catch (error) {
+      next(error);
+    }
+});
+
+VishSchema.pre("validate", async function (next) {
+    try {
+        
+      const existingCategoryCount = await Category.countDocuments({ _id: { $in: this.category_list } });
+  
+      if (existingCategoryCount !== this.category_list.length) {
+        const error = new Error("One or more Category IDs do not exist.");
+        error.statusCode = 400;
+        return next(error);
+      }
+  
+      next();
+    } catch (error) {
+      next(error);
+    }
+  });
+
 
 module.exports = mongoose.model('Vish', VishSchema)
