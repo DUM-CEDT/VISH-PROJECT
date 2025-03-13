@@ -12,9 +12,11 @@ const user = require('./routes/user')
 const app = express()
 
 const yanTemplateImage = require('./routes/YanTemplateImage')
+const yanTemplate = require('./routes/YanTemplate')
 
 app.use(express.json())
 app.use('/api/yan/image', yanTemplateImage)
+app.use('/api/yan/template', yanTemplate)
 
 app.get('/', (req , res) => {
     res.status(200).json({success : true, msg : 'Hello World'})
