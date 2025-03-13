@@ -33,7 +33,10 @@ const VishSchema = new mongoose.Schema({
     bon_condition : {
         type : Number
     },
-    bon_point : {
+    bon_vish_target : {
+        type : Number,
+    },
+    bon_credit : {
         type : Number
     },
     distribution : {

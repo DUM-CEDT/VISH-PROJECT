@@ -1,6 +1,7 @@
 const Vish = require('../models/Vish')
 const mongoose = require('mongoose')
 const VishTimeStamp = require ('../models/VishTimeStamp')
+const User = require('../models/User')
 
 //@desc         Any thing about Merchandise
 
@@ -20,11 +21,26 @@ exports.getVishs = async (req , res, next) => {
 }
 
 exports.createVish = async (req , res , next) => {
-    const {user_id, text, category_list, vish_count, is_bon, bon_condition, bon_point, distribution, is_success, report_count } = req.body
-    
+    const user_id = req.body.user_id
+    const {text, category_list, vish_count, is_bon, bon_condition, bon_point, distribution, is_success, report_count } = req.body
     
     try {
-        newVish = Vish.create({
+
+        if (is_bon) {
+
+            user_data = await User.findById(user_id)
+
+            if (bon_condition == true) { // use like
+                
+            }
+            else { // use success
+
+            }
+        }
+
+
+
+        newVish = await Vish.insertOne({
             user_id,
             text,
             category_list,
