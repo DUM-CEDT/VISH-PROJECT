@@ -8,7 +8,8 @@ const YanTemplateSchema = new mongoose.Schema({
   }],
   yan_template_image_list: [{ 
     type : [mongoose.Schema.ObjectId], 
-    required : true
+    required : true,
+    validate : v => v.length == 4
   }],
   background: { 
     type: String, 
