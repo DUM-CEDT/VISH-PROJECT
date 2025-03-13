@@ -26,7 +26,7 @@ const VishSchema = new mongoose.Schema({
         type : Date,
         default : Date.now()
     },
-    is_bon : {
+    is_bon : { // 0 is like 1 is success
         type : Boolean,
         required : true
     },

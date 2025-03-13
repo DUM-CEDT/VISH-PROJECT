@@ -6,6 +6,5 @@ const { protect } = require('../middleware/user');
 
 router.route('/').get(getVishs)
 router.route('/createvish').post(protect, createVish)
-router.route('/createvishtimestamp').post(createVishTimeStamp)
 
 module.exports = router
