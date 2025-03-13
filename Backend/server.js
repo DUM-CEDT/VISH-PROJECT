@@ -7,6 +7,7 @@ dotenv.config({path:'./config/config.env'})
 connectDB()
 
 const vish = require('./routes/vish')
+const user = require('./routes/user')
 
 const app = express()
 
@@ -20,6 +21,7 @@ app.get('/', (req , res) => {
 })
 
 app.use('/api/vish', vish)
+app.use('/api/user', user)
 
 const PORT = process.env.PORT || 1234
 

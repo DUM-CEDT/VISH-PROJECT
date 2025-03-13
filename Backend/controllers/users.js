@@ -5,6 +5,7 @@ const User = require('../models/User');
 //@access   Public
 exports.register = async (req, res, next) => {
     try {
+        console.log(req.body)
         const { name, email, password, role } = req.body;
         const user = await User.create({
             name,
@@ -15,7 +16,7 @@ exports.register = async (req, res, next) => {
 
         sendTokenResponse(user, 200, res);
     } catch (err) {
-        res.status(400).json({ success: false });
+        res.status(400).json({ success: false , msg : err.message});
 
     }
 };
@@ -88,7 +89,6 @@ exports.logout = async (req, res, next) => {
     });
 
     res.status(200).json({ success: true, msg: 'Logged out successfully' });
-    
 };
 
 //@desc     Get current logged in user
@@ -100,7 +100,6 @@ exports.getMe = async (req, res, next) => {
         success: true, 
         data: user 
     });
-        
 };
 
 //Get token from model, create cookie and send response
@@ -109,7 +108,7 @@ const sendTokenResponse = (user, statusCode, res) => {
     const token = user.getSignedJwtToken();
 
     const options = {
-        expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000),
+        expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE * 60 * 1000), //process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000 คือถ้านับเป็นวัน
         httpOnly: true
     };
 
