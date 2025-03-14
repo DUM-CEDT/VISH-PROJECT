@@ -114,98 +114,98 @@ exports.withdraw = async (req, res) => {
   }
 };
 
-exports.reward = async (req, res) => {
-  try {
-    const { vish_id } = req.body;
-    if (!mongoose.Types.ObjectId.isValid(vish_id)) {
-      return res.status(400).json({ success: false, message: 'Invalid Vish ID' });
-    }
+// exports.reward = async (req, res) => {
+//   try {
+//     const { vish_id } = req.body;
+//     if (!mongoose.Types.ObjectId.isValid(vish_id)) {
+//       return res.status(400).json({ success: false, message: 'Invalid Vish ID' });
+//     }
 
-    const vish = await Vish.findById(vish_id);
-    if (!vish) {
-      return res.status(404).json({ success: false, message: 'Vish not found' });
-    }
-    if (!vish.is_bon) {
-      return res.status(400).json({ success: false, message: 'This Vish is not a Bon' });
-    }
+//     const vish = await Vish.findById(vish_id);
+//     if (!vish) {
+//       return res.status(404).json({ success: false, message: 'Vish not found' });
+//     }
+//     if (!vish.is_bon) {
+//       return res.status(400).json({ success: false, message: 'This Vish is not a Bon' });
+//     }
 
-    // ตรวจสอบเงื่อนไขตาม bon_condition
-    if (vish.bon_condition === false) { // Success: ต้องให้ผู้โพสกดเปลี่ยน is_success
-      if (!vish.is_success) {
-        return res.status(403).json({ success: false, message: 'Only the poster can mark this Vish as successful' });
-      }
-      // ตรวจสอบว่าเป็นผู้โพส
-      if (vish.user_id.toString() !== req.user.user_id.toString()) {
-        return res.status(403).json({ success: false, message: 'Only the poster can trigger reward for success condition' });
-      }
-    } else if (vish.bon_condition === true) { // Like: ตรวจสอบ vish_count กับ bon_vish_target
-      if (vish.vish_count < vish.bon_vish_target) {
-        return res.status(400).json({ success: false, message: `Vish count (${vish.vish_count}) must reach ${vish.bon_vish_target} to distribute rewards` });
-      }
-      // อัปเดต is_success ถ้ายังไม่สำเร็จ
-      if (!vish.is_success) {
-        vish.is_success = true;
-        await vish.save();
-      }
-    }
+//     // ตรวจสอบเงื่อนไขตาม bon_condition
+//     if (vish.bon_condition === false) { // Success: ต้องให้ผู้โพสกดเปลี่ยน is_success
+//       if (!vish.is_success) {
+//         return res.status(403).json({ success: false, message: 'Only the poster can mark this Vish as successful' });
+//       }
+//       // ตรวจสอบว่าเป็นผู้โพส
+//       if (vish.user_id.toString() !== req.user.user_id.toString()) {
+//         return res.status(403).json({ success: false, message: 'Only the poster can trigger reward for success condition' });
+//       }
+//     } else if (vish.bon_condition === true) { // Like: ตรวจสอบ vish_count กับ bon_vish_target
+//       if (vish.vish_count < vish.bon_vish_target) {
+//         return res.status(400).json({ success: false, message: `Vish count (${vish.vish_count}) must reach ${vish.bon_vish_target} to distribute rewards` });
+//       }
+//       // อัปเดต is_success ถ้ายังไม่สำเร็จ
+//       if (!vish.is_success) {
+//         vish.is_success = true;
+//         await vish.save();
+//       }
+//     }
 
-    // ป้องกันการแจกซ้ำ
-    if (vish.is_success && vish.bon_condition === true) {
-      return res.status(400).json({ success: false, message: 'This Vish has already been rewarded' });
-    }
+//     // ป้องกันการแจกซ้ำ
+//     if (vish.is_success && vish.bon_condition === true) {
+//       return res.status(400).json({ success: false, message: 'This Vish has already been rewarded' });
+//     }
 
-    // ดึงรายชื่อผู้ใช้ที่กด Vish
-    const vishTimestamps = await VishTimeStamp.find({ vish_id, status: true });
-    if (vishTimestamps.length === 0) {
-      return res.status(400).json({ success: false, message: 'No users have Vished this post' });
-    }
+//     // ดึงรายชื่อผู้ใช้ที่กด Vish
+//     const vishTimestamps = await VishTimeStamp.find({ vish_id, status: true });
+//     if (vishTimestamps.length === 0) {
+//       return res.status(400).json({ success: false, message: 'No users have Vished this post' });
+//     }
 
-    const vishers = vishTimestamps.map(ts => ts.user_id.toString());
-    const uniqueVishers = [...new Set(vishers)];
+//     const vishers = vishTimestamps.map(ts => ts.user_id.toString());
+//     const uniqueVishers = [...new Set(vishers)];
 
-    // คำนวณจำนวน Credit ต่อคน
-    const creditsPerUser = Math.floor(vish.bon_credit / vish.distribution);
-    const remainingCredits = vish.bon_credit % vish.distribution; // ส่วนที่เหลือ
-    if (creditsPerUser <= 0) {
-      return res.status(400).json({ success: false, message: 'Invalid distribution or bon_credit' });
-    }
+//     // คำนวณจำนวน Credit ต่อคน
+//     const creditsPerUser = Math.floor(vish.bon_credit / vish.distribution);
+//     const remainingCredits = vish.bon_credit % vish.distribution; // ส่วนที่เหลือ
+//     if (creditsPerUser <= 0) {
+//       return res.status(400).json({ success: false, message: 'Invalid distribution or bon_credit' });
+//     }
 
-    // ตรวจสอบจำนวนผู้ใช้ที่เพียงพอ
-    if (uniqueVishers.length < vish.distribution) {
-      return res.status(400).json({ success: false, message: 'Not enough users to distribute rewards' });
-    }
+//     // ตรวจสอบจำนวนผู้ใช้ที่เพียงพอ
+//     if (uniqueVishers.length < vish.distribution) {
+//       return res.status(400).json({ success: false, message: 'Not enough users to distribute rewards' });
+//     }
 
-    // สุ่มเลือกผู้ใช้
-    const shuffledVishers = uniqueVishers.sort(() => 0.5 - Math.random());
-    const selectedVishers = shuffledVishers.slice(0, vish.distribution);
+//     // สุ่มเลือกผู้ใช้
+//     const shuffledVishers = uniqueVishers.sort(() => 0.5 - Math.random());
+//     const selectedVishers = shuffledVishers.slice(0, vish.distribution);
 
-    // แจก Credit
-    const updatedUsers = [];
-    for (let i = 0; i < selectedVishers.length; i++) {
-      const userId = selectedVishers[i];
-      const userToUpdate = await User.findById(userId);
-      if (userToUpdate) {
-        const creditsToAdd = creditsPerUser + (i === selectedVishers.length - 1 ? remainingCredits : 0);
-        userToUpdate.credit += creditsToAdd;
-        await userToUpdate.save();
-        updatedUsers.push({ user_id: userToUpdate._id, credits_added: creditsToAdd });
-        await Transaction.create({ 
-          user_id: userToUpdate._id, 
-          amount: creditsToAdd, 
-          trans_category: 'reward' 
-        });
-      }
-    }
+//     // แจก Credit
+//     const updatedUsers = [];
+//     for (let i = 0; i < selectedVishers.length; i++) {
+//       const userId = selectedVishers[i];
+//       const userToUpdate = await User.findById(userId);
+//       if (userToUpdate) {
+//         const creditsToAdd = creditsPerUser + (i === selectedVishers.length - 1 ? remainingCredits : 0);
+//         userToUpdate.credit += creditsToAdd;
+//         await userToUpdate.save();
+//         updatedUsers.push({ user_id: userToUpdate._id, credits_added: creditsToAdd });
+//         await Transaction.create({ 
+//           user_id: userToUpdate._id, 
+//           amount: creditsToAdd, 
+//           trans_category: 'reward' 
+//         });
+//       }
+//     }
 
-    res.json({ 
-      success: true, 
-      distributed_credits: creditsPerUser,
-      distributed_users: updatedUsers.map(u => ({ user_id: u._id, credits_added: creditsPerUser }))
-    });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-};
+//     res.json({ 
+//       success: true, 
+//       distributed_credits: creditsPerUser,
+//       distributed_users: updatedUsers.map(u => ({ user_id: u._id, credits_added: creditsPerUser }))
+//     });
+//   } catch (err) {
+//     res.status(500).json({ success: false, message: err.message });
+//   }
+// };
 
 // exports.buyItems = async (req, res) => {
 //   try {
