@@ -18,11 +18,13 @@ const rewardUtil = async (vishId, userId) => {
       throw new Error('This Vish is not a Bon');
     }
 
+    // ถ้า is_success เป็น true อยู่แล้วปัดทิ้ง
+    if (vish.is_success) {
+      throw new Error('This Vish has already been rewarded');
+    }
+
     // ตรวจสอบเงื่อนไขตาม bon_condition
     if (vish.bon_condition === false) {
-      if (!vish.is_success) {
-        throw new Error('Only the poster can mark this Vish as successful');
-      }
       if (vish.user_id.toString() !== userId.toString()) {
         throw new Error('Only the poster can trigger reward for success condition');
       }
@@ -30,14 +32,6 @@ const rewardUtil = async (vishId, userId) => {
       if (vish.vish_count < vish.bon_vish_target) {
         throw new Error(`Vish count (${vish.vish_count}) must reach ${vish.bon_vish_target} to distribute rewards`);
       }
-      if (!vish.is_success) {
-        vish.is_success = true;
-        await vish.save();
-      }
-    }
-
-    if (vish.is_success && vish.bon_condition === true) {
-      throw new Error('This Vish has already been rewarded');
     }
 
     const vishTimestamps = await VishTimeStamp.find({ vish_id: vishId, status: true });
@@ -48,17 +42,20 @@ const rewardUtil = async (vishId, userId) => {
     const vishers = vishTimestamps.map(ts => ts.user_id.toString());
     const uniqueVishers = [...new Set(vishers)];
 
-    const creditsPerUser = Math.floor(vish.bon_credit / vish.distribution);
-    const remainingCredits = vish.bon_credit % vish.distribution;
-    if (creditsPerUser <= 0) {
-      throw new Error('Invalid distribution or bon_credit');
-    }
-
     if (uniqueVishers.length < vish.distribution) {
       throw new Error('Not enough users to distribute rewards');
     }
 
-    const shuffledVishers = uniqueVishers.sort(() => 0.5 - Math.random());
+    const creditsPerUser = vish.bon_credit;
+    if (creditsPerUser <= 0) {
+      throw new Error('Invalid bon_credit');
+    }
+
+    const shuffledVishers = [...uniqueVishers];
+    for (let i = shuffledVishers.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledVishers[i], shuffledVishers[j]] = [shuffledVishers[j], shuffledVishers[i]];
+    }
     const selectedVishers = shuffledVishers.slice(0, vish.distribution);
 
     const updatedUsers = [];
@@ -66,17 +63,20 @@ const rewardUtil = async (vishId, userId) => {
       const userId = selectedVishers[i];
       const userToUpdate = await User.findById(userId);
       if (userToUpdate) {
-        const creditsToAdd = creditsPerUser + (i === selectedVishers.length - 1 ? remainingCredits : 0);
-        userToUpdate.credit += creditsToAdd;
+        userToUpdate.credit += creditsPerUser;
         await userToUpdate.save();
         await Transaction.create({
           user_id: userToUpdate._id,
-          amount: creditsToAdd,
+          amount: creditsPerUser,
           trans_category: 'reward'
         });
-        updatedUsers.push({ user_id: userToUpdate._id, credits_added: creditsToAdd });
+        updatedUsers.push({ user_id: userToUpdate._id, credits_added: creditsPerUser });
       }
     }
+
+    // ตั้งค่า is_success เป็น true หลังจากแจก Reward เสร็จในทุกกรณี
+    vish.is_success = true;
+    await vish.save();
 
     return {
       success: true,
