@@ -100,3 +100,32 @@ exports.getYanTemplate = async (req, res, next) => {
     }
 }
 
+// @desc    Delete a YanTemplate
+// @route   DELETE /api/yan/template/:id
+// @access  Admin
+exports.deleteYanTemplate = async (req, res, next) => {
+    try {
+        const yanTemplate = await YanTemplate.findById(req.params.id);
+
+        if (!yanTemplate) {
+            return res.status(404).json({
+                success: false,
+                msg: 'Yan Template not found'
+            })
+        }
+        
+        await yanTemplate.deleteOne()
+
+        res.status(200).json({
+            success: true,
+            msg: 'Yan Template deleted successfully',
+        })
+    }
+    catch (error) {
+        res.status(400).json({
+            success: false,
+            msg: error.message,
+        })
+    }
+}
+
