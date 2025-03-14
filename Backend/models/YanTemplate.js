@@ -30,14 +30,11 @@ YanTemplateSchema.pre("validate", async function (next) {
   try {
     
     yan_image_list_not_null = this.yan_template_image_list.filter(image => image !== null);
-    console.log(yan_image_list_not_null);
 
     yan_image_list_not_null = [...new Set(yan_image_list_not_null.map(id => id.toString()))]; // Convert to string & remove duplicates
     yan_image_list_not_null = yan_image_list_not_null.map(id => new mongoose.Types.ObjectId(id)); // Convert back to ObjectId
 
-    console.log(yan_image_list_not_null);
     const existingImageCount = await YanTemplateImage.countDocuments({ _id: { $in: yan_image_list_not_null} });
-    console.log(existingImageCount);
 
     if (existingImageCount !== yan_image_list_not_null.length) {
       const error = new Error("One or more Image IDs do not exist.");
