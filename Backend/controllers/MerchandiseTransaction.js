@@ -12,7 +12,14 @@ const Transaction = require('../models/Transaction');
 //@access        Private (User and Admin) Token required
 exports.getAllMerchTrans = async (req, res) => {
   try {
-    const transactions = await MerchandiseTransaction.find().populate('merch_id user_id');
+    let transactions;
+    // ถ้าเป็น Admin เห็นทั้งหมด
+    if (req.user.role === 'admin') {
+      transactions = await MerchandiseTransaction.find().populate('merch_id user_id');
+    } else {
+      // ถ้าเป็น User เห็นเฉพาะ Transaction ของตัวเอง
+      transactions = await MerchandiseTransaction.find({ user_id: req.user.user_id }).populate('merch_id user_id');
+    }
     res.json({ success: true, transactions });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
