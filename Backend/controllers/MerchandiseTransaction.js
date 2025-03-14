@@ -12,7 +12,14 @@ const Transaction = require('../models/Transaction');
 //@access        Private (User and Admin) Token required
 exports.getAllMerchTrans = async (req, res) => {
   try {
-    const transactions = await MerchandiseTransaction.find().populate('merch_id user_id');
+    let transactions;
+    // ถ้าเป็น Admin เห็นทั้งหมด
+    if (req.user.role === 'admin') {
+      transactions = await MerchandiseTransaction.find().populate('merch_id user_id');
+    } else {
+      // ถ้าเป็น User เห็นเฉพาะ Transaction ของตัวเอง
+      transactions = await MerchandiseTransaction.find({ user_id: req.user.user_id }).populate('merch_id user_id');
+    }
     res.json({ success: true, transactions });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -47,6 +54,20 @@ exports.addMerchTrans = async (req, res) => {
   
       const user = await User.findById(user_id);
       if (!user || user._id.toString() !== req.user.user_id.toString()) return res.status(403).json({ success: false, message: 'Unauthorized' });
+  
+    // ตรวจสอบว่า selected_merch_prop ตรงกับ merch_props
+    const validProps = item.merch_props.reduce((acc, prop) => {
+      acc[prop.type] = prop.options;
+      return acc;
+    }, {});
+    let isValid = true;
+    for (let propType in selected_merch_prop) {
+      if (!validProps[propType] || !validProps[propType].includes(selected_merch_prop[propType])) {
+        isValid = false;
+        break;
+      }
+    }
+    if (!isValid) return res.status(400).json({ success: false, message: 'Invalid merchandise properties' });
   
       const totalCost = item.price * quantity;
       if (user.credit < totalCost) return res.status(400).json({ success: false, message: 'Insufficient credits' });
