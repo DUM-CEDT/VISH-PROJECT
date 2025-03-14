@@ -1,4 +1,17 @@
 const YanTemplate = require('../models/YanTemplate');
+const YanTemplateImage = require('../models/YanTemplateImage');
+const sharp = require('sharp');
+
+const hexToRgba = (hex, alpha = 1) => {
+    hex = hex.replace(/^#/, ''); // Remove #
+    if (hex.length === 3) {
+        hex = hex.split('').map(x => x + x).join(''); // Convert short hex (e.g., #FFF) to full (e.g., #FFFFFF)
+    }
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    return { r, g, b, alpha };
+};
 
 // @desc    Create a new YanTemplate
 // @route   POST /api/yan/template
@@ -129,3 +142,70 @@ exports.deleteYanTemplate = async (req, res, next) => {
     }
 }
 
+// @desc    Download a YanTemplate
+// @route   GET /api/yan/template/download/:id
+// @access  Public
+exports.downloadYanTemplate = async (req, res, next) => {
+    try {
+        const yanTemplate = await YanTemplate.findById(req.params.id);
+
+        if (!yanTemplate) {
+            return res.status(404).json({
+                success: false,
+                msg: 'Yan Template not found'
+            })
+        }
+
+        const yanImages = await Promise.all(
+            yanTemplate.yan_template_image_list.map(async (imageId) => {
+                const yanImage = await YanTemplateImage.findById(imageId);
+                if (!yanImage) throw new Error('Yan Image not found');
+                return Buffer.from(yanImage.yan_image_base64, 'base64');
+            })
+        );
+
+        if (yanImages.length === 0) {
+            return res.status(404).json({
+                success: false,
+                msg: 'No images found for this template'
+            });
+        }
+
+        const bgColorHex = yanTemplate.background_color || "#FFFFFF";
+        const backgroundColor = hexToRgba(bgColorHex);
+
+        const width = 300; 
+        const height = 400; 
+
+        const background = await sharp({
+            create: {
+                width,
+                height,
+                channels: 4,
+                background: backgroundColor
+            }
+        })
+        .png()
+        .toBuffer();
+
+        const layeredImage = await sharp(background)
+            .composite(
+                yanImages.map(imageBuffer => ({ input: imageBuffer, blend: 'over' }))
+            )
+            .png()
+            .toBuffer();
+
+        res.setHeader('Content-Type', 'image/png');
+        res.setHeader('Content-Disposition', `attachment; filename="yan-template.png"`);
+
+        res.send(layeredImage);
+
+        yanTemplate.export_count += 1;
+        await yanTemplate.save();
+    }catch (error) {
+        res.status(500).json({
+            success: false,
+            msg: error.message,
+        })
+    }
+}
