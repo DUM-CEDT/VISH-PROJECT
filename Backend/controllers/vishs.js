@@ -20,6 +20,16 @@ exports.getVishs = async (req , res, next) => {
 
     removeFields.forEach((param) => delete reqQuery[param])
 
+    if (type == 'popular') {
+
+    }
+    else if (type == 'latest') {
+
+    }
+    else if (type == 'myvish') {
+        
+    }
+
     return res.status(200).json(req.query)
 }
 
