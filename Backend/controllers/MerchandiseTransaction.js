@@ -4,12 +4,11 @@ const Merchandise = require('../models/Merchandise');
 const User = require('../models/User');
 const Transaction = require('../models/Transaction');
 
-
 //@desc         Anything about Merchandise Transaction
 
 //@desc         getAllMerchTrans
 //@route        GET /api/merchandise/transactions
-//@access        Private (User and Admin) Token required
+//@access       Private (User and Admin) Token required
 exports.getAllMerchTrans = async (req, res) => {
   try {
     let transactions;
@@ -43,93 +42,145 @@ exports.getOneMerchTrans = async (req, res) => {
 //@route        POST /api/merchandise/transactions
 //@access       Private (User and Admin) Token ตรวจ credit ก่อน อันนี้ซื้อของ
 exports.addMerchTrans = async (req, res) => {
-    try {
-      const { merch_id, user_id, quantity, selected_merch_prop, tel, address } = req.body;
-      if (!merch_id || !user_id || !quantity || quantity <= 0 || !selected_merch_prop || !tel || !address) {
-        return res.status(400).json({ success: false, message: 'Invalid data' });
-      }
-  
-      const item = await Merchandise.findById(merch_id);
-      if (!item) return res.status(404).json({ success: false, message: 'Item not found' });
-  
-      const user = await User.findById(user_id);
-      if (!user || user._id.toString() !== req.user.user_id.toString()) return res.status(403).json({ success: false, message: 'Unauthorized' });
-  
-    // ตรวจสอบว่า selected_merch_prop ตรงกับ merch_props
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    console.log('req.headers.authorization:', req.headers.authorization);
+    console.log('req.user:', req.user);
+    console.log('req.body:', req.body);
+    if (!req.user || !req.user._id) {
+      throw new Error('Not authorized, user not found');
+    }
+
+    const { merch_id, user_id, quantity, selected_merch_prop, tel, address } = req.body;
+    if (!merch_id || !user_id || !quantity || quantity <= 0 || !selected_merch_prop || !tel || !address) {
+      throw new Error('Invalid data');
+    }
+
+    if (!Array.isArray(selected_merch_prop)) {
+      throw new Error('selected_merch_prop must be an array');
+    }
+    console.log('user_id:', user_id);
+    console.log('merch_id:', merch_id);
+    const item = await Merchandise.findById(merch_id).session(session);
+    if (!item) throw new Error('Item not found');
+
+    const user = await User.findById(user_id).session(session);
+    if (!user || user._id.toString() !== req.user._id.toString()) throw new Error('Unauthorized');
+
     const validProps = item.merch_props.reduce((acc, prop) => {
       acc[prop.type] = prop.options;
       return acc;
     }, {});
-    let isValid = true;
-    for (let propType in selected_merch_prop) {
-      if (!validProps[propType] || !validProps[propType].includes(selected_merch_prop[propType])) {
-        isValid = false;
-        break;
+
+    for (const prop of selected_merch_prop) {
+      if (!prop.type || !prop.selected_option) {
+        throw new Error('Each selected_merch_prop must have a type and selected_option');
+      }
+      if (!validProps[prop.type] || !validProps[prop.type].includes(prop.selected_option)) {
+        throw new Error(`Invalid option ${prop.selected_option} for type ${prop.type}`);
       }
     }
-    if (!isValid) return res.status(400).json({ success: false, message: 'Invalid merchandise properties' });
-  
-      const totalCost = item.price * quantity;
-      if (user.credit < totalCost) return res.status(400).json({ success: false, message: 'Insufficient credits' });
-  
-      user.credit -= totalCost;
-      await user.save();
 
-      await Transaction.create({
+    const merchPropTypes = item.merch_props.map(prop => prop.type);
+    const selectedPropTypes = selected_merch_prop.map(prop => prop.type);
+    const missingProps = merchPropTypes.filter(type => !selectedPropTypes.includes(type));
+    if (missingProps.length > 0) {
+      throw new Error(`Missing selection for properties: ${missingProps.join(', ')}`);
+    }
+
+    const totalCost = item.price * quantity;
+    if (user.credit < totalCost) throw new Error('Insufficient credits');
+
+    user.credit -= totalCost;
+    await user.save({ session });
+
+    await Transaction.create(
+      [{
         user_id: user._id,
         amount: -totalCost,
-        trans_category: 'buytransactions'
-      });
+        trans_category: 'buytransactions',
+        created_at: new Date()
+      }],
+      { session }
+    );
 
-      const transaction = await MerchandiseTransaction.create({ merch_id, user_id, quantity, selected_merch_prop, tel, address });
-      res.json({ success: true, transaction_id: transaction._id, credits: user.credit });
-    } catch (err) {
-      res.status(500).json({ success: false, message: err.message });
-    }
-  };
+    const transaction = await MerchandiseTransaction.create(
+      [{
+        merch_id,
+        user_id,
+        quantity,
+        selected_merch_prop,
+        tel,
+        address,
+        created_at: new Date()
+      }],
+      { session }
+    );
+
+    await session.commitTransaction();
+    res.json({ success: true, transaction_id: transaction[0]._id, credits: user.credit });
+  } catch (err) {
+    await session.abortTransaction();
+    res.status(400).json({ success: false, message: err.message });
+  } finally {
+    session.endSession();
+  }
+};
 
 //@desc         updateMerchTrans
-//@route        PUT /api/merchandise/transactions/:idg
+//@route        PUT /api/merchandise/transactions/:id
 //@access       Private only Admin ไว้เปลี่ยน status การจัดส่งสินค้า
 exports.updateMerchTrans = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
     const { status } = req.body;
-    if (!status) return res.status(400).json({ success: false, message: 'Invalid status' });
+    if (!status) throw new Error('Invalid status');
 
-    const transaction = await MerchandiseTransaction.findById(req.params.id).populate('user_id merch_id');
-    if (!transaction) return res.status(404).json({ success: false, message: 'Transaction not found' });
+    const transaction = await MerchandiseTransaction.findById(req.params.id).populate('user_id merch_id').session(session);
+    if (!transaction) throw new Error('Transaction not found');
 
     if (transaction.status === 'ยกเลิก') {
-      return res.status(400).json({ success: false, message: 'Cannot update a cancelled transaction' });
+      throw new Error('Cannot update a cancelled transaction');
     }
 
     if (status === 'ยกเลิก' && transaction.status !== 'ยกเลิก') {
-      const user = await User.findById(transaction.user_id);
-      const merchandise = await Merchandise.findById(transaction.merch_id);
+      const user = await User.findById(transaction.user_id).session(session);
+      const merchandise = await Merchandise.findById(transaction.merch_id).session(session);
       const totalCost = merchandise.price * transaction.quantity;
       user.credit += totalCost;
-      await user.save();
+      await user.save({ session });
 
-      await Transaction.create({
-        user_id: user._id,
-        amount: totalCost,
-        trans_category: 'refund'
-      });
+      await Transaction.create(
+        [{
+          user_id: user._id,
+          amount: totalCost,
+          trans_category: 'refund',
+          created_at: new Date()
+        }],
+        { session }
+      );
     }
 
     const updatedTransaction = await MerchandiseTransaction.findByIdAndUpdate(
       req.params.id,
       { status },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true, session }
     );
-    if (!updatedTransaction) return res.status(404).json({ success: false, message: 'Transaction not found' });
+    if (!updatedTransaction) throw new Error('Transaction not found');
 
+    await session.commitTransaction();
     res.json({ success: true, transaction: updatedTransaction });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    await session.abortTransaction();
+    res.status(400).json({ success: false, message: err.message });
+  } finally {
+    session.endSession();
   }
 };
-
 
 //@desc         deleteMerchTrans
 //@route        DELETE /api/merchandise/transactions/:id

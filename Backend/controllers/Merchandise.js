@@ -37,8 +37,8 @@ exports.addMerch = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid data' });
     }
 
-    if (!Array.isArray(merch_props) || merch_props.length === 0) {
-      return res.status(400).json({ success: false, message: 'merch_props must be a non-empty array' });
+    if (!Array.isArray(merch_props)) {
+      return res.status(400).json({ success: false, message: 'merch_props must be an array' });
     }
     for (let prop of merch_props) {
       if (!prop.type || !Array.isArray(prop.options) || prop.options.length === 0) {
@@ -64,8 +64,8 @@ exports.updateMerch = async (req, res) => {
     }
 
     if (merch_props) {
-      if (!Array.isArray(merch_props) || merch_props.length === 0) {
-        return res.status(400).json({ success: false, message: 'merch_props must be a non-empty array' });
+      if (!Array.isArray(merch_props)) {
+        return res.status(400).json({ success: false, message: 'merch_props must be an array' });
       }
       for (let prop of merch_props) {
         if (!prop.type || !Array.isArray(prop.options) || prop.options.length === 0) {
