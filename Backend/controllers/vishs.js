@@ -37,17 +37,47 @@ exports.getVishs = async (req , res, next) => {
 //@route        POST /api/vish/createVish/
 //@access       Private
 exports.createVish = async (req , res , next) => {
-    const userId = req.user._id
-    const {text, category_list, is_bon, bon_condition, bon_credit, distribution } = req.body
 
+    const userId = req.user._id
+    const {text, category_list, is_bon, bon_condition, bon_vish_target, bon_credit, distribution } = req.body
     const mongoose_session = await mongoose.startSession()
+    thisUser = req.user
     mongoose_session.startTransaction()
+    
+    if (!thisUser) {
+        mongoose_session.endSession()
+        return res.status(404).json({
+            success : false,
+            msg : `No user with id : ${userId}`
+        })
+    }
 
     try {
+
+        const oneDayAgo = new Date();
+        oneDayAgo.setHours(oneDayAgo.getHours() - 24); 
         
+        const createdVishInOneDay = await Vish.countDocuments({user_id : userId, create_at : {$gte : oneDayAgo}})
+        if ((thisUser.premium && createdVishInOneDay >= 3) || (!thisUser.premium && createdVishInOneDay >= 1)) {
+            mongoose_session.endSession()
+            return res.status(400).json({
+                success : false,
+                msg : "Reach Day Vish Create Limit"
+            })
+        }
+
         if (is_bon) {
-            thisUser = await User.findById(userId)
-            if (thisUser.credit < bon_credit) {
+
+            if (bon_condition == true && distribution > bon_vish_target) {
+                return res.status(400).json({
+                    success : false,
+                    msg : "Distribution can't greater than Vish Target"
+                })
+            }
+
+            total_credit = (bon_credit *distribution)
+
+            if (thisUser.credit < total_credit) {
                 return res.status(400).json({
                     success : false,
                     msg : "User credit is less than the credit of bon condition"
@@ -57,12 +87,13 @@ exports.createVish = async (req , res , next) => {
             thisUser = await updateUser({
                 _id : userId,
                 data : {
-                    credit : thisUser.credit - bon_credit
+                    credit : thisUser.credit - total_credit
                 },
                 session : mongoose_session
             })
             
         }
+
 
         newVish = await Vish.insertOne({
             user_id : userId,
@@ -70,6 +101,7 @@ exports.createVish = async (req , res , next) => {
             category_list,
             is_bon,
             bon_condition,
+            bon_vish_target : (is_bon == true && bon_condition == true) ? bon_vish_target : 0,
             bon_credit : is_bon == false ? 0 : bon_credit,
             distribution : is_bon == false ? 1 : distribution,
         }, {session : mongoose_session})
@@ -79,7 +111,7 @@ exports.createVish = async (req , res , next) => {
         if (is_bon) {
             createdTransaction = await Transaction.insertOne({
                  user_id: userId, 
-                 amount: bon_credit, 
+                 amount: total_credit, 
                  trans_category: 'bon',
                  created_at : vishCreateDate
             }, {session : mongoose_session})
@@ -111,5 +143,99 @@ exports.createVish = async (req , res , next) => {
     res.status(200).json({success : true, vish : newVish})
 }
 
+exports.vishVish = async (req , res , next) => {
+    
+    const vishId = req.body.vish_id
+    const mongoose_session = await mongoose.startSession()
+
+    try {
+
+        const isThisUserAlreadyVish = await VishTimeStamp.exists(
+            {   
+                vish_id : vishId, 
+                user_id : req.user._id,
+                status : true,
+                point : 1
+        });
+
+        mongoose_session.startTransaction()
+
+        let cnt = 0
+        if (isThisUserAlreadyVish) {
+            
+            cnt = -1
+
+            const removeVishTimeStamp = await VishTimeStamp.findOneAndDelete({
+                vish_id : vishId,
+                user_id : req.user._id,
+                status : true,
+                point : 1
+            }, {new : true,session : mongoose_session})
+
+        }
+        else { // Not Already Like
+
+            cnt = 1
+
+            const insertVishTimeStamp = await VishTimeStamp.insertOne({
+                vish_id : vishId,
+                user_id : req.user._id,
+                status : true,
+                point : 1,
+            }, {new : true, session : mongoose_session})
+
+        }
+
+        const updateVish = await Vish.findByIdAndUpdate(vishId, {$inc : {vish_count : cnt}}, {new : true, session : mongoose_session})
+        
+        if (updateVish.is_bon == true && updateVish.bon_condition == true && updateVish.vish_count >= updateVish.bon_vish_target) {
+            // is success = true is in the credit distribution code 
+            console.log("Reach Target")
+            // distribute credit
+
+        }
+
+        await mongoose_session.commitTransaction()
+        mongoose_session.endSession()
+
+        return res.status(200).json({
+            success : true,
+            vish : updateVish
+        })
+
+    }
+    catch(err) {
+
+        await mongoose_session.abortTransaction();
+        mongoose_session.endSession()
+
+        return res.status(400).json({
+            success : false,
+            msg : err.message
+        })
+    }
+
+
+}
+
+exports.setVishSuccess = async (req , res , next) => {
+
+    const userId = req.user._id
+    const vishId = req.body.vish_id
+
+    // Check is this vish already success
+
+    try {
+
+    }
+    catch (err) {
+        return res.status(400).json({
+            success : false,
+            msg : err.message
+        })
+    }
+
+
+}
 
 
