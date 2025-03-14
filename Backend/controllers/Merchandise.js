@@ -32,12 +32,11 @@ exports.getOneMerch = async (req, res) => {
 //@access       Private only ADMIN
 exports.addMerch = async (req, res) => {
   try {
-    const { price, image, merch_props, description } = req.body;
-    if (!price || !image || !merch_props || !description) {
+    const { name, price, image, merch_props, description } = req.body;
+    if (!name || !price || !image || !merch_props || !description) {
       return res.status(400).json({ success: false, message: 'Invalid data' });
     }
 
-    // ตรวจสอบว่า merch_props เป็น Array และมี type/options
     if (!Array.isArray(merch_props) || merch_props.length === 0) {
       return res.status(400).json({ success: false, message: 'merch_props must be a non-empty array' });
     }
@@ -47,7 +46,7 @@ exports.addMerch = async (req, res) => {
       }
     }
 
-    const merchandise = await Merchandise.create({ price, image, merch_props, description });
+    const merchandise = await Merchandise.create({ name, price, image, merch_props, description });
     res.status(201).json({ success: true, item: merchandise });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -59,12 +58,11 @@ exports.addMerch = async (req, res) => {
 //@access       Private only ADMIN
 exports.updateMerch = async (req, res) => {
   try {
-    const { price, image, merch_props, description } = req.body;
-    if (!price && !image && !merch_props && !description) {
+    const { name, price, image, merch_props, description } = req.body;
+    if (!name && !price && !image && !merch_props && !description) {
       return res.status(400).json({ success: false, message: 'At least one field is required for update' });
     }
 
-    // ตรวจสอบ merch_props หากมีการอัปเดต
     if (merch_props) {
       if (!Array.isArray(merch_props) || merch_props.length === 0) {
         return res.status(400).json({ success: false, message: 'merch_props must be a non-empty array' });
@@ -78,7 +76,7 @@ exports.updateMerch = async (req, res) => {
 
     const merchandise = await Merchandise.findByIdAndUpdate(
       req.params.id,
-      { price, image, merch_props, description },
+      { name, price, image, merch_props, description },
       { new: true, runValidators: true }
     );
     if (!merchandise) return res.status(404).json({ success: false, message: 'Item not found' });
