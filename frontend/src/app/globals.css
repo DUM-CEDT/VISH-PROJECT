@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme{
+  --color-primary: #203359;
+  --color-secondary: #3E5C98;
+  --color-subsecondary: #7ab0d7;
+  --color-highlight1: #FEDE98;
+  --color-highlight2: #F8B874;
+  --color-white: #FAFAFA;
+  --font-family-mitr: "Mitr", sans-serif;
+  
+}
+
+body {
+  @apply bg-primary text-white; /* Use Tailwind to set bg-primary and keep text readable */
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    /* Optional: Adjust for dark mode if needed */
+    @apply bg-primary text-white;
+  }
+}
