@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const User = require('./User')
 const Vish = require('./Vish')
 const Category = require('./Category')
+const { getThaiTime } = require('../utils/timeUtils')
 
 const VishTimeStampSchema = new mongoose.Schema({
     vish_id : {
@@ -24,7 +25,7 @@ const VishTimeStampSchema = new mongoose.Schema({
     },
     timestamp : {
         type : Date,
-        default : Date.now()
+        default : () => getThaiTime()
     }
 })
 

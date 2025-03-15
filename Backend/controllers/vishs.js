@@ -12,8 +12,9 @@ const rewardUtil = require('../utils/rewardUtils')
 //@desc         Get All Vish With Pagination
 //@route        GET /api/vish/getallvish/:page
 //@access       Public
-exports.getVishs = async (req , res, next) => {
+exports.getVishes = async (req , res, next) => {
 
+    const pageSize = 24
     let query 
 
     let reqQuery = { ...req.query }
@@ -21,17 +22,107 @@ exports.getVishs = async (req , res, next) => {
 
     removeFields.forEach((param) => delete reqQuery[param])
 
-    if (type == 'popular') {
+    let vishes
 
-    }
-    else if (type == 'latest') {
+    const type = req.query.type
+    let page = req.query.page
 
+    if (!page)
+        page = 0
+    else
+        page = parseInt(page)
+
+    if (!type || type == 'latest') {
+        vishes = await Vish.find().sort({create_at : -1}).limit(pageSize).skip(page * pageSize)
     }
-    else if (type == 'myvish') {
+    else if (type == 'popular') {
+        const sevenDaysAgo = new Date()
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+        
+        vishes = await VishTimeStamp.aggregate(
+            [
+                {
+                  '$match': {
+                    'timestamp': {
+                      '$gte': sevenDaysAgo
+                    }
+                  }
+                }, {
+                  '$group': {
+                    '_id': '$vish_id', 
+                    'count': {
+                      '$sum': 1
+                    }
+                  }
+                }, {
+                  '$sort': {
+                    'count': -1
+                  }
+                }, {
+                  '$lookup': {
+                    'from': 'vishes', 
+                    'localField': '_id', 
+                    'foreignField': '_id', 
+                    'as': 'vish_data'
+                  }
+                }, {
+                  '$unwind': {
+                    'path': '$vish_data', 
+                    'preserveNullAndEmptyArrays': false
+                  }
+                }, {
+                  '$replaceRoot': {
+                    'newRoot': '$vish_data'
+                  }
+                }, {
+                  '$skip': page * pageSize
+                }, {
+                  '$limit': pageSize
+                }
+              ]
+          )
         
     }
+    
+    return res.status(200).json({
+        success : true,
+        count : vishes.length,
+        pagination : {
+            page : page,
+            next : page + 1,
+            prev : page - 1
+        },
+        vishes : vishes
+    })
+}
 
-    return res.status(200).json(req.query)
+//@desc         Get All Vish That This User Created With Pagination
+//@route        GET /api/vish/getmyvish/:page
+//@access       Private
+exports.getMyVishes = async (req , res , next) => {
+
+    const pageSize = 24
+    let page = req.query.page
+
+    if (!page)
+        page = 0
+    else
+        page = parseInt(page)
+    
+    let vishes = await Vish.find({user_id : req.user._id }).sort({create_at : -1}).limit(pageSize).skip(page * pageSize)
+    
+    return res.status(200).json({
+        success : true,
+        count : vishes.length,
+        pagination : {
+            page : page,
+            next : page + 1,
+            prev : page - 1
+        },
+        vishes : vishes
+    })
+
+
 }
 
 //@desc         Create New Vish
@@ -370,16 +461,54 @@ exports.deleteVish = async (req, res, next) => {
         })
     }
 
-    mongoose_session = await mongoose.startSession()
+    const mongoose_session = await mongoose.startSession()
+    mongoose_session.startTransaction()
 
     try {
-        mongoose_session.startTransaction()
+         
+        if (targetVish.is_bon == true) {
+            deleteBonPoint = await VishTimeStamp.findOneAndDelete({
+                vish_id : targetVish._id,
+                status : false,
+                point : 10
+            }, {session : mongoose_session})
+
+            const total_credit = targetVish.distribution * targetVish.bon_credit
+
+            const giveOwnerCreditBack = await User.findByIdAndUpdate(targetVish.user_id, {$inc : {credit : total_credit}}, {session : mongoose_session})
+    
+            const insertDeleteTransaction = await Transaction.insertOne({
+                user_id : targetVish.user_id,
+                amount : total_credit,
+                trans_category : 'delete-bon'
+            }, {session : mongoose_session})
+
+        }
+        
+        const removeAllVishFromThisVish = await VishTimeStamp.deleteMany({
+            vish_id : targetVish._id
+        }, {session : mongoose_session})
+
+        await mongoose_session.commitTransaction()
+        mongoose_session.endSession()
+
+        const deleteVish = await Vish.findByIdAndDelete(vishId, {session : mongoose_session})
+
+        await mongoose_session.commitTransaction()
+        await mongoose_session.endSession()
+
+        return res.status(200).json({
+            success : true,
+            vish : deleteVish
+        })
         
     }
     catch(err) {
-
+        return res.status(400).json({
+            success : false,
+            msg : err.message
+        })
     }
-
 
 
 }

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Merchandise = require('./Merchandise');
 const User = require('./User');
+const { getThaiTime } = require('../utils/timeUtils');
 
 const merchandiseTransactionSchema = new mongoose.Schema({
     merch_id: { 
@@ -48,7 +49,7 @@ const merchandiseTransactionSchema = new mongoose.Schema({
     },
     created_at: { 
       type: Date, 
-      default: Date.now 
+      default: () => getThaiTime()
   }
 });
 
