@@ -14,7 +14,7 @@ const transactionSchema = new mongoose.Schema({
     },
     trans_category: { 
         type: String, 
-        enum: ['deposit', 'withdraw', 'reward', 'buyItems', 'refund', 'bon', 'delete-bon'], 
+        enum: ['deposit', 'withdraw', 'reward-withdraw', 'reward-bon', 'buyItems', 'refund', 'bon', 'delete-bon'], 
         required: true 
     },
     created_at: { 
