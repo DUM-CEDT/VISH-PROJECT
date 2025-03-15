@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Mitr } from "next/font/google";
 
-import "./globals.css";
 import NavBar from "@/components/NavBar";
 
 const mitr = Mitr({
@@ -21,7 +20,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={mitr.className}>
+
       <body>
+        <NavBar></NavBar>
         {children}
       </body>
     </html>
