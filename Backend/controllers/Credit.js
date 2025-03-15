@@ -77,22 +77,86 @@ exports.withdraw = async (req, res) => {
     const globalPoints = globalPointsAgg.length > 0 ? globalPointsAgg[0].totalPoints : 0;
 
     const userPointsAgg = await VishTimeStamp.aggregate([
-      { $group: { _id: '$user_id', userPoints: { $sum: '$point' } } }
+      { $group: { _id: '$user_id', userPoints: { $sum: '$point' } } },
+      {$sort : {_id : 1}}
     ]);
 
-    // ดึงผู้ใช้ทั้งหมด ยกเว้นผู้ใช้ที่ถอน (เพื่อป้องกันการแจกให้ตัวเอง)
-    const users = await User.find({ _id: { $ne: user._id } }).session(session);
-    if (users.length === 0) {
-      const receivedBaht = amount * 0.5;
-      await session.commitTransaction();
-      return res.json({
-        success: true,
-        remaining_credits: user.credit,
-        received_baht: receivedBaht,
-        distributed_baht: 0,
-        distributed_users: []
-      });
+    let cummuArray = userPointsAgg.map(item => item.userPoints)
+    let userIdArray = userPointsAgg.map(item => item._id)
+
+    for (let i = 1 ; i <cummuArray.length ; i++) {
+      cummuArray[i] = cummuArray[i - 1] + cummuArray[i]
     }
+
+    let sum = cummuArray[cummuArray.length - 1]
+
+    total_credit = distributed
+    
+    const rewardMapping = {}
+
+    for (let i = 0 ; i < distributed ; i++) {
+      random01 = Math.random()
+      randomRange = random01 * sum
+      ceilRandomRange = Math.ceil(randomRange)
+      // console.log(ceilRandomRange)
+
+      let left = 0, right = cummuArray.length - 1;
+    
+      while (left < right) {
+          let mid = Math.floor((left + right) / 2);
+          if (cummuArray[mid] < ceilRandomRange) {
+              left = mid + 1;  // Move right if target is greater or equal
+          } else {
+              right = mid;  // Keep searching in the left half
+          }
+      }
+
+      if (!rewardMapping[left])
+        rewardMapping[left] = 1
+      else
+        rewardMapping[left] += 1
+
+    }
+
+    
+    let updateArray = []
+    
+    for (const key of Object.keys(rewardMapping)) {
+
+      updateArray.push({
+        updateOne : {
+          filter : {
+            _id : userIdArray[parseInt(key)]
+          },
+          update : {
+            $inc : {credit : rewardMapping[key]}
+          }
+        }
+      })
+    }
+
+
+    let updateMany = await User.bulkWrite(updateArray)
+
+    
+
+
+    // ดึงผู้ใช้ทั้งหมด ยกเว้นผู้ใช้ที่ถอน (เพื่อป้องกันการแจกให้ตัวเอง)
+    // const users = await User.find({ _id: { $ne: user._id } }).session(session);
+    // if (users.length === 0) {
+    //   const receivedBaht = amount * 0.5;
+    //   await session.commitTransaction();
+    //   return res.json({
+    //     success: true,
+    //     remaining_credits: user.credit,
+    //     received_baht: receivedBaht,
+    //     distributed_baht: 0,
+    //     distributed_users: []
+    //   });
+    // }
+
+    return res.status(200).json({arr : updateMany})
+
 
     const userProbabilities = await Promise.all(users.map(async (u) => {
       const userPointsEntry = userPointsAgg.find(up => up._id.toString() === u._id.toString());
