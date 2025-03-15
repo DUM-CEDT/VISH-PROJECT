@@ -42,7 +42,8 @@ exports.createVish = async (req , res , next) => {
     const userId = req.user._id
     const {text, category_list, is_bon, bon_condition, bon_vish_target, bon_credit, distribution } = req.body
     const mongoose_session = await mongoose.startSession()
-    thisUser = req.user
+    let thisUser = req.user
+    let total_credit
     mongoose_session.startTransaction()
     
     if (!thisUser) {
@@ -106,7 +107,7 @@ exports.createVish = async (req , res , next) => {
             distribution : is_bon == false ? 1 : distribution,
         }, {session : mongoose_session})
 
-        vishCreateDate = newVish.create_at
+        let vishCreateDate = newVish.create_at
 
         if (is_bon) {
             createdTransaction = await Transaction.insertOne({
@@ -116,7 +117,7 @@ exports.createVish = async (req , res , next) => {
                  created_at : vishCreateDate
             }, {session : mongoose_session})
 
-            newTimeStamp = new VishTimeStamp({
+            let newTimeStamp = new VishTimeStamp({
                 vish_id : newVish._id,
                 user_id : userId,
                 status : false,
@@ -143,9 +144,13 @@ exports.createVish = async (req , res , next) => {
     res.status(200).json({success : true, vish : newVish})
 }
 
+//@desc         Vish (Like) Vish
+//@route        POST /api/vish/vishvish/
+//@access       Private
 exports.vishVish = async (req , res , next) => {
     
     const vishId = req.body.vish_id
+    const userId = req.user._id
     const mongoose_session = await mongoose.startSession()
 
     try {
@@ -153,7 +158,7 @@ exports.vishVish = async (req , res , next) => {
         const isThisUserAlreadyVish = await VishTimeStamp.exists(
             {   
                 vish_id : vishId, 
-                user_id : req.user._id,
+                user_id : userId,
                 status : true,
                 point : 1
         });
@@ -167,7 +172,7 @@ exports.vishVish = async (req , res , next) => {
 
             const removeVishTimeStamp = await VishTimeStamp.findOneAndDelete({
                 vish_id : vishId,
-                user_id : req.user._id,
+                user_id : userId,
                 status : true,
                 point : 1
             }, {new : true,session : mongoose_session})
@@ -179,7 +184,7 @@ exports.vishVish = async (req , res , next) => {
 
             const insertVishTimeStamp = await VishTimeStamp.insertOne({
                 vish_id : vishId,
-                user_id : req.user._id,
+                user_id : userId,
                 status : true,
                 point : 1,
             }, {new : true, session : mongoose_session})
@@ -187,17 +192,15 @@ exports.vishVish = async (req , res , next) => {
         }
 
         const updateVish = await Vish.findByIdAndUpdate(vishId, {$inc : {vish_count : cnt}}, {new : true, session : mongoose_session})
-        
-        if (updateVish.is_bon == true && updateVish.bon_condition == true && updateVish.vish_count >= updateVish.bon_vish_target) {
-            // is success = true is in the credit distribution code 
-            console.log("Reach Target")
-            // distribute credit
-            rewardUtil()
-
-        }
-
         await mongoose_session.commitTransaction()
         mongoose_session.endSession()
+        
+        if (updateVish.is_bon == true && updateVish.bon_condition == true && updateVish.vish_count >= updateVish.bon_vish_target) {
+                rewardDistribution = await rewardUtil(vishId, userId, mongoose_session)
+                if (rewardDistriburtion.success == true) {
+                    updateVish.is_success = true
+                }
+        }
 
         return res.status(200).json({
             success : true,
@@ -206,7 +209,6 @@ exports.vishVish = async (req , res , next) => {
 
     }
     catch(err) {
-
         await mongoose_session.abortTransaction();
         mongoose_session.endSession()
 
@@ -219,19 +221,73 @@ exports.vishVish = async (req , res , next) => {
 
 }
 
+//@desc         Set Vish Status To Success (For Bon condition false)
+//@route        POST /api/vish/vishvish/
+//@access       Private
 exports.setVishSuccess = async (req , res , next) => {
-
+    
     const userId = req.user._id
     const vishId = req.body.vish_id
 
-    // Check is this vish already success -> reward
-    // Add Transaction
-    // user is owner of vish
-
+    const mongoose_session = await mongoose.startSession()
+    mongoose_session.startTransaction()
     try {
-        updateVish = await Vish.findByIdAndUpdate(vishId, {is_success : true}, {new : true})
+
+        targetVish = await Vish.findById(vishId).session(mongoose_session)        
+
+        if (targetVish.is_bon == false) {
+            return res.status(400).json({
+                success : false,
+                msg : "This Vish has no bon"
+            })
+        }
+
+        if (targetVish.bon_condition == true) {
+            return res.status(400).json({
+                success : false,
+                msg : "This Vish can't use this success function (Bon Type = true)"
+            })
+        }
+
+        if (targetVish.user_id.toString() != userId.toString()) {
+            return res.status(400).json({
+                success : false,
+                msg : `User with ID : ${userId} is not the owner of Vish with ID : ${vishId}`
+            })
+        }
+        
+        if (targetVish.is_success) {
+            return res.status(400).json({
+                success : false,
+                msg : `This Vish is already set to success status`
+            })
+        }
+
+        targetVish.is_success = true
+        
+        await mongoose_session.commitTransaction()
+        mongoose_session.endSession()
+        
+        const rewardDistriburtion = await rewardUtil(vishId, userId, mongoose_session)
+
+        if (rewardDistriburtion.success == false) {
+            return res.status(400).json({
+                success : false,
+                msg : rewardDistriburtion.msg
+            })
+        }
+
+        return res.status(200).json({
+            success : true,
+            vish : targetVish
+        })
+        
+
     }
     catch (err) {
+
+        await mongoose_session.abortTransaction()
+        mongoose_session.endSession()
         return res.status(400).json({
             success : false,
             msg : err.message
@@ -241,4 +297,89 @@ exports.setVishSuccess = async (req , res , next) => {
 
 }
 
+exports.updateVish = async (req, res, next) => {
 
+    let vishId = req.body.vish_id
+    let userId = req.user._id
+    let text = req.body.text
+    let category_list = req.body.category_list
+
+    let targetVish = Vish.findById(vishId)
+
+    if (!targetVish) {
+        return res.status(404).json({
+            success : false,
+            msg : `Can't find Vish with ID : ${vishId}`
+        })
+    }
+
+    if (targetVish.user_id.toString() != userId.toString()) {
+        return res.status(400).json({
+            success : false,
+            msg : `User with ID : ${userId} is not the owner of Vish with ID : ${vishId}`
+        })
+    }
+
+    if (!text || text.length == 0) {
+        return res.status(400).json({
+            success : false,
+            msg : "Please provide un blank text"
+        })
+    }
+
+    try {
+        targetVish.text = text
+        targetVish.category_list = category_list
+
+        targetVish = await targetVish.save()
+
+        return res.status(200).json({
+            success : true,
+            vish : targetVish
+        })
+    }
+    catch (err) {
+        return res.status(400).json({
+            success : false,
+            msg : err.message
+        })
+    }
+
+}
+
+exports.deleteVish = async (req, res, next) => {
+    // transaction "bon-delete"
+    // refund credit
+    // remove like from vishtimestamp
+    const vishId = req.body.vish_id
+    const userId = req.user._id
+
+    let targetVish = await Vish.findById(vishId)
+
+    if (!targetVish) {
+        return res.status(404).json({
+            success : false,
+            msg : `Can't find Vish with ID : ${vishId}`
+        })
+    }
+
+    if (targetVish.user_id.toString() != userId.toString()) {
+        return res.status(400).json({
+            success : false,
+            msg : `User with ID : ${userId} is not the owner if Vish with ID : ${vishId}`
+        })
+    }
+
+    mongoose_session = await mongoose.startSession()
+
+    try {
+        mongoose_session.startTransaction()
+        
+    }
+    catch(err) {
+
+    }
+
+
+
+}
