@@ -28,6 +28,7 @@ exports.getAllMerchTrans = async (req, res) => {
 //@desc         getOneMerchTrans
 //@route        GET /api/merchandise/transactions/:id
 //@access       Private (User and Admin) Token required
+
 exports.getOneMerchTrans = async (req, res) => {
   try {
     const transaction = await MerchandiseTransaction.findById(req.params.id).populate('merch_id user_id');
@@ -46,9 +47,6 @@ exports.addMerchTrans = async (req, res) => {
   session.startTransaction();
 
   try {
-    console.log('req.headers.authorization:', req.headers.authorization);
-    console.log('req.user:', req.user);
-    console.log('req.body:', req.body);
     if (!req.user || !req.user._id) {
       throw new Error('Not authorized, user not found');
     }
@@ -61,12 +59,11 @@ exports.addMerchTrans = async (req, res) => {
     if (!Array.isArray(selected_merch_prop)) {
       throw new Error('selected_merch_prop must be an array');
     }
-    console.log('user_id:', user_id);
-    console.log('merch_id:', merch_id);
+
     const item = await Merchandise.findById(merch_id).session(session);
     if (!item) throw new Error('Item not found');
 
-    const user = await User.findById(user_id).session(session);
+    const user = await User.findById(user_id);
     if (!user || user._id.toString() !== req.user._id.toString()) throw new Error('Unauthorized');
 
     const validProps = item.merch_props.reduce((acc, prop) => {
@@ -94,13 +91,13 @@ exports.addMerchTrans = async (req, res) => {
     if (user.credit < totalCost) throw new Error('Insufficient credits');
 
     user.credit -= totalCost;
-    await user.save({ session });
-
+    await user.save();
+    
     await Transaction.create(
       [{
         user_id: user._id,
         amount: -totalCost,
-        trans_category: 'buytransactions',
+        trans_category: 'buyItems',
         created_at: new Date()
       }],
       { session }
@@ -122,7 +119,9 @@ exports.addMerchTrans = async (req, res) => {
     await session.commitTransaction();
     res.json({ success: true, transaction_id: transaction[0]._id, credits: user.credit });
   } catch (err) {
+    console.log('error:', err);
     await session.abortTransaction();
+    
     res.status(400).json({ success: false, message: err.message });
   } finally {
     session.endSession();
