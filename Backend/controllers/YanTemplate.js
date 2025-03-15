@@ -174,8 +174,8 @@ exports.downloadYanTemplate = async (req, res, next) => {
         const bgColorHex = yanTemplate.background_color || "#FFFFFF";
         const backgroundColor = hexToRgba(bgColorHex);
 
-        const width = 300; 
-        const height = 400; 
+        const width = 290; 
+        const height = 430; 
 
         const background = await sharp({
             create: {
