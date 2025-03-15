@@ -5,55 +5,72 @@ const VishTimeStamp = require('../models/VishTimeStamp');
 const Vish = require('../models/Vish');
 
 exports.deposit = async (req, res, next) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
     const { amount } = req.body;
     if (!amount || amount <= 0) {
-      return res.status(400).json({ success: false, message: 'Invalid amount' });
+      throw new Error('Invalid amount');
     }
 
-    const user = await User.findById(req.user.user_id);
+    const user = await User.findById(req.user._id).session(session);
     if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+      throw new Error('User not found');
     }
 
     user.credit += amount;
-    await user.save();
+    await user.save({ session });
 
-    await Transaction.create({ user_id: user._id, amount, trans_category: 'deposit' });
+    await Transaction.create(
+      [{ user_id: user._id, amount, trans_category: 'deposit' }],
+      { session }
+    );
+
+    await session.commitTransaction();
     res.json({ success: true, total_credits: user.credit });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    await session.abortTransaction();
+    res.status(400).json({ success: false, message: err.message });
+  } finally {
+    session.endSession();
   }
 };
 
 exports.withdraw = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
     const { amount } = req.body;
     if (!amount || amount < 0) {
-      return res.status(400).json({ success: false, message: 'Invalid amount' });
+      throw new Error('Invalid amount');
     }
     if (amount < 100) {
-      return res.status(400).json({ success: false, message: 'Minimum withdrawal is 100 credits' });
+      throw new Error('Minimum withdrawal is 100 credits');
     }
 
-    const user = await User.findById(req.user.user_id);
+    const user = await User.findById(req.user._id).session(session);
     if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+      throw new Error('User not found');
     }
 
     const totalDeduction = amount;
     const distributed = Math.floor(amount * 0.25);
 
     if (user.credit < totalDeduction) {
-      return res.status(400).json({ success: false, message: 'Insufficient credits' });
+      throw new Error('Insufficient credits');
     }
 
     user.credit -= totalDeduction;
-    await user.save();
+    await user.save({ session });
 
-    await Transaction.create({ user_id: user._id, amount: -totalDeduction, trans_category: 'withdraw' });
+    await Transaction.create(
+      [{ user_id: user._id, amount: -totalDeduction, trans_category: 'withdraw' }],
+      { session }
+    );
 
-    // คำนวณโอกาสแจก Credit ด้วย Aggregation เพื่อเพิ่มประสิทธิภาพ
+    // คำนวณโอกาสแจก Credit ด้วย Aggregation
     const globalPointsAgg = await VishTimeStamp.aggregate([
       { $group: { _id: null, totalPoints: { $sum: '$point' } } }
     ]);
@@ -63,7 +80,20 @@ exports.withdraw = async (req, res) => {
       { $group: { _id: '$user_id', userPoints: { $sum: '$point' } } }
     ]);
 
-    const users = await User.find();
+    // ดึงผู้ใช้ทั้งหมด ยกเว้นผู้ใช้ที่ถอน (เพื่อป้องกันการแจกให้ตัวเอง)
+    const users = await User.find({ _id: { $ne: user._id } }).session(session);
+    if (users.length === 0) {
+      const receivedBaht = amount * 0.5;
+      await session.commitTransaction();
+      return res.json({
+        success: true,
+        remaining_credits: user.credit,
+        received_baht: receivedBaht,
+        distributed_baht: 0,
+        distributed_users: []
+      });
+    }
+
     const userProbabilities = await Promise.all(users.map(async (u) => {
       const userPointsEntry = userPointsAgg.find(up => up._id.toString() === u._id.toString());
       const userPoints = userPointsEntry ? userPointsEntry.userPoints : 0;
@@ -90,9 +120,12 @@ exports.withdraw = async (req, res) => {
       if (selectedUser) {
         const userToUpdate = selectedUser.user;
         userToUpdate.credit += 1;
-        await userToUpdate.save();
+        await userToUpdate.save({ session });
         updatedUsers.push(userToUpdate);
-        await Transaction.create({ user_id: userToUpdate._id, amount: 1, trans_category: 'reward-withdraw' });
+        await Transaction.create(
+          [{ user_id: userToUpdate._id, amount: 1, trans_category: 'reward-withdraw' }],
+          { session }
+        );
         remainingCreditsToDistribute -= 1;
       } else {
         break;
@@ -102,14 +135,18 @@ exports.withdraw = async (req, res) => {
     const receivedBaht = amount * 0.5;
     const distributedBaht = (distributed - remainingCreditsToDistribute) * 0.5;
 
-    res.json({ 
-      success: true, 
+    await session.commitTransaction();
+    res.json({
+      success: true,
       remaining_credits: user.credit,
       received_baht: receivedBaht,
       distributed_baht: distributedBaht,
       distributed_users: updatedUsers.map(u => ({ user_id: u._id, credits_added: 1 }))
     });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    await session.abortTransaction();
+    res.status(400).json({ success: false, message: err.message });
+  } finally {
+    session.endSession();
   }
 };
