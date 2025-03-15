@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const Category = require('./Category');
 const User = require('./User')
+const Transaction = require('./Transaction')
+const { getThaiTime } = require('../utils/timeUtils');
 
 const VishSchema = new mongoose.Schema({
     user_id : {
@@ -24,7 +26,7 @@ const VishSchema = new mongoose.Schema({
     },
     create_at : {
         type : Date,
-        default : Date.now()
+        default : () => getThaiTime()
     },
     is_bon : { // 0 is like 1 is success
         type : Boolean,

@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const User = require('./User');
+const { getThaiTime } = require('../utils/timeUtils');
 
 const transactionSchema = new mongoose.Schema({
     user_id: { 
@@ -18,7 +19,7 @@ const transactionSchema = new mongoose.Schema({
     },
     created_at: { 
         type: Date, 
-        default: Date.now 
+        default: () => getThaiTime()
     }
 });
 
