@@ -18,9 +18,21 @@ const merchandiseTransactionSchema = new mongoose.Schema({
         required: true 
     }, 
     selected_merch_prop: { 
+    type: [
+      {
+        type: {
         type: String, 
         required: true 
     },
+        selected_option: {
+          type: String,
+          required: true
+        }
+      }
+    ],
+    required: true,
+    default: []
+  },
     tel: { 
         type: String, 
         required: true 
@@ -33,7 +45,11 @@ const merchandiseTransactionSchema = new mongoose.Schema({
         type: String, 
         enum: ['รอจัดส่ง', 'กำลังจัดส่ง', 'จัดส่งแล้ว', 'ยกเลิก'], 
         default: 'รอจัดส่ง' 
-    }
+    },
+    created_at: { 
+      type: Date, 
+      default: Date.now 
+  }
 });
 
 merchandiseTransactionSchema.pre("validate", async function (next) {

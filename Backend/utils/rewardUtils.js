@@ -5,12 +5,15 @@ const User = require('../models/User');
 const Transaction = require('../models/Transaction');
 
 const rewardUtil = async (vishId, userId) => {
+  const mongooseSession = await mongoose.startSession();
+  mongooseSession.startTransaction();
+
   try {
     if (!mongoose.Types.ObjectId.isValid(vishId)) {
       throw new Error('Invalid Vish ID');
     }
 
-    const vish = await Vish.findById(vishId);
+    const vish = await Vish.findById(vishId).session(mongooseSession);
     if (!vish) {
       throw new Error('Vish not found');
     }
@@ -18,12 +21,10 @@ const rewardUtil = async (vishId, userId) => {
       throw new Error('This Vish is not a Bon');
     }
 
-    // ถ้า is_success เป็น true อยู่แล้วปัดทิ้ง
     if (vish.is_success) {
       throw new Error('This Vish has already been rewarded');
     }
 
-    // ตรวจสอบเงื่อนไขตาม bon_condition
     if (vish.bon_condition === false) {
       if (vish.user_id.toString() !== userId.toString()) {
         throw new Error('Only the poster can trigger reward for success condition');
@@ -53,38 +54,43 @@ const rewardUtil = async (vishId, userId) => {
 
     const shuffledVishers = [...uniqueVishers];
     for (let i = shuffledVishers.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffledVishers[i], shuffledVishers[j]] = [shuffledVishers[j], shuffledVishers[i]];
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledVishers[i], shuffledVishers[j]] = [shuffledVishers[j], shuffledVishers[i]];
     }
     const selectedVishers = shuffledVishers.slice(0, vish.distribution);
-    
-    const updatedUsers = [];
-    for (let i = 0; i < selectedVishers.length; i++) {
-      const userId = selectedVishers[i];
-      const userToUpdate = await User.findById(userId);
-      if (userToUpdate) {
-        userToUpdate.credit += creditsPerUser;
-        await userToUpdate.save();
-        await Transaction.create({
-          user_id: userToUpdate._id,
-          amount: creditsPerUser,
-          trans_category: 'reward'
-        });
-        updatedUsers.push({ user_id: userToUpdate._id, credits_added: creditsPerUser });
-      }
-    }
 
-    // ตั้งค่า is_success เป็น true หลังจากแจก Reward เสร็จในทุกกรณี
+    const updateOperations = selectedVishers.map(userId => ({
+      updateOne: {
+        filter: { _id: userId },
+        update: { $inc: { credit: creditsPerUser } }
+      }
+    }));
+
+    const transactionData = selectedVishers.map(userId => ({
+      user_id: userId,
+      amount: creditsPerUser,
+      trans_category: 'reward',
+      created_at: new Date()
+    }));
+
+    await User.bulkWrite(updateOperations, { session: mongooseSession });
+    await Transaction.insertMany(transactionData, { session: mongooseSession });
+
     vish.is_success = true;
-    await vish.save();
+    await vish.save({ session: mongooseSession });
+
+    await mongooseSession.commitTransaction();
 
     return {
       success: true,
       distributed_credits: creditsPerUser,
-      distributed_users: updatedUsers.map(u => ({ user_id: u.user_id, credits_added: u.credits_added }))
+      distributed_users: selectedVishers.map(userId => ({ user_id: userId, credits_added: creditsPerUser }))
     };
   } catch (err) {
+    await mongooseSession.abortTransaction();
     throw err;
+  } finally {
+    mongooseSession.endSession();
   }
 };
 
