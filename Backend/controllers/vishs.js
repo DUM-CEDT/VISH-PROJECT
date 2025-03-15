@@ -4,6 +4,7 @@ const VishTimeStamp = require ('../models/VishTimeStamp')
 const User = require('../models/User')
 const { updateUser } = require('../utils/updateUser')
 const Transaction = require('../models/Transaction')
+const rewardUtil = require('../utils/rewardUtils')
 
 
 //@desc         Any thing about Vish
@@ -93,7 +94,6 @@ exports.createVish = async (req , res , next) => {
             })
             
         }
-
 
         newVish = await Vish.insertOne({
             user_id : userId,
@@ -192,6 +192,7 @@ exports.vishVish = async (req , res , next) => {
             // is success = true is in the credit distribution code 
             console.log("Reach Target")
             // distribute credit
+            rewardUtil()
 
         }
 
@@ -223,10 +224,12 @@ exports.setVishSuccess = async (req , res , next) => {
     const userId = req.user._id
     const vishId = req.body.vish_id
 
-    // Check is this vish already success
+    // Check is this vish already success -> reward
+    // Add Transaction
+    // user is owner of vish
 
     try {
-
+        updateVish = await Vish.findByIdAndUpdate(vishId, {is_success : true}, {new : true})
     }
     catch (err) {
         return res.status(400).json({

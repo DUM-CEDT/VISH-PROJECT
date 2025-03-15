@@ -33,7 +33,7 @@ const rewardUtil = async (vishId, userId) => {
         throw new Error(`Vish count (${vish.vish_count}) must reach ${vish.bon_vish_target} to distribute rewards`);
       }
     }
-
+ // Visit this agiain later naja
     const vishTimestamps = await VishTimeStamp.find({ vish_id: vishId, status: true });
     if (vishTimestamps.length === 0) {
       throw new Error('No users have Vished this post');
@@ -57,7 +57,7 @@ const rewardUtil = async (vishId, userId) => {
     [shuffledVishers[i], shuffledVishers[j]] = [shuffledVishers[j], shuffledVishers[i]];
     }
     const selectedVishers = shuffledVishers.slice(0, vish.distribution);
-
+    
     const updatedUsers = [];
     for (let i = 0; i < selectedVishers.length; i++) {
       const userId = selectedVishers[i];
