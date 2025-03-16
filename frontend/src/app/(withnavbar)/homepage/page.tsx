@@ -5,30 +5,35 @@ export default function Home() {
   return (
     <div className="absolute h-[100vh] w-[100vw]">
       <div className={styles.wrapper}>
-        <div className={styles.content}>
-          <Image
-            src="/Yan.gif"
-            alt="YanTra"
-            width={0}
-            height={0}
-            sizes='100vw'
-            className="ml-[24%] object-contain w-[70%] aspect-square"
-          />
-          <div className="pt-12">
-            <Button1 text="สร้างยันต์ของคุณ" size={16}/>
-          </div>
+        <div className="text-[24px] font-light text-center">
+          วันนี้คุณ “รู้สึก” อยากทำอะไร ?
         </div>
-        <div className={styles.content}>
-          <Image
-            src="/Gear.gif"
-            alt="Gear"
-            width={0}
-            height={0}
-            sizes='100vw'
-            className="object-contain w-[70%] aspect-square"
-          />
-          <div className="pt-12">
-            <Button1 text="ขอพรกับพระวิษณุกรรม" size={16}/>
+        <div className="flex flex-row justify-center gap-[32px] pt-8">
+          <div className={styles.content}>
+            <Image
+              src="/Yan.gif"
+              alt="YanTra"
+              width={0}
+              height={0}
+              sizes='100vw'
+              className="ml-[24%] object-contain w-[70%] aspect-square"
+            />
+            <div className="pt-12">
+              <Button1 text="สร้างยันต์ของคุณ" size={16}/>
+            </div>
+          </div>
+          <div className={styles.content}>
+            <Image
+              src="/Gear.gif"
+              alt="Gear"
+              width={0}
+              height={0}
+              sizes='100vw'
+              className="object-contain w-[70%] aspect-square"
+            />
+            <div className="pt-12">
+              <Button1 text="ขอพรกับพระวิษณุกรรม" size={16}/>
+            </div>
           </div>
         </div>
       </div>
@@ -52,9 +57,6 @@ export default function Home() {
               style={{ minWidth: "120vw" }}
         />
       </div>
-      
     </div>
-    
-
   );
 }

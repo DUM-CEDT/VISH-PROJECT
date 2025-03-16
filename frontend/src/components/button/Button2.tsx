@@ -3,17 +3,20 @@ import LessSign from "../svg/LessSign";
 import Share from "../svg/Share";
 import Buy from "../svg/Buy";
 import Download from "../svg/Download";
+import Google from "../svg/Google";
 
 export default function Button2({
     size = 16,
     text = "ตัวหนังสือ",
     icon = "",
-    front = false
+    front = false,
+    onClick,
   }: {
     size?: number;
     text?: string;
     icon?: string;
     front?: boolean;
+    onClick?: () => void;
   }) {
     return (
       <button
@@ -34,7 +37,8 @@ export default function Button2({
             justify-center
             gap-2
         "
-        style={{ fontSize: `${size}px` }}>
+        style={{ fontSize: `${size}px` }}
+        onClick={onClick}>
 
         {front === false ? text : null}
 
@@ -43,6 +47,8 @@ export default function Button2({
         {icon === 'Share' ? <Share width={size} height={size} className="fill-white group-hover:fill-black transition-all duration-300 ease-in-out"/> : null}
         {icon === 'Download' ? <Download width={size} height={size} className="fill-white group-hover:fill-black transition-all duration-300 ease-in-out"/> : null}
         {icon === 'Buy' ? <Buy width={size} height={size} className="fill-white group-hover:fill-black transition-all duration-300 ease-in-out"/> : null}
+        {icon === 'Google' ? <Google width={size} height={size} className="group-hover:fill-black transition-all duration-300 ease-in-out"/> : null}
+        
 
         {front === true ? text : null}
       </button>
