@@ -2,13 +2,34 @@ const Merchandise = require('../models/Merchandise');
 
 //@desc         Anything about Merchandise
 
+
 //@desc         getAllMerch
 //@route        GET /api/merchandise/items
 //@access       Public
 exports.getAllMerch = async (req, res) => {
   try {
-    const items = await Merchandise.find();
-    res.json({ success: true, items });
+    const { page = 1, limit = 27 } = req.query; // 25 รายการต่อหน้า
+    const parsedPage = parseInt(page, 10);
+    const parsedLimit = parseInt(limit, 10);
+    const skip = (parsedPage - 1) * parsedLimit;
+
+    const totalItems = await Merchandise.countDocuments();
+    const items = await Merchandise.find()
+      .skip(skip)
+      .limit(parsedLimit);
+
+    const totalPages = Math.ceil(totalItems / parsedLimit);
+
+    res.json({
+      success: true,
+      items,
+      pagination: {
+        total_items: totalItems,
+        total_pages: totalPages,
+        current_page: parsedPage,
+        limit: parsedLimit
+      }
+    });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

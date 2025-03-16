@@ -11,6 +11,7 @@ const user = require('./routes/user')
 
 const credit = require('./routes/credit');
 const merchandise = require('./routes/merchandise');
+const transaction = require('./routes/transaction');
 
 const app = express()
 
@@ -23,6 +24,7 @@ app.use('/api/yan/template', yanTemplate)
 
 app.use('/api/credit', credit);
 app.use('/api/merchandise', merchandise);
+app.use('/api/transactions', transaction);
 
 app.get('/', (req , res) => {
     res.status(200).json({success : true, msg : 'Hello World'})
