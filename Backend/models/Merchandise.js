@@ -14,6 +14,12 @@ const merchandiseSchema = new mongoose.Schema({
         type: String,
         required: true 
     },
+    type: {
+      type: String,
+      enum: ['ยันต์', 'กำไล', 'แหวน', 'สร้อย', 'เบอร์มงคล', 'อื่นๆ'],
+      required: true,
+      default: 'อื่นๆ'
+    },
     merch_props: {
         type: [
           {

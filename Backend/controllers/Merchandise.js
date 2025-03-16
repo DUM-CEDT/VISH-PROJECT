@@ -1,20 +1,22 @@
 const Merchandise = require('../models/Merchandise');
 
-//@desc         Anything about Merchandise
-
-
 //@desc         getAllMerch
 //@route        GET /api/merchandise/items
 //@access       Public
 exports.getAllMerch = async (req, res) => {
   try {
-    const { page = 1, limit = 27 } = req.query; // 25 รายการต่อหน้า
+    const { page = 1, limit = 27, type } = req.query; 
     const parsedPage = parseInt(page, 10);
     const parsedLimit = parseInt(limit, 10);
     const skip = (parsedPage - 1) * parsedLimit;
 
-    const totalItems = await Merchandise.countDocuments();
-    const items = await Merchandise.find()
+    const query = {};
+    if (type) {
+      query.type = type;
+    }
+
+    const totalItems = await Merchandise.countDocuments(query);
+    const items = await Merchandise.find(query)
       .skip(skip)
       .limit(parsedLimit);
 
@@ -53,8 +55,8 @@ exports.getOneMerch = async (req, res) => {
 //@access       Private only ADMIN
 exports.addMerch = async (req, res) => {
   try {
-    const { name, price, image, merch_props, description } = req.body;
-    if (!name || !price || !image || !merch_props || !description) {
+    const { name, price, image, merch_props, description, type } = req.body;
+    if (!name || !price || !image || !merch_props || !description || !type) {
       return res.status(400).json({ success: false, message: 'Invalid data' });
     }
 
@@ -67,7 +69,12 @@ exports.addMerch = async (req, res) => {
       }
     }
 
-    const merchandise = await Merchandise.create({ name, price, image, merch_props, description });
+    const validTypes = ['ยันต์', 'กำไล', 'แหวน', 'สร้อย', 'เบอร์มงคล', 'อื่นๆ'];
+    if (!validTypes.includes(type)) {
+      return res.status(400).json({ success: false, message: 'Invalid merchandise type' });
+    }
+
+    const merchandise = await Merchandise.create({ name, price, image, merch_props, description, type });
     res.status(201).json({ success: true, item: merchandise });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -79,8 +86,8 @@ exports.addMerch = async (req, res) => {
 //@access       Private only ADMIN
 exports.updateMerch = async (req, res) => {
   try {
-    const { name, price, image, merch_props, description } = req.body;
-    if (!name && !price && !image && !merch_props && !description) {
+    const { name, price, image, merch_props, description, type } = req.body;
+    if (!name && !price && !image && !merch_props && !description && !type) {
       return res.status(400).json({ success: false, message: 'At least one field is required for update' });
     }
 
@@ -95,9 +102,18 @@ exports.updateMerch = async (req, res) => {
       }
     }
 
+    const updateData = { name, price, image, merch_props, description };
+    if (type) {
+      const validTypes = ['ยันต์', 'กำไล', 'แหวน', 'สร้อย', 'เบอร์มงคล', 'อื่นๆ'];
+      if (!validTypes.includes(type)) {
+        return res.status(400).json({ success: false, message: 'Invalid merchandise type' });
+      }
+      updateData.type = type;
+    }
+
     const merchandise = await Merchandise.findByIdAndUpdate(
       req.params.id,
-      { name, price, image, merch_props, description },
+      updateData,
       { new: true, runValidators: true }
     );
     if (!merchandise) return res.status(404).json({ success: false, message: 'Item not found' });
