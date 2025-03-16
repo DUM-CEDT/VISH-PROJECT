@@ -9,7 +9,7 @@ router.route('/getmyvish').get(protect, getMyVishes)
 router.route('/createvish').post(protect, createVish)
 router.route('/vishVish').post(protect, vishVish)
 router.route('/setvishsuccess').put(protect, setVishSuccess)
-router.route('/updatevish', protect, updateVish)
-router.route('/deletevish', protect, deleteVish)
+router.route('/updatevish').put(protect, updateVish)
+router.route('/deletevish').delete(protect, deleteVish)
 
 module.exports = router
