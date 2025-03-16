@@ -124,8 +124,7 @@ exports.addMerchTrans = async (req, res) => {
       [{
         user_id: user._id,
         amount: -totalCost,
-        trans_category: 'buyItems',
-        created_at: new Date()
+        trans_category: 'buyItems'
       }],
       { session }
     );
@@ -137,8 +136,7 @@ exports.addMerchTrans = async (req, res) => {
         quantity,
         selected_merch_prop,
         tel,
-        address,
-        created_at: new Date()
+        address
       }],
       { session }
     );
@@ -184,8 +182,7 @@ exports.updateMerchTrans = async (req, res) => {
         [{
           user_id: user._id,
           amount: totalCost,
-          trans_category: 'refund',
-          created_at: new Date()
+          trans_category: 'refund'
         }],
         { session }
       );
