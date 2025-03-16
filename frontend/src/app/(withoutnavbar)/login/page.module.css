@@ -1,0 +1,93 @@
+.page-wrapper {
+    background-color: #FAFAFA;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+}
+
+.banner-wrapper {
+    background-color: #112141;
+    width: 36%;
+    height: 100%;
+}
+
+.login-wrapper {
+    background-color: #FAFAFA;
+    width: 64%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-content {
+    /* background-color: aqua; */
+    width: 60%;
+    /* height: 70%; */
+    max-width: 400px;
+}
+
+.login-banner-and-information {
+    /* background-color: green; */
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.login-banner-and-information form {
+    width: 100%;
+}
+
+.login-banner-and-information h1 {
+    font-size: 32;
+    color: #112141;
+}
+
+.page-wrapper .login-banner-and-information h2 {
+    
+    margin-bottom: 4px;
+    font-size: 16;
+    color: #445b94;
+    font-weight:400;
+}
+
+.login-banner-and-information a {
+    font-size: 16;
+    color: #445b94;
+    font-weight:400;
+    text-decoration: underline;
+}
+
+.login-banner-and-information input  {
+    background-color: white;
+    width: 100%;
+    border-radius: 8px;
+    border: solid 2px;
+    height: 44px;
+    border-color: #445b94;
+    color: #445b94;
+    padding: 4px 8px;
+    font-weight:400;
+    box-shadow: 3px 2px 5px #c6c5c5;
+}
+
+.input-wrapper {
+    margin-top: 24px;
+    width: 100%;
+}
+
+.page-wrapper h2 {
+    
+    font-size: 16;
+    color: #445b94;
+    font-weight:200;
+}
+
+.line {
+    width: 100%;
+    height: 1px;
+    background-color: #445b94;
+}
