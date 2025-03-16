@@ -54,7 +54,7 @@ export default function Home() {
               height={1000}
               objectFit="cover"
               className={styles['star-image']}
-              style={{ minWidth: "120vw" }}
+              style={{ minWidth: "100vw" , opacity : 0.4}}
         />
       </div>
     </div>

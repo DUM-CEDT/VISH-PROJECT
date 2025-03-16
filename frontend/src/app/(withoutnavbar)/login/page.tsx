@@ -1,15 +1,55 @@
+'use client'
+
 import Image from "next/image";
 import styles from './page.module.css'
-import Button1 from "@/components/button/Button1";
 import Button2 from "@/components/button/Button2";
-
+import Button3 from "@/components/button/Button3";
+import Vish from "@/components/svg/Vish";
 export default function LoginPage() {
   return (
     
       
     <div className={styles['page-wrapper']}>
         <div className={styles['banner-wrapper']}>
-          
+          <div className={styles['image-banner-wrapper']}>
+          <Image
+              src="/login_top.png"
+              alt="cloud"
+              width={0}
+              height={0}
+              sizes='100vw'
+              className="object-contain w-[100%] bottom-0 opacity-100"
+            />
+          </div>
+            <Image
+              src="/Vish.png"
+              alt="cloud"
+              width={0}
+              height={0}
+              sizes='100vw'
+              className="object-contain w-[50%] bottom-0 opacity-100"
+            />
+          <div className={styles['image-banner-wrapper']}>
+            <Image
+                src="/login_bottom.png"
+                alt="cloud"
+                width={0}
+                height={0}
+                sizes='100vw'
+                className="object-contain w-[100%] bottom-0 opacity-100"
+                style={{}}
+              />
+          </div>
+
+          <Image
+              src="/star_2.png"
+              alt="star"
+              layout="intrinsic"
+              width={1000}
+              height={1000}
+              objectFit="cover"
+              className='absolute z-0 opacity-[30%]'
+        />
         </div>
         <div className={styles['login-wrapper']}>
           <div className={styles['login-content']}>
@@ -43,7 +83,7 @@ export default function LoginPage() {
             </div>
 
             <div className="mt-[32px] w-[100%] flex justify-center">
-                <Button1 text="เข้าสู่ระบบด้วยบัญชี Google" size={16}/>
+                <Button3 onClick={() => {}} icon='Google' front={true} text="เข้าสู่ระบบด้วยบัญชี Google" size={16}/>
               </div>
 
           </div>

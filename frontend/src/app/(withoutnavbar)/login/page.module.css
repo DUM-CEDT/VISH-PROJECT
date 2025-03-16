@@ -9,6 +9,12 @@
     background-color: #112141;
     width: 36%;
     height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+
 }
 
 .login-wrapper {
@@ -18,11 +24,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 1;
 }
 
 .login-content {
     /* background-color: aqua; */
-    width: 60%;
+    width: 50%;
     /* height: 70%; */
     max-width: 400px;
 }
@@ -90,4 +97,8 @@
     width: 100%;
     height: 1px;
     background-color: #445b94;
+}
+
+.image-banner-wrapper {
+    width: 100%;
 }
