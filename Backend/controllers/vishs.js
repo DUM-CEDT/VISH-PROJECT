@@ -286,7 +286,7 @@ exports.vishVish = async (req , res , next) => {
         await mongoose_session.commitTransaction()
         mongoose_session.endSession()
         
-        if (updateVish.is_bon == true && updateVish.bon_condition == true && updateVish.vish_count >= updateVish.bon_vish_target) {
+        if (updateVish.is_bon == true && updateVish.bon_condition == true && updateVish.vish_count >= updateVish.bon_vish_target && updateVish.is_success == false) {
                 rewardDistribution = await rewardUtil(vishId, userId, mongoose_session)
                 if (rewardDistriburtion.success == true) {
                     updateVish.is_success = true
