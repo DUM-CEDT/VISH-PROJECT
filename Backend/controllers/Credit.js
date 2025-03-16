@@ -73,11 +73,10 @@ exports.withdraw = async (req, res) => {
       { session }
     );
 
-    const globalPointsAgg = await VishTimeStamp.aggregate([
-      { $group: { _id: null, totalPoints: { $sum: '$point' } } }
-    ]).session(session);
-    const globalPoints = globalPointsAgg.length > 0 ? globalPointsAgg[0].totalPoints : 0;
-
+    // ตรวจสอบจำนวนผู้ใช้ทั้งหมดในระบบ (นอกเหนือจากตัวเอง)
+    const otherUsersCount = await User.countDocuments({ _id: { $ne: req.user._id } }).session(session);
+    
+    // ตรวจสอบว่ามีคนที่เคยกด Like หรือไม่
     let userPointsAgg = await VishTimeStamp.aggregate([
       { $group: { _id: '$user_id', userPoints: { $sum: '$point' } } },
       { $sort: { _id: 1 } }
@@ -87,7 +86,8 @@ exports.withdraw = async (req, res) => {
       item => item._id.toString() !== req.user._id.toString()
     );
 
-    if (userPointsAgg.length === 0) {
+    // เงื่อนไข: ถ้าไม่มีผู้ใช้คนอื่นในระบบเลย หรือไม่มีคนที่เคยกด Like
+    if (otherUsersCount === 0 || userPointsAgg.length === 0) {
       const receivedBaht = amount * 0.5;
       await session.commitTransaction();
       return res.json({
@@ -99,46 +99,49 @@ exports.withdraw = async (req, res) => {
       });
     }
 
+    const globalPointsAgg = await VishTimeStamp.aggregate([
+      { $group: { _id: null, totalPoints: { $sum: '$point' } } }
+    ]).session(session);
+    const globalPoints = globalPointsAgg.length > 0 ? globalPointsAgg[0].totalPoints : 0;
+
     let cummuArray = userPointsAgg.map(item => item.userPoints);
     let userIdArray = userPointsAgg.map(item => item._id);
 
-    for (let i = 1 ; i <cummuArray.length ; i++) {
-      cummuArray[i] = cummuArray[i - 1] + cummuArray[i]
+    for (let i = 1; i < cummuArray.length; i++) {
+      cummuArray[i] = cummuArray[i - 1] + cummuArray[i];
     }
 
-    let sum = cummuArray[cummuArray.length - 1]
+    let sum = cummuArray[cummuArray.length - 1];
+    let total_credit = distributed;
 
-    total_credit = distributed
-    
-    const rewardMapping = {}
+    const rewardMapping = {};
 
-    for (let i = 0 ; i < distributed ; i++) {
-      random01 = Math.random()
-      randomRange = random01 * sum
-      ceilRandomRange = Math.ceil(randomRange)
-      // console.log(ceilRandomRange)
+    for (let i = 0; i < distributed; i++) {
+      random01 = Math.random();
+      randomRange = random01 * sum;
+      ceilRandomRange = Math.ceil(randomRange);
 
       let left = 0, right = cummuArray.length - 1;
-    
+
       while (left < right) {
-          let mid = Math.floor((left + right) / 2);
-          if (cummuArray[mid] < ceilRandomRange) {
-              left = mid + 1;  // Move right if target is greater or equal
-          } else {
-              right = mid;  // Keep searching in the left half
-          }
+        let mid = Math.floor((left + right) / 2);
+        if (cummuArray[mid] < ceilRandomRange) {
+          left = mid + 1;
+        } else {
+          right = mid;
+        }
       }
 
-      if (!rewardMapping[left])
-        rewardMapping[left] = 1
-      else
-        rewardMapping[left] += 1
-
+      if (!rewardMapping[left]) {
+        rewardMapping[left] = 1;
+      } else {
+        rewardMapping[left] += 1;
+      }
     }
 
-    let updateArray = []
+    let updateArray = [];
     let transactionArray = [];
-        
+
     for (const key of Object.keys(rewardMapping)) {
       const userId = userIdArray[parseInt(key)];
       const creditsAdded = rewardMapping[key];
