@@ -33,6 +33,7 @@ export default function Button1({
         items-center
         justify-center
         gap-2
+        
       "
       style={{ fontSize: `${size}px` }}>
 
