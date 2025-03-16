@@ -1,43 +1,60 @@
 import Button1 from "@/components/button/Button1";
 import Image from "next/image";
-
+import styles from './page.module.css'
 export default function Home() {
   return (
-    <div className="h-[92vh] z-0 flex flex-col items-center justify-center">
-
-      <div className="border h-[500px] w-[700px] px-6 py-12">
-        <div className="flex flex-col items-center justify-center">
-          <div className="font-light text-[24px] text-center">
-            วันนี้คุณ “รู้สึก” อยากทำอะไร ?
+    <div className="absolute h-[100vh] w-[100vw]">
+      <div className={styles.wrapper}>
+        <div className={styles.content}>
+          <Image
+            src="/Yan.gif"
+            alt="YanTra"
+            width={0}
+            height={0}
+            sizes='100vw'
+            className="ml-[24%] object-contain w-[70%] aspect-square"
+          />
+          <div className="pt-12">
+            <Button1 text="สร้างยันต์ของคุณ" size={16}/>
           </div>
-          <div className="flex pt-12 justify-around w-full">
-            <div className="flex flex-col items-center flex-1 min-h-0">
-              <Image
-                src="/Yan.png"
-                alt="YanTra"
-                width={200}
-                height={200}
-                className="object-contain h-[200px] w-[200px]"
-              />
-              <div className="mt-auto pt-12">
-                <Button1 text="สร้างยันต์ของคุณ" size={16}/>
-              </div>
-            </div>
-            <div className="flex flex-col items-center flex-1 min-h-0">
-              <Image
-                src="/Gear.png"
-                alt="Gear"
-                width={200}
-                height={200}
-                className="object-contain h-[200px] w-[200px]"
-              />
-              <div className="mt-auto pt-12">
-                <Button1 text="ขอพรกับพระวิษณุกรรม" size={16} />
-              </div>
-            </div>
+        </div>
+        <div className={styles.content}>
+          <Image
+            src="/Gear.gif"
+            alt="Gear"
+            width={0}
+            height={0}
+            sizes='100vw'
+            className="object-contain w-[70%] aspect-square"
+          />
+          <div className="pt-12">
+            <Button1 text="ขอพรกับพระวิษณุกรรม" size={16}/>
           </div>
         </div>
       </div>
+      <Image
+            src="/Cloud.png"
+            alt="cloud"
+            width={0}
+            height={0}
+            sizes='100vw'
+            className="absolute object-contain w-[100vw] bottom-0 opacity-100"
+      />
+      <div className={styles['star-wrapper']}>
+        <Image
+              src="/star.png"
+              alt="Gear"
+              layout="intrinsic"
+              width={2000}
+              height={1000}
+              objectFit="cover"
+              className={styles['star-image']}
+              style={{ minWidth: "120vw" }}
+        />
+      </div>
+      
     </div>
+    
+
   );
 }

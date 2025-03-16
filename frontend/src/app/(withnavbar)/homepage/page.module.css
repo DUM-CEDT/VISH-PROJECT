@@ -1,0 +1,63 @@
+.wrapper {
+    position: absolute;
+
+    height: 100vh;
+    display: flex;
+    width: 100%;
+    padding: 0 20%;
+    gap: 32px;
+    justify-content: center;
+    align-items: center;
+    padding-top: 8vh;
+}
+
+.content {
+    height: 64%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 10;
+    overflow: auto;
+}
+
+
+.star-wrapper {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.star-image {
+    width: calc(max(100vh, 100vw));
+    height: calc(max(100vh, 100vw));
+    animation: rotate 180s normal linear infinite;
+}
+
+
+@keyframes rotate {
+    0% {
+        -webkit-transform: rotate3d(0, 0, 1, 0deg);
+        transform: rotate3d(0, 0, 1, 0deg);
+      }
+      25% {
+        -webkit-transform: rotate3d(0, 0, 1, 90deg);
+        transform: rotate3d(0, 0, 1, 90deg);
+      }
+      50% {
+        -webkit-transform: rotate3d(0, 0, 1, 180deg);
+        transform: rotate3d(0, 0, 1, 180deg);
+      }
+      75% {
+        -webkit-transform: rotate3d(0, 0, 1, 270deg);
+        transform: rotate3d(0, 0, 1, 270deg);
+      }
+      100% {
+        -webkit-transform: rotate3d(0, 0, 1, 360deg);
+        transform: rotate3d(0, 0, 1, 360deg);
+      }
+  }
