@@ -5,7 +5,7 @@ import Buy from "../svg/Buy";
 import Download from "../svg/Download";
 import Google from "../svg/Google";
 
-export default function Button1({
+export default function Button3({
   size = 16,
   text = "ตัวหนังสือ",
   icon = "",
@@ -22,13 +22,12 @@ export default function Button1({
     <button
       className="
         bg-white hover:bg-secondary active:bg-primary
-        text-black hover:text-white active:text-white
+        text-secondary hover:text-white active:text-white
         font-regular 
         py-2 px-8 
         rounded-full
         border-2
-        border-primary hover:border-white active:border-white
-        shadow-[-2px_-2px_10px_rgba(250,250,250,0.5),4px_4px_10px_rgba(62,92,152,0.3)]
+        border-[#86AFD3] hover:border-white active:border-white
         transition-all duration-300 ease-in-out
         group
         flex

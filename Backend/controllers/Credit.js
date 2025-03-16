@@ -62,27 +62,45 @@ exports.withdraw = async (req, res) => {
       throw new Error('Insufficient credits');
     }
 
-    user.credit -= totalDeduction;
-    await user.save({ session });
+    await User.updateOne(
+      { _id: req.user._id },
+      { $inc: { credit: -totalDeduction } },
+      { session }
+    );
 
     await Transaction.create(
       [{ user_id: user._id, amount: -totalDeduction, trans_category: 'withdraw' }],
       { session }
     );
 
-    // คำนวณโอกาสแจก Credit ด้วย Aggregation
     const globalPointsAgg = await VishTimeStamp.aggregate([
       { $group: { _id: null, totalPoints: { $sum: '$point' } } }
-    ]);
+    ]).session(session);
     const globalPoints = globalPointsAgg.length > 0 ? globalPointsAgg[0].totalPoints : 0;
 
-    const userPointsAgg = await VishTimeStamp.aggregate([
+    let userPointsAgg = await VishTimeStamp.aggregate([
       { $group: { _id: '$user_id', userPoints: { $sum: '$point' } } },
-      {$sort : {_id : 1}}
-    ]);
+      { $sort: { _id: 1 } }
+    ]).session(session);
 
-    let cummuArray = userPointsAgg.map(item => item.userPoints)
-    let userIdArray = userPointsAgg.map(item => item._id)
+    userPointsAgg = userPointsAgg.filter(
+      item => item._id.toString() !== req.user._id.toString()
+    );
+
+    if (userPointsAgg.length === 0) {
+      const receivedBaht = amount * 0.5;
+      await session.commitTransaction();
+      return res.json({
+        success: true,
+        remaining_credits: user.credit - totalDeduction,
+        received_baht: receivedBaht,
+        distributed_baht: 0,
+        distributed_users: []
+      });
+    }
+
+    let cummuArray = userPointsAgg.map(item => item.userPoints);
+    let userIdArray = userPointsAgg.map(item => item._id);
 
     for (let i = 1 ; i <cummuArray.length ; i++) {
       cummuArray[i] = cummuArray[i - 1] + cummuArray[i]
@@ -118,94 +136,49 @@ exports.withdraw = async (req, res) => {
 
     }
 
-    
     let updateArray = []
-    
+    let transactionArray = [];
+        
     for (const key of Object.keys(rewardMapping)) {
+      const userId = userIdArray[parseInt(key)];
+      const creditsAdded = rewardMapping[key];
 
       updateArray.push({
-        updateOne : {
-          filter : {
-            _id : userIdArray[parseInt(key)]
-          },
-          update : {
-            $inc : {credit : rewardMapping[key]}
-          }
+        updateOne: {
+          filter: { _id: userId },
+          update: { $inc: { credit: creditsAdded } }
         }
-      })
-    }
-
-
-    let updateMany = await User.bulkWrite(updateArray)
-
-    
-
-
-    // ดึงผู้ใช้ทั้งหมด ยกเว้นผู้ใช้ที่ถอน (เพื่อป้องกันการแจกให้ตัวเอง)
-    // const users = await User.find({ _id: { $ne: user._id } }).session(session);
-    // if (users.length === 0) {
-    //   const receivedBaht = amount * 0.5;
-    //   await session.commitTransaction();
-    //   return res.json({
-    //     success: true,
-    //     remaining_credits: user.credit,
-    //     received_baht: receivedBaht,
-    //     distributed_baht: 0,
-    //     distributed_users: []
-    //   });
-    // }
-
-    return res.status(200).json({arr : updateMany})
-
-
-    const userProbabilities = await Promise.all(users.map(async (u) => {
-      const userPointsEntry = userPointsAgg.find(up => up._id.toString() === u._id.toString());
-      const userPoints = userPointsEntry ? userPointsEntry.userPoints : 0;
-      const probability = globalPoints > 0 ? userPoints / globalPoints : 0;
-      return { user: u, probability };
-    }));
-
-    const totalProbability = userProbabilities.reduce((sum, u) => sum + u.probability, 0);
-    userProbabilities.forEach(u => {
-      u.probability = totalProbability > 0 ? u.probability / totalProbability : 1 / users.length;
-    });
-
-    let remainingCreditsToDistribute = distributed;
-    const updatedUsers = [];
-
-    while (remainingCreditsToDistribute > 0) {
-      const random = Math.random();
-      let cumulativeProb = 0;
-      const selectedUser = userProbabilities.find(({ probability }) => {
-        cumulativeProb += probability;
-        return random <= cumulativeProb;
       });
 
-      if (selectedUser) {
-        const userToUpdate = selectedUser.user;
-        userToUpdate.credit += 1;
-        await userToUpdate.save({ session });
-        updatedUsers.push(userToUpdate);
-        await Transaction.create(
-          [{ user_id: userToUpdate._id, amount: 1, trans_category: 'reward-withdraw' }],
-          { session }
-        );
-        remainingCreditsToDistribute -= 1;
-      } else {
-        break;
-      }
+      transactionArray.push({
+        insertOne: {
+          document: {
+            user_id: userId,
+            amount: creditsAdded,
+            trans_category: 'reward-withdraw'
+          }
+        }
+      });
+    }
+
+    if (updateArray.length > 0) {
+      await User.bulkWrite(updateArray, { session });
+      await Transaction.bulkWrite(transactionArray, { session });
     }
 
     const receivedBaht = amount * 0.5;
-    const distributedBaht = (distributed - remainingCreditsToDistribute) * 0.5;
+    const distributedBaht = distributed * 0.5;
 
     await session.commitTransaction();
-    res.json({
+    res.status(200).json({
       success: true,
-      remaining_credits: user.credit,
+      remaining_credits: user.credit - totalDeduction,
       received_baht: receivedBaht,
       distributed_baht: distributedBaht,
-      distributed_users: updatedUsers.map(u => ({ user_id: u._id, credits_added: 1 }))
+      distributed_users: Object.keys(rewardMapping).map(key => ({
+        user_id: userIdArray[parseInt(key)],
+        credits_added: rewardMapping[key]
+      }))
     });
   } catch (err) {
     await session.abortTransaction();

@@ -11,15 +11,42 @@ const Transaction = require('../models/Transaction');
 //@access       Private (User and Admin) Token required
 exports.getAllMerchTrans = async (req, res) => {
   try {
+    const { page = 1, limit = 20 } = req.query; // 10 รายการต่อหน้า
+    const parsedPage = parseInt(page, 10);
+    const parsedLimit = parseInt(limit, 10);
+    const skip = (parsedPage - 1) * parsedLimit;
+
     let transactions;
+    let totalItems;
+
     // ถ้าเป็น Admin เห็นทั้งหมด
     if (req.user.role === 'admin') {
-      transactions = await MerchandiseTransaction.find().populate('merch_id user_id');
+      totalItems = await MerchandiseTransaction.countDocuments();
+      transactions = await MerchandiseTransaction.find()
+        .populate('merch_id user_id')
+        .skip(skip)
+        .limit(parsedLimit);
     } else {
       // ถ้าเป็น User เห็นเฉพาะ Transaction ของตัวเอง
-      transactions = await MerchandiseTransaction.find({ user_id: req.user.user_id }).populate('merch_id user_id');
+      totalItems = await MerchandiseTransaction.countDocuments({ user_id: req.user._id });
+      transactions = await MerchandiseTransaction.find({ user_id: req.user._id })
+        .populate('merch_id user_id')
+        .skip(skip)
+        .limit(parsedLimit);
     }
-    res.json({ success: true, transactions });
+
+    const totalPages = Math.ceil(totalItems / parsedLimit);
+
+    res.json({
+      success: true,
+      transactions,
+      pagination: {
+        total_items: totalItems,
+        total_pages: totalPages,
+        current_page: parsedPage,
+        limit: parsedLimit
+      }
+    });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

@@ -1,5 +1,7 @@
 const YanTemplate = require('../models/YanTemplate');
 const YanTemplateImage = require('../models/YanTemplateImage');
+const YanExport = require('../models/YanExport');
+const User = require('../models/User');
 const sharp = require('sharp');
 
 const hexToRgba = (hex, alpha = 1) => {
@@ -26,6 +28,15 @@ exports.createYanTemplate = async (req, res, next) => {
             background_color: background,
             export_count: 0
         })
+
+        const existedYanTemplate = await YanTemplate.exists({ yan_template_image_list: image, background_color: background });
+        if (existedYanTemplate) {
+            return res.status(200).json({
+                success: true,
+                msg: 'Yan Template already exists',
+                data: existedYanTemplate
+            })
+        }
 
         const createdYanTemplate = await yanTemplate.save()
 
@@ -200,8 +211,23 @@ exports.downloadYanTemplate = async (req, res, next) => {
 
         res.send(layeredImage);
 
-        yanTemplate.export_count += 1;
-        await yanTemplate.save();
+        const userId = req.user._id;
+        const yanExport = await YanExport.findOne({ yan_template_id: req.params.id });
+        if (yanExport) {
+            if (!yanExport.user_id.includes(userId)) {
+                yanExport.user_id.push(userId);
+                await yanExport.save();
+                yanTemplate.export_count += 1;
+                await yanTemplate.save();
+            }
+        } else {
+            await YanExport.create({
+                yan_template_id: req.params.id,
+                user_id: [userId]
+            });
+            yanTemplate.export_count += 1;
+            await yanTemplate.save();
+        }
     }catch (error) {
         res.status(500).json({
             success: false,
