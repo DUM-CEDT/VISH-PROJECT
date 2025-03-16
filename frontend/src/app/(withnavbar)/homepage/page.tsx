@@ -8,7 +8,7 @@ export default function Home() {
         <div className="text-[24px] font-light text-center">
           วันนี้คุณ “รู้สึก” อยากทำอะไร ?
         </div>
-        <div className="flex flex-row justify-center gap-[32px] pt-8">
+        <div className="flex flex-row justify-center gap-[150px] pt-8">
           <div className={styles.content}>
             <Image
               src="/Yan.gif"
@@ -19,7 +19,7 @@ export default function Home() {
               className="ml-[24%] object-contain w-[70%] aspect-square"
             />
             <div className="pt-12">
-              <Button1 text="สร้างยันต์ของคุณ" size={16}/>
+              <Button1 text="สร้างยันต์ของคุณ" size={16} minWidth={250}/>
             </div>
           </div>
           <div className={styles.content}>
@@ -32,7 +32,7 @@ export default function Home() {
               className="object-contain w-[70%] aspect-square"
             />
             <div className="pt-12">
-              <Button1 text="ขอพรกับพระวิษณุกรรม" size={16}/>
+              <Button1 text="ขอพรกับพระวิษณุกรรม" size={16} minWidth={250}/>
             </div>
           </div>
         </div>
