@@ -11,12 +11,14 @@ export default function Button3({
   icon = "",
   front = false,
   onClick,
+  minWidth
 }: {
   size?: number;
   text?: string;
   icon?: string;
   front?: boolean;
   onClick?: () => void;
+  minWidth?: number;
 }) {
   return (
     <button
@@ -37,7 +39,7 @@ export default function Button3({
         gap-2
         
       "
-      style={{ fontSize: `${size}px` }}
+      style={{ fontSize: `${size}px`, minWidth: minWidth ? `${minWidth}px` : undefined }} 
       onClick={onClick}>
 
       {front === false ? text : null}

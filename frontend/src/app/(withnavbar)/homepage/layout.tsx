@@ -19,12 +19,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={mitr.className}>
-
-      <body>
-        <NavBar></NavBar>
-        {children}
-      </body>
-    </html>
+    <div>
+      <NavBar></NavBar>
+      {children}
+    </div>
   );
 }

@@ -1,5 +1,4 @@
-// src/components/MerchandiseSelector.tsx
-"use client"; // Marks this as a Client Component
+"use client";
 
 import { useState } from "react";
 
@@ -8,10 +7,8 @@ export default function MerchandiseChoice({
 }: {
   onSelect?: (selected: string) => void; // Callback to notify parent of selection
 }) {
-  // State to track the active merchandise type (default to "home")
-  const [activeItem, setActiveItem] = useState("home");
+  const [activeItem, setActiveItem] = useState("all");
 
-  // Handler to update the active item and notify parent
   const handleSelect = (item: string) => {
     setActiveItem(item);
     if (onSelect) onSelect(item); // Call the callback with the selected item
@@ -19,24 +16,24 @@ export default function MerchandiseChoice({
 
   // Merchandise options
   const items = [
-    { id: "home", label: "หน้าแรก" },
+    { id: "all", label: "ทั้งหมด" },
     { id: "yantra", label: "ยันต์" },
-    { id: "pray", label: "ขอพร" },
-    { id: "shop", label: "ร้านค้า" },
-    { id: "howto", label: "วิธีการใช้งาน" },
+    { id: "holythread", label: "สายสิญจน์" },
+    { id: "takrud", label: "ตะกรุด" },
+    { id: "other", label: "อื่นๆ" },
   ];
 
   return (
-    <div className="flex items-center justify-center bg-gray-700 rounded-full p-2">
+    <div className="flex items-center justify-center bg-white rounded-full p-2">
       {items.map((item) => (
         <button
           key={item.id}
           onClick={() => handleSelect(item.id)}
-          className={`px-6 py-2 rounded-full text-xl font-regular transition-all duration-300 ${
+          className={`px-8 py-2 rounded-full text-[20px] font-regular transition-all duration-300 ${
             activeItem === item.id
-              ? "bg-secondary text-white shadow-md"
-              : "bg-transparent text-white hover:bg-gray-600"
-          }`}
+              ? "bg-secondary text-white"
+              : "bg-transparent text-black"
+          } hover:cursor-pointer`}
         >
           {item.label}
         </button>
