@@ -21,7 +21,7 @@ export default function Button2({
           bg-primary hover:bg-[#90ACE5] active:bg-white
           text-white hover:text-black active:text-black
           font-regular 
-          py-2 px-8 
+          py-2 px-[44px] 
           rounded-full
           border-2
           border-white hover:border-primary active:border-primary
