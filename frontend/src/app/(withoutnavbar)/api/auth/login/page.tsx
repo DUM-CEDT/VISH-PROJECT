@@ -16,7 +16,6 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(""); // Reset error ก่อน login
   
     try {
       const result = await signIn("credentials", {
@@ -25,22 +24,17 @@ export default function LoginPage() {
         redirect: false,
       });
   
-      console.log("Result from signIn:", result); // Debug ดูค่า result
-  
-      if (!result) {
-        setError("เกิดข้อผิดพลาดในการเข้าสู่ระบบ (result เป็น undefined)");
-        return;
-      }
-  
-      if (result.error) {
+      // console.log("signIn result:", result);
+
+      if (result?.error) {
         setError("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
       } else {
-        console.log("เข้าสู่ระบบสำเร็จ:", result);
-        router.push("/"); // ใช้ router แทน window.location
+        // alert("Login success");
+        router.push("/");
       }
     } catch (error) {
-      console.error("Error during login:", error);
-      setError("เกิดข้อผิดพลาด กรุณาลองใหม่");
+      // alert("Please check your Email and Password");
+      console.error("Error during login", error);
     }
   };
   

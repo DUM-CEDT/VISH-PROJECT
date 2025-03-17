@@ -3,9 +3,21 @@ import Link from "next/link";
 import Vish from "./svg/Vish";
 import ArrowForward from "./svg/ArrowForward";
 import { authOptions } from "@/app/(withoutnavbar)/api/auth/[...nextauth]/route";
+import getUserProfile from "@/app/libs/getUserProfile";
 
 export default async function NavBar() {
     const session = await getServerSession(authOptions);
+
+    let userProfile = null;
+    if (session?.user?.token) {
+        try {
+        userProfile = await getUserProfile(session.user.token);
+        } catch (error) {
+        console.error("Failed to fetch user profile:", error);
+        }
+    }
+    // console.log("NavBar session:", session);
+    // console.log("User profile:", userProfile);
 
     return (
         <nav className="h-[8vh] absolute top-0 left-0 z-10 w-full flex justify-between items-center px-16 bg-primary text-white">
@@ -33,7 +45,7 @@ export default async function NavBar() {
                         <li>
                             <Link href="/profile" className="hover:text-highlight1">โปรไฟล์</Link>
                         </li>
-                        <li className="text-sm text-gray-300">ID: {session.user?._id || "N/A"}</li>
+                        {/* <li className="text-sm text-gray-300">ID: {userProfile?.data?._id ?? "N/A"}</li> */}
                     </>
                 ) : (
                     <li className="group flex items-center space-x-2">
