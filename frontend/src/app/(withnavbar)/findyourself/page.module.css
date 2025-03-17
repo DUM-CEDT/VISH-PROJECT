@@ -2,17 +2,15 @@
     position: absolute;
     padding-top: 8vh;
     width: 100%;
+    overflow: hidden;
 }
 
 .back-wrapper {
     width: 100%;
     margin-top: 4vh;
     height: 2vh;
-<<<<<<< HEAD
-=======
     z-index: 1;
     position: relative;
->>>>>>> ns
 }
 
 .wrapper p {
@@ -22,14 +20,6 @@
 
 .content-wrapper {
     height: 86vh;
-<<<<<<< HEAD
-    background-color: red;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    /* justify-content: center; */
-    align-items: center;
-=======
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -65,7 +55,7 @@
 
 .choice-wrapper {
     width: calc(min(60%, 680px));   
-    margin-top: calc(min(20%, 24px));
+    margin-top: calc(min(16%, 16px));
 }
 
 .op-wrapper {
@@ -81,5 +71,4 @@
 .op-button-wrapper {
     height: calc(min(80px, 8vh));
     width: calc(min(30%, 240px));
->>>>>>> ns
 }

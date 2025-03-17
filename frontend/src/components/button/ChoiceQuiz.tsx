@@ -1,11 +1,13 @@
 export default function ChoiceQuiz({ 
     size = 16,
     text = "ตัวหนังสือ",
-    mt = 0
+    mt = 0,
+    onClick
 }: {
     size?: number;
     text?: string;
-    mt? : number
+    mt? : number;
+    onClick? : Function
 }){
     return(
         <button className="
@@ -24,6 +26,7 @@ export default function ChoiceQuiz({
             justify-center
             "
             style={{ fontSize: `${size}px` , marginTop: `${mt}px`}}
+            onClick={onClick}
         >
             {text}
         </button>
