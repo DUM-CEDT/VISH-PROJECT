@@ -47,14 +47,14 @@ export default function Home() {
       />
       <div className={styles['star-wrapper']}>
         <Image
-              src="/star.png"
+              src="/star_3.png"
               alt="Gear"
               layout="intrinsic"
               width={2000}
               height={1000}
               objectFit="cover"
               className={styles['star-image']}
-              style={{ minWidth: "100vw" , opacity : 0.4}}
+              style={{top: "-10vw", position: "absolute",  minWidth: "140vw" , opacity : 0.1}}
         />
       </div>
     </div>
