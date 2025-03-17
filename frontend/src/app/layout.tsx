@@ -3,6 +3,9 @@ import { Mitr } from "next/font/google";
 
 import "./globals.css";
 import NavBar from "@/components/NavBar";
+import NextAuthProvider from "./provider/NextAuthProvider";
+import { getServerSession } from "next-auth";
+import { authOptions } from "./(withoutnavbar)/api/auth/[...nextauth]/route";
 
 const mitr = Mitr({
   subsets: ['latin', 'thai'],
@@ -19,10 +22,12 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = getServerSession(authOptions);
+
   return (
-    <html lang="en" className={mitr.className}>
-      <body>
-        {children}
+    <html lang="en">
+      <body className={mitr.className}>
+        <NextAuthProvider session={session}>{children}</NextAuthProvider>
       </body>
     </html>
   );

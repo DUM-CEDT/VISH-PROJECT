@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation'
 
 export default async function Home() {
-  redirect('/homepage') // Navigate to the new post page
+  // redirect('/homepage') // Navigate to the new post page
   return (
     <></>
   );
