@@ -19,7 +19,7 @@ export default function Home() {
               className="ml-[24%] object-contain w-[70%] aspect-square"
             />
             <div className="pt-12">
-              <Button1 text="สร้างยันต์ของคุณ" size={16} minWidth={250}/>
+              <Button1 text="สร้างยันต์ของคุณ" size={16} minWidth="250px"/>
             </div>
           </div>
           <div className={styles.content}>
@@ -32,7 +32,7 @@ export default function Home() {
               className="object-contain w-[70%] aspect-square"
             />
             <div className="pt-12">
-              <Button1 text="ขอพรกับพระวิษณุกรรม" size={16} minWidth={250}/>
+              <Button1 text="ขอพรกับพระวิษณุกรรม" size={16} minWidth="250px"/>
             </div>
           </div>
         </div>

@@ -5,13 +5,13 @@ const Merchandise = require('../models/Merchandise');
 //@access       Public
 exports.getAllMerch = async (req, res) => {
   try {
-    const { page = 1, limit = 27, type } = req.query; 
+    const { page = 1, limit = 9, type } = req.query; 
     const parsedPage = parseInt(page, 10);
     const parsedLimit = parseInt(limit, 10);
     const skip = (parsedPage - 1) * parsedLimit;
 
     const query = {};
-    if (type) {
+    if (type && ['ยันต์', 'กำไล', 'แหวน', 'สร้อย', 'เบอร์มงคล', 'อื่นๆ'].includes(type)) {
       query.type = type;
     }
 
@@ -21,6 +21,7 @@ exports.getAllMerch = async (req, res) => {
       .limit(parsedLimit);
 
     const totalPages = Math.ceil(totalItems / parsedLimit);
+    const lastPage = totalPages > 0 ? totalPages : 1; 
 
     res.json({
       success: true,
@@ -28,6 +29,7 @@ exports.getAllMerch = async (req, res) => {
       pagination: {
         total_items: totalItems,
         total_pages: totalPages,
+        last_page: lastPage,
         current_page: parsedPage,
         limit: parsedLimit
       }

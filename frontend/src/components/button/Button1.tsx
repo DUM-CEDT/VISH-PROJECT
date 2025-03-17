@@ -18,7 +18,7 @@ export default function Button1({
   icon?: string;
   front?: boolean;
   onClick?: () => void;
-  minWidth?: number;
+  minWidth?: string;
 }) {
   return (
     <button
@@ -39,7 +39,7 @@ export default function Button1({
         justify-center
         gap-2
       "
-      style={{ fontSize: `${size}px`, minWidth: minWidth ? `${minWidth}px` : undefined }} 
+      style={{ fontSize: `${size}px`, minWidth: minWidth ? `${minWidth}` : undefined }} 
       onClick={onClick}>
 
       {front === false ? text : null}
