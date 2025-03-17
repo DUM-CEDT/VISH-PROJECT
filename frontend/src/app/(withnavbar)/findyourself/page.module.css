@@ -1,0 +1,26 @@
+.wrapper {
+    position: absolute;
+    padding-top: 8vh;
+    width: 100%;
+}
+
+.back-wrapper {
+    width: 100%;
+    margin-top: 4vh;
+    height: 2vh;
+}
+
+.wrapper p {
+    font-size: 24px;
+    font-weight: 300;
+}
+
+.content-wrapper {
+    height: 86vh;
+    background-color: red;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+    align-items: center;
+}

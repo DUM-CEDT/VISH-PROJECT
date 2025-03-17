@@ -3,7 +3,7 @@ import Image from "next/image";
 import styles from './page.module.css'
 export default function Home() {
   return (
-    <div className="absolute h-[100vh] w-[100vw]">
+    <div className="absolute h-[100vh] w-[100vw] overflow-hidden">
       <div className={styles.wrapper}>
         <div className="text-[24px] font-light text-center">
           วันนี้คุณ “รู้สึก” อยากทำอะไร ?
