@@ -43,10 +43,19 @@ const rewardUtil = async (vishId, userId) => {
     
     const vishers = vishTimestamps.map(ts => ts.user_id.toString());
     var uniqueVishers = [...new Set(vishers)];
+    console.log("Owner of vhis vish" + vish.user_id.toString())
+    console.log(uniqueVishers)
     uniqueVishers = uniqueVishers.filter((visher) => visher != vish.user_id.toString())
+    console.log(uniqueVishers)
+
+    if (uniqueVishers.length < vish.bon_vish_target) {
+      throw new Error('Total vish count must be greater than or equal to bon_vish_target');
+    }
+
     if (uniqueVishers.length < vish.distribution) {
       throw new Error('Not enough users to distribute rewards');
     }
+
     
     const creditsPerUser = vish.bon_credit;
     if (creditsPerUser <= 0) {

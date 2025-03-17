@@ -283,7 +283,7 @@ exports.vishVish = async (req , res , next) => {
 
         }
 
-        const updateVish = await Vish.findByIdAndUpdate(vishId, {$inc : {vish_count : cnt}}, {new : true, session : mongoose_session})
+        var updateVish = await Vish.findByIdAndUpdate(vishId, {$inc : {vish_count : cnt}}, {new : true, session : mongoose_session})
         await mongoose_session.commitTransaction()
         mongoose_session.endSession()
 
@@ -292,8 +292,8 @@ exports.vishVish = async (req , res , next) => {
 
         if (updateVish.is_bon == true && updateVish.bon_condition == true && updateVish.vish_count >= updateVish.bon_vish_target && updateVish.is_success == false) {
                 console.log("In If")
-                rewardDistribution = await rewardUtil(vishId, userId)
-                if (rewardDistriburtion.success == true) {
+                const rewardDistribution = await rewardUtil(vishId, userId)
+                if (rewardDistribution.success == true) {
                     console.log("Before Update")
                     updateVish.is_success = true
                 }
@@ -306,7 +306,7 @@ exports.vishVish = async (req , res , next) => {
 
     }
     catch(err) {
-        if (startReward) {
+        if (!startReward) {
             await mongoose_session.abortTransaction();
             mongoose_session.endSession()
         }
