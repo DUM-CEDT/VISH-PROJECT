@@ -1,13 +1,15 @@
 export default function ChoiceQuiz({ 
     size = 16,
     text = "ตัวหนังสือ",
+    mt = 0
 }: {
     size?: number;
     text?: string;
+    mt? : number
 }){
     return(
         <button className="
-            w-full
+            w-[100%]
             bg-white hover:bg-subsecondary active:bg-highlight1
             text-black
             font-regular 
@@ -21,7 +23,7 @@ export default function ChoiceQuiz({
             items-center
             justify-center
             "
-            style={{ fontSize: `${size}px` }}
+            style={{ fontSize: `${size}px` , marginTop: `${mt}px`}}
         >
             {text}
         </button>
