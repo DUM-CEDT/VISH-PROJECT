@@ -1,10 +1,10 @@
 export default function LessSign({
-    width = 16,
-    height = 16,
+    width = "16px",
+    height = "16px",
     className,
   }: {
-    width?: number;
-    height?: number;
+    width?: string;
+    height?: string;
     className?: string;
   }) {
     return (
