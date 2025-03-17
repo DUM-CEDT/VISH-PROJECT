@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { getThaiTime } = require('../utils/timeUtils');
+const YanTemplate = require('./YanTemplate');
 
 const UserSchema = new mongoose.Schema({
     name: { 
@@ -40,19 +41,22 @@ const UserSchema = new mongoose.Schema({
     },
     premium: { 
         type: Boolean, 
-        default: false },
+        default: false 
+    },
     vish_count: { 
         type: Number, 
         default: 0 
     },
     yan_template_id: [
         { 
-            type: Number 
+            type : mongoose.Schema.ObjectId,
+            ref : "YanTemplate",
         }
     ],
     vish_list: [
-        {  
-            type: Number 
+        { 
+            type : mongoose.Schema.ObjectId,
+            ref : "Vish",
         }
     ],
     vished_count: { 

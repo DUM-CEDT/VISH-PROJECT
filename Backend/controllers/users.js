@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const YanTemplate = require('../models/YanTemplate');
 
 //@desc     Register user
 //@route    POST /api/users/register
@@ -100,6 +101,58 @@ exports.getMe = async (req, res, next) => {
         success: true, 
         data: user 
     });
+};
+
+//@desc     Add yan template to user's yan_template_id array
+//@route    POST /api/user/add-yan-template/:yanTemplateId
+//@access   Private
+exports.addYanTemplate = async (req, res, next) => {
+    try {
+        const yanTemplateId = req.params.yanTemplateId;
+        const userId = req.user.id;
+
+        const yanTemplate = await YanTemplate.findById(yanTemplateId);
+        if (!yanTemplate) {
+            return res.status(404).json({
+                success: false,
+                msg: `Yan template with id ${yanTemplateId} not found`
+            });
+        }
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                msg: `User with id ${userId} not found`
+            });
+        }
+
+        if (user.yan_template_id.includes(yanTemplateId)) {
+            return res.status(400).json({
+                success: false,
+                msg: `Yan template with id ${yanTemplateId} already exists in user's template list`
+            });
+        }
+
+        user.yan_template_id.push(yanTemplateId);
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            data: {
+                yan_template_id: user.yan_template_id
+            },
+            msg: 'Yan template added successfully'
+        });
+
+    } catch (err) {
+        res.status(400).json({
+            success: false,
+            msg: 'Failed to add yan template',
+            error: err.message
+        });
+    }
 };
 
 //Get token from model, create cookie and send response
