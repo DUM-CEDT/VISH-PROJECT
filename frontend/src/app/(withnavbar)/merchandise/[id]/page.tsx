@@ -106,9 +106,9 @@ export default function MerchandiseDetail() {
             width={0}
             height={0}
             sizes="100vw"
-            className="object-contain w-[40%] opacity-100"
+            className="object-contain w-[37.5%] opacity-100"
           />
-          <div className="flex flex-col justify-between w-[60%]">
+          <div className="flex flex-col justify-between w-[62.5%]">
             <div>
               <div className="font-regular text-[28px] text-white">
                 {item.name}
