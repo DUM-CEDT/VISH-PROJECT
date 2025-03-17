@@ -198,19 +198,14 @@ exports.downloadYanTemplate = async (req, res, next) => {
         })
         .png()
         .toBuffer();
-
+        
         const layeredImage = await sharp(background)
-            .composite(
-                yanImages.map(imageBuffer => ({ input: imageBuffer, blend: 'over' }))
-            )
-            .png()
-            .toBuffer();
-
-        res.setHeader('Content-Type', 'image/png');
-        res.setHeader('Content-Disposition', `attachment; filename="yan-template.png"`);
-
-        res.send(layeredImage);
-
+        .composite(
+          yanImages.map(imageBuffer => ({ input: imageBuffer, blend: 'over' }))
+        )
+        .png()
+        .toBuffer();
+        
         const userId = req.user._id;
         const yanExport = await YanExport.findOne({ yan_template_id: req.params.id });
         if (yanExport) {
@@ -228,6 +223,12 @@ exports.downloadYanTemplate = async (req, res, next) => {
             yanTemplate.export_count += 1;
             await yanTemplate.save();
         }
+
+        res.setHeader('Content-Type', 'image/png');
+        res.setHeader('Content-Disposition', `attachment; filename="yan-template.png"`);
+        
+        res.send(layeredImage);
+
     }catch (error) {
         res.status(500).json({
             success: false,
