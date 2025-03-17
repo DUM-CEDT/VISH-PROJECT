@@ -70,7 +70,7 @@ const rewardUtil = async (vishId, userId) => {
     const transactionData = selectedVishers.map(userId => ({
       user_id: userId,
       amount: creditsPerUser,
-      trans_category: 'reward',
+      trans_category: 'reward-bon',
       created_at: new Date()
     }));
     
@@ -88,6 +88,7 @@ const rewardUtil = async (vishId, userId) => {
       distributed_users: selectedVishers.map(userId => ({ user_id: userId, credits_added: creditsPerUser }))
     };
   } catch (err) {
+    console.log(err)
     await mongooseSession.abortTransaction();
     return {
       success : false,

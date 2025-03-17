@@ -243,6 +243,7 @@ exports.vishVish = async (req , res , next) => {
     const vishId = req.body.vish_id
     const userId = req.user._id
     const mongoose_session = await mongoose.startSession()
+    let startReward = false
 
     try {
 
@@ -285,24 +286,31 @@ exports.vishVish = async (req , res , next) => {
         const updateVish = await Vish.findByIdAndUpdate(vishId, {$inc : {vish_count : cnt}}, {new : true, session : mongoose_session})
         await mongoose_session.commitTransaction()
         mongoose_session.endSession()
-        
+
+        startReward = true
+        console.log(99999)
+
         if (updateVish.is_bon == true && updateVish.bon_condition == true && updateVish.vish_count >= updateVish.bon_vish_target && updateVish.is_success == false) {
-                rewardDistribution = await rewardUtil(vishId, userId, mongoose_session)
+                console.log("In If")
+                rewardDistribution = await rewardUtil(vishId, userId)
                 if (rewardDistriburtion.success == true) {
+                    console.log("Before Update")
                     updateVish.is_success = true
                 }
         }
-
+        console.log(12345)
         return res.status(200).json({
             success : true,
             vish : updateVish
-        })
+        })  
 
     }
     catch(err) {
-        await mongoose_session.abortTransaction();
-        mongoose_session.endSession()
-
+        if (startReward) {
+            await mongoose_session.abortTransaction();
+            mongoose_session.endSession()
+        }
+        console.log(err)
         return res.status(400).json({
             success : false,
             msg : err.message
@@ -444,9 +452,9 @@ exports.deleteVish = async (req, res, next) => {
     // remove like from vishtimestamp
     const vishId = req.body.vish_id
     const userId = req.user._id
-
+    
     let targetVish = await Vish.findById(vishId)
-
+    
     if (!targetVish) {
         return res.status(404).json({
             success : false,
@@ -460,40 +468,37 @@ exports.deleteVish = async (req, res, next) => {
             msg : `User with ID : ${userId} is not the owner if Vish with ID : ${vishId}`
         })
     }
-
+    
     const mongoose_session = await mongoose.startSession()
     mongoose_session.startTransaction()
-
+    
     try {
-         
+        
         if (targetVish.is_bon == true) {
             deleteBonPoint = await VishTimeStamp.findOneAndDelete({
                 vish_id : targetVish._id,
                 status : false,
                 point : 10
             }, {session : mongoose_session})
-
+            
             const total_credit = targetVish.distribution * targetVish.bon_credit
-
+            
             const giveOwnerCreditBack = await User.findByIdAndUpdate(targetVish.user_id, {$inc : {credit : total_credit}}, {session : mongoose_session})
-    
+            
             const insertDeleteTransaction = await Transaction.insertOne({
                 user_id : targetVish.user_id,
                 amount : total_credit,
                 trans_category : 'delete-bon'
             }, {session : mongoose_session})
-
+            
         }
         
         const removeAllVishFromThisVish = await VishTimeStamp.deleteMany({
             vish_id : targetVish._id
         }, {session : mongoose_session})
-
-        await mongoose_session.commitTransaction()
-        mongoose_session.endSession()
-
+        
         const deleteVish = await Vish.findByIdAndDelete(vishId, {session : mongoose_session})
-
+        
         await mongoose_session.commitTransaction()
         await mongoose_session.endSession()
 
