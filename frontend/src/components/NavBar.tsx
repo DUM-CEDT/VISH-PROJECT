@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import Link from "next/link";
 import Vish from "./svg/Vish";
 import ArrowForward from "./svg/ArrowForward";
-import { authOptions } from "@/app/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import getUserProfile from "@/app/libs/getUserProfile";
 
 export default async function NavBar() {
