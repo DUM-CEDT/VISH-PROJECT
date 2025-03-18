@@ -93,49 +93,118 @@ exports.getYanImages = async (req, res, next) => {
         const yanImages = await YanTemplateImage.aggregate(
           [
             {
-              '$match': {
-                'yan_level': level
-              }
-            }, {
-              '$sort': {
-                'yan_template_image_set_id': 1
-              }
-            }, {
-              '$lookup': {
-                'from': 'yansetnames', 
-                'localField': 'yan_template_image_set_id', 
-                'foreignField': 'yan_template_image_set_id', 
-                'as': 'result'
-              }
-            }, {
-              '$unwind': {
-                'path': '$result', 
-                'preserveNullAndEmptyArrays': false
-              }
-            }, {
-              '$set': {
-                'yan_set_name': '$result.yan_set_name'
-              }
-            }, {
-              '$unset': 'result'
-            }, {
-              '$lookup': {
-                'from': 'categories', 
-                'localField': 'yan_category', 
-                'foreignField': '_id', 
-                'as': 'result'
-              }
-            }, {
-              '$unwind': {
-                'path': '$result', 
-                'preserveNullAndEmptyArrays': false
-              }
-            }, {
-              '$set': {
-                'category': '$result.category_name'
-              }
-            }, {
-              '$unset': 'result'
+              $match:
+                /**
+                 * query: The query in MQL.
+                 */
+                {
+                  yan_level: level
+                }
+            },
+            {
+              $sort:
+                /**
+                 * Provide any number of field/order pairs.
+                 */
+                {
+                  yan_template_image_set_id: 1
+                }
+            },
+            {
+              $lookup:
+                /**
+                 * from: The target collection.
+                 * localField: The local join field.
+                 * foreignField: The target join field.
+                 * as: The name for the results.
+                 * pipeline: Optional pipeline to run on the foreign collection.
+                 * let: Optional variables to use in the pipeline field stages.
+                 */
+                {
+                  from: "yansetnames",
+                  localField: "yan_template_image_set_id",
+                  foreignField: "yan_template_image_set_id",
+                  as: "result"
+                }
+            },
+            {
+              $unwind:
+                /**
+                 * path: Path to the array field.
+                 * includeArrayIndex: Optional name for index.
+                 * preserveNullAndEmptyArrays: Optional
+                 *   toggle to unwind null and empty values.
+                 */
+                {
+                  path: "$result",
+                  preserveNullAndEmptyArrays: false
+                }
+            },
+            {
+              $set:
+                /**
+                 * field: The field name
+                 * expression: The expression.
+                 */
+                {
+                  yan_set_name: "$result.yan_set_name"
+                }
+            },
+            {
+              $unset:
+                /**
+                 * Provide the field name to exclude.
+                 * To exclude multiple fields, pass the field names in an array.
+                 */
+                "result"
+            },
+            {
+              $lookup:
+                /**
+                 * from: The target collection.
+                 * localField: The local join field.
+                 * foreignField: The target join field.
+                 * as: The name for the results.
+                 * pipeline: Optional pipeline to run on the foreign collection.
+                 * let: Optional variables to use in the pipeline field stages.
+                 */
+                {
+                  from: "categories",
+                  localField: "yan_category",
+                  foreignField: "_id",
+                  as: "result"
+                }
+            },
+            {
+              $unwind:
+                /**
+                 * path: Path to the array field.
+                 * includeArrayIndex: Optional name for index.
+                 * preserveNullAndEmptyArrays: Optional
+                 *   toggle to unwind null and empty values.
+                 */
+                {
+                  path: "$result",
+                  preserveNullAndEmptyArrays: false
+                }
+            },
+            {
+              $set:
+                /**
+                 * field: The field name
+                 * expression: The expression.
+                 */
+                {
+                  category: "$result.category_name"
+                }
+            },
+            {
+              $unset:
+                /**
+                 * Provide the field name to exclude.
+                 * To exclude multiple fields, pass the field names in an array.
+                 */
+                "result"
             }
           ]
         );

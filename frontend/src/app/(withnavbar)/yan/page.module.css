@@ -91,7 +91,7 @@
     justify-content: center;
     flex-direction: column;
     gap : 12px;
-    margin-bottom: 48px;
+    margin-bottom: 72px;
 }
 
 .left-side-wrapper {
@@ -114,14 +114,60 @@
 .yan-background {
     width: 364px;
     aspect-ratio: calc(29/43);
-    background-color: rgb(240, 152, 255);
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
 .color-wrapper {
-    background-color: #F9DFA1;
+    /* background-color: #F9DFA1; */
     width: 100%;
-    height: 100%;
+    height: 48px;
+    display: flex;
+    gap: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
+
+.circle {
+    height: 70%;
+    aspect-ratio: 1;
+    border-radius: 100%;
+    outline: solid 2px;
+    outline-color: #FAFAFA;
+}
+
+.color-wrapper input {
+    height: 48px;
+    width: 142px;
+    background-color: #FAFAFA;
+    border-radius: 8px;
+    padding: 4px 8px;
+    color: #A1A1A1;
+    font-size: 20;
+    font-weight: 400;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+}
+
+::placeholder {
+    color: #e2e2e2;
+    opacity: 1; /* Firefox */
+    font-size: 20;
+    font-weight: 400;
+  }
+  
+::-ms-input-placeholder { /* Edge 12 -18 */
+    color: #A1A1A1;
+    font-size: 20;
+    font-weight: 300;
+}
+
+input[type=text]:focus {
+    border: None;
+    outline: None;
+  }
+
+textarea:focus, input:focus{ border: None; outline: None;}
