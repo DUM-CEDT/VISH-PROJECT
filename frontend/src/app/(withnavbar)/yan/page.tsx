@@ -60,8 +60,8 @@ export default function Yan () {
                             
                         </div>
                         <div className={styles['bottom-button-wrapper']}>
-                            <Button1 minWidth={150} icon='Download' front={true} text='เสร็จสิ้น'></Button1>
-                            <Button1 minWidth={150} icon='Share' text='แชร์'></Button1>
+                            <Button1 minWidth={'150'} icon='Download' front={true} text='เสร็จสิ้น'></Button1>
+                            <Button1 minWidth={'150'} icon='Share' text='แชร์'></Button1>
                         </div>
                     </div>
 
