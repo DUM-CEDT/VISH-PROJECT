@@ -17,6 +17,7 @@ const app = express()
 
 const yanTemplateImage = require('./routes/YanTemplateImage')
 const yanTemplate = require('./routes/YanTemplate')
+const YanSetName = require('./models/YanSetName')
 
 app.use(express.json())
 app.use('/api/yan/image', yanTemplateImage)
