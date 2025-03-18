@@ -1,0 +1,47 @@
+.wrapper {
+    position: absolute;
+    margin-top: 8vh;
+    width: 100%;
+    overflow: hidden;
+    height: 92vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.content-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    z-index: 1;
+}
+
+.yan-scope {
+    width: 520px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.yan-boarder {
+    width: 70% ;
+    aspect-ratio: calc(29/43);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.yan-background {
+    width: 100%;
+    aspect-ratio: calc(29/43);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+
+
