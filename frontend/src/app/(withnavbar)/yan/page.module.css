@@ -48,6 +48,14 @@
     align-items: center;
 }
 
+.yan-inner-image {
+    width: 70% ;
+    aspect-ratio: calc(29/43);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .yan-inner-first {
     width: 100% ;
     aspect-ratio: calc(29/43);
@@ -107,4 +115,7 @@
     width: 364px;
     aspect-ratio: calc(29/43);
     background-color: rgb(240, 152, 255);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

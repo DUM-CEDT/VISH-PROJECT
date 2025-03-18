@@ -19,10 +19,22 @@ export default function Yan () {
     useEffect(() => {
         const x = async () => {
             const fetchingData = await getAllYanImage()
+            console.log(fetchingData)
             setAllYanImage(fetchingData)
         }
         x()
     },[])
+
+    let img_test0
+    let img_test1
+    let img_test2
+    let img_test3
+    if (allYanImage.success) {
+        img_test0 = (allYanImage['data'][0][2]['yan_image_base64'])
+        img_test1 = (allYanImage['data'][1][1]['yan_image_base64'])
+        img_test2 = (allYanImage['data'][2][3]['yan_image_base64'])
+        img_test3 = (allYanImage['data'][3][8]['yan_image_base64'])
+    }
 
     return (
         <div className={styles['wrapper']}>
@@ -43,7 +55,7 @@ export default function Yan () {
                         <div className={styles['yan-scope']}>
                             <div className={styles['yan-boarder']}>
                                 <div id='yan-background' className={styles['yan-background']}>
-                                    <div style={{backgroundColor : 'aqua'}} className={styles['yan-inner-first']}>
+                                    {/* <div style={{backgroundColor : 'aqua'}} className={styles['yan-inner-first']}>
                                         <div style={{backgroundColor : 'black'}} className={styles['yan-inner'] + " z-2"}>
                                             <div style={{backgroundColor : 'green'}} className={styles['yan-inner'] + " z-3"}>
                                                 <div style={{backgroundColor : 'pink'}} className={styles['yan-inner'] + " z-4"}>
@@ -51,7 +63,39 @@ export default function Yan () {
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> */}
+                                    <Image
+                                        src={`data:image/jpeg;base64, ${img_test0}`}
+                                        alt="star"
+                                        layout="intrinsic"
+                                        width={10000}
+                                        height={10000}
+                                        className='absolute w-[364px] z-0 opacity-[100%]'
+                                    />
+                                    <Image
+                                        src={`data:image/jpeg;base64, ${img_test1}`}
+                                        alt="star"
+                                        layout="intrinsic"
+                                        width={10000}
+                                        height={10000}
+                                        className='absolute w-[364px] z-0 opacity-[100%]'
+                                    />
+                                    <Image
+                                        src={`data:image/jpeg;base64, ${img_test2}`}
+                                        alt="star"
+                                        layout="intrinsic"
+                                        width={10000}
+                                        height={10000}
+                                        className='absolute w-[364px] z-0 opacity-[100%]'
+                                    />
+                                    <Image
+                                        src={`data:image/jpeg;base64, ${img_test3}`}
+                                        alt="star"
+                                        layout="intrinsic"
+                                        width={10000}
+                                        height={10000}
+                                        className='absolute w-[364px] z-0 opacity-[100%]'
+                                    />
                                 </div>
                             </div>
                             
