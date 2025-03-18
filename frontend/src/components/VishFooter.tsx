@@ -3,17 +3,21 @@ import { useEffect, useState } from 'react';
 import Star from './svg/Star';
 import CheckCircleSelected from './svg/CheckCircleSelected';
 import CheckCircleUnselected from './svg/CheckCircleUnselected';
+import Plus from './svg/Plus';
 import getAllVishCategories from '@/app/libs/getAllVishCategories';
 
-export default function VishFooter() {
-  const [filter, setFilter] = useState<'popular' | 'latest' | null>(null);
+interface VishFooterProps {
+  onFilterChange: (filter: 'popular' | 'latest') => void;
+}
+
+export default function VishFooter({ onFilterChange }: VishFooterProps) {
+  const [filter, setFilter] = useState<'popular' | 'latest'>('popular');
   const [starCategories, setStarCategories] = useState<{ color: string; label: string }[]>([]);
 
   const toggleFilter = (selectedFilter: 'popular' | 'latest') => {
-    if (filter === selectedFilter) {
-      setFilter(null);
-    } else {
+    if (filter !== selectedFilter) {
       setFilter(selectedFilter);
+      onFilterChange(selectedFilter);
     }
   };
 
@@ -30,12 +34,15 @@ export default function VishFooter() {
         console.error(err);
       }
     };
-
     fetchData();
   }, []);
 
+  useEffect(() => {
+    onFilterChange(filter);
+  }, []);
+
   return (
-    <div className="fixed bottom-0 left-0 right-0 text-white py-1 px-6 bg-gray-900">
+    <div className="fixed bottom-0 left-0 right-0 text-white py-1 px-6">
       <div className="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4 p-2">
         <div className="flex flex-wrap gap-4 p-1 border border-white rounded-xl">
           {starCategories.map((category, index) => (
@@ -77,20 +84,7 @@ export default function VishFooter() {
 
         <div className="flex items-center gap-4 px-4 py-2">
           <button className="flex items-center justify-center w-12 h-12 bg-[#4C5F79] rounded-md hover:bg-gray-400 transition-colors">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="40"
-              height="40"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#B3D4E6"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
+            <Plus width={28} height={28} />
           </button>
           <span className="text-[24px] font-normal">สร้างดวงดาวแห่งคำขอของคุณ</span>
         </div>

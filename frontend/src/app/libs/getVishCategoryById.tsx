@@ -1,6 +1,8 @@
 'use server'
 
-export default async function getVishCategoryById(id: string) {
+import { VishCategoryResponse } from "../../../interface";
+
+export default async function getVishCategoryById(id: string): Promise<VishCategoryResponse> {
   const BACKEND_URL = process.env.BACKEND_URL;
   const response = await fetch(
     `${BACKEND_URL}/api/vish/category/${id}`,
@@ -17,5 +19,5 @@ export default async function getVishCategoryById(id: string) {
     throw new Error(`Failed to get Vish category with id: ${id}`);
   }
 
-  return await response.json();
+  return await response.json() as VishCategoryResponse;
 }
