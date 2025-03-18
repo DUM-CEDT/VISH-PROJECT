@@ -29,7 +29,6 @@ export default function FindYourSelf () {
 
     for (let i = 0 ; i < 4 ; i++) {
         buttonStatus[i] = thisQuestionObject['choices'][i]['field'] == questionAnswer[questionIndex - 1]
-        console.log(buttonStatus[i])
     }
     
 
