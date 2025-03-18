@@ -34,7 +34,7 @@ export default function NavButton({
       onClick={onClick}>
 
       {next ? <GreaterSign width={size} height={size} className="fill-secondary group-hover:fill-white transition-all duration-300 ease-in-out"/> : 
-      <LessSign width={size} height={size} className="fill-secondary group-hover:fill-white transition-all duration-300 ease-in-out"/> }
+      <LessSign width={size.toString()+"px"} height={size.toString()+"px"} className="fill-secondary group-hover:fill-white transition-all duration-300 ease-in-out"/> }
     </button>
   );
 }
