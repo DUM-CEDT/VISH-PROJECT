@@ -31,7 +31,6 @@ export default function YanSelection ({layer, innerText, description, leftButton
                         height={32}
                         objectFit='cover'
                         alt=''
-                        // style={{height : '100%', aspectRatio:0.878}}
                     ></Image>
                 </div>
 

@@ -28,7 +28,7 @@ export default async function NavBar() {
             </div>
             <ul className="flex space-x-16 font-light text-2xl">
                 <li>
-                    <Link href="/" className="hover:text-highlight1">ยันต์</Link>
+                    <Link href="/yan" className="hover:text-highlight1">ยันต์</Link>
                 </li>
                 <li>
                     <Link href="/services" className="hover:text-highlight1">ขอพร</Link>
