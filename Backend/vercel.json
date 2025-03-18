@@ -3,7 +3,7 @@
     "name"  : "VISH-Backend",
     "builds": [
       {
-        "src": "backend/server.js",
+        "src": "server.js",
         "use": "@vercel/node"
       }
     ],
