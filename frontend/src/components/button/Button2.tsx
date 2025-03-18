@@ -45,7 +45,7 @@ export default function Button2({
         {front === false ? text : null}
 
         {icon === 'GreaterSign' ? <GreaterSign width={size} height={size} className="fill-white group-hover:fill-black transition-all duration-300 ease-in-out"/> : null}
-        {icon === 'LessSign' ? <LessSign width={size} height={size} className="fill-white group-hover:fill-black transition-all duration-300 ease-in-out"/> : null}
+        {icon === 'LessSign' ? <LessSign width={size.toString()+"px"} height={size.toString()+"px"} className="fill-white group-hover:fill-black transition-all duration-300 ease-in-out"/> : null}
         {icon === 'Share' ? <Share width={size} height={size} className="fill-white group-hover:fill-black transition-all duration-300 ease-in-out"/> : null}
         {icon === 'Download' ? <Download width={size} height={size} className="fill-white group-hover:fill-black transition-all duration-300 ease-in-out"/> : null}
         {icon === 'Buy' ? <Buy width={size} height={size} className="fill-white group-hover:fill-black transition-all duration-300 ease-in-out"/> : null}

@@ -18,7 +18,7 @@ export default function Button1({
   icon?: string;
   front?: boolean;
   onClick?: () => void;
-  minWidth?: number;
+  minWidth?: string;
 }) {
   return (
     <button
@@ -39,13 +39,13 @@ export default function Button1({
         justify-center
         gap-2
       "
-      style={{ fontSize: `${size}px`, minWidth: minWidth ? `${minWidth}px` : undefined }} 
+      style={{ fontSize: `${size}px`, minWidth: minWidth ? `${minWidth}` : undefined }} 
       onClick={onClick}>
 
       {front === false ? text : null}
 
       {icon === 'GreaterSign' ? <GreaterSign width={size} height={size} className="fill-black group-hover:fill-white transition-all duration-300 ease-in-out"/> : null}
-      {icon === 'LessSign' ? <LessSign width={size} height={size} className="fill-black group-hover:fill-white transition-all duration-300 ease-in-out"/> : null}
+      {icon === 'LessSign' ? <LessSign width={size.toString()+"px"} height={size.toString()+"px"} className="fill-black group-hover:fill-white transition-all duration-300 ease-in-out"/> : null}
       {icon === 'Share' ? <Share width={size} height={size} className="fill-black group-hover:fill-white transition-all duration-300 ease-in-out"/> : null}
       {icon === 'Download' ? <Download width={size} height={size} className="fill-black group-hover:fill-white transition-all duration-300 ease-in-out"/> : null}
       {icon === 'Buy' ? <Buy width={size} height={size} className="fill-black group-hover:fill-white transition-all duration-300 ease-in-out"/> : null}

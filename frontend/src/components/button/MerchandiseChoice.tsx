@@ -17,10 +17,12 @@ export default function MerchandiseChoice({
   // Merchandise options
   const items = [
     { id: "all", label: "ทั้งหมด" },
-    { id: "yantra", label: "ยันต์" },
-    { id: "holythread", label: "สายสิญจน์" },
-    { id: "takrud", label: "ตะกรุด" },
-    { id: "other", label: "อื่นๆ" },
+    { id: "ยันต์", label: "ยันต์" },
+    { id: "กำไล", label: "กำไล" },
+    { id: "แหวน", label: "แหวน" },
+    { id: "สร้อย", label: "สร้อย" },
+    { id: "เบอร์มงคล", label: "เบอร์มงคล" },
+    { id: "อื่นๆ", label: "อื่นๆ"}
   ];
 
   return (

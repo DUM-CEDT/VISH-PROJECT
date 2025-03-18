@@ -108,3 +108,77 @@
     aspect-ratio: calc(29/43);
     background-color: rgb(240, 152, 255);
 }
+.wrapper {
+    position: absolute;
+    padding-top: 8vh;
+    width: 100%;
+    overflow: hidden;
+}
+
+.back-wrapper {
+    width: 100%;
+    margin-top: 4vh;
+    height: 2vh;
+    z-index: 1;
+    position: relative;
+}
+
+.wrapper p {
+    font-size: 24px;
+    font-weight: 300;
+}
+
+.content-wrapper {
+    height: 86vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1;
+    position: relative;
+    justify-content: center;
+}
+
+.content-wrapper h2 {
+    font-size: 24;
+    font-weight: 300;
+}
+
+.content-wrapper h4 {
+    font-size: 24;
+    font-weight: 400;
+}
+
+.content-wrapper h1 {
+    font-size: 32;
+    font-weight: 500;
+}
+
+.choice-block {
+    height: calc(min(80px, 8vh));
+    width: 100%;
+    margin-top: calc(min(32px, 3vh));
+    
+    /* color  */
+
+}
+
+.choice-wrapper {
+    width: calc(min(60%, 680px));   
+    margin-top: calc(min(16%, 16px));
+}
+
+.op-wrapper {
+    height: calc(min(80px, 8vh));
+    width: 100%;
+    margin-top: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 32px;
+}
+
+.op-button-wrapper {
+    height: calc(min(80px, 8vh));
+    width: calc(min(30%, 240px));
+}

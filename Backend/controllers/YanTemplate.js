@@ -236,3 +236,49 @@ exports.downloadYanTemplate = async (req, res, next) => {
         })
     }
 }
+
+//@desc         calculateYanLayers
+//@route        POST /api/merchandise/calculate-yan-layers
+//@access       Private
+exports.calculateYanLayers = async (req, res) => {
+    try {
+      const { scores } = req.body; // รับ Array [การเรียน, การงาน, การเงิน, ความรัก, สุขภาพ, ครอบครัว]
+ 
+      if (!scores || !Array.isArray(scores) || scores.length !== 6) {
+        return res.status(400).json({ success: false, message: 'Invalid scores array, must contain 6 values' });
+      }
+  
+      if (!scores.every(score => typeof score === 'number' && score >= 0)) {
+        return res.status(400).json({ success: false, message: 'Scores must be non-negative numbers' });
+      }
+  
+      const totalScore = scores.reduce((sum, score) => sum + score, 0);
+      if (totalScore === 0) {
+        return res.status(400).json({ success: false, message: 'Total score cannot be zero' });
+      }
+      const weights = scores.map(score => (score / totalScore) * 100);
+  
+      const weightedRandom = () => {
+        const rand = Math.random() * 100;
+        let sum = 0;
+        for (let i = 0; i < weights.length; i++) {
+          sum += weights[i];
+          if (rand <= sum) return i + 1; 
+        }
+        return 6; //default
+      };
+
+      const layers = [];
+      for (let i = 0; i < 4; i++) {
+        layers.push(weightedRandom());
+      }
+  
+      res.json({
+        success: true,
+        layers: layers, // layer เป็น array ข้างในเป็นเลข 1-6 จำนวน 4 ตัว
+        scores: scores 
+      });
+    } catch (err) {
+      res.status(500).json({ success: false, message: err.message });
+    }
+  };
