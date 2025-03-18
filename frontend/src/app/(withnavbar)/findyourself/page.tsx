@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react'
 export default function FindYourSelf () {
     const questionList = Q['question_list']
     const questionCount = questionList.length
-
+    
     let buttonStatus = [false, false, false, false]
 
     const [questionIndex, setQuestionIndex] = useState(1)
@@ -32,7 +32,6 @@ export default function FindYourSelf () {
         console.log(buttonStatus[i])
     }
     
-
     return (
         <div className={styles.wrapper}>
             <Image
