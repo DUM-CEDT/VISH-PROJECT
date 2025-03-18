@@ -5,7 +5,7 @@ import "./globals.css";
 import NavBar from "@/components/NavBar";
 import NextAuthProvider from "./provider/NextAuthProvider";
 import { getServerSession } from "next-auth";
-import { authOptions } from "./(withoutnavbar)/api/auth/[...nextauth]/route";
+import { authOptions } from "./[...nextauth]/route";
 
 const mitr = Mitr({
   subsets: ['latin', 'thai'],
