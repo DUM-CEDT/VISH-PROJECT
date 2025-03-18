@@ -35,9 +35,9 @@ export default function YanSelection ({layer, innerText, description, leftButton
                 </div>
 
             </div>
-            
             <div className='flex w-[100%] items-center justify-center'>
-                <h4>ยันต์ลายนี้เด่นในด้าน {description}</h4>
+                {description != '' && (<h4>ยันต์ลายนี้เด่นในด้าน {description}</h4>)}
+                {description == '' && (<h4 style={{color : 'transparent'}}>ยันต์ลายนี้เด่นในด้าน {description}</h4>)}
             </div>
             
         </div>

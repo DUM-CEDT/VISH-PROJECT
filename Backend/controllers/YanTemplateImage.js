@@ -90,7 +90,55 @@ exports.getYanImages = async (req, res, next) => {
       // Fetch all images per yan_level
       for (const level of levels) {
         const levelQuery = { yan_level: level }; // Query by yan_level
-        const yanImages = await YanTemplateImage.find(levelQuery).sort(sortOption);
+        const yanImages = await YanTemplateImage.aggregate(
+          [
+            {
+              '$match': {
+                'yan_level': level
+              }
+            }, {
+              '$sort': {
+                'yan_template_image_set_id': 1
+              }
+            }, {
+              '$lookup': {
+                'from': 'yansetnames', 
+                'localField': 'yan_template_image_set_id', 
+                'foreignField': 'yan_template_image_set_id', 
+                'as': 'result'
+              }
+            }, {
+              '$unwind': {
+                'path': '$result', 
+                'preserveNullAndEmptyArrays': false
+              }
+            }, {
+              '$set': {
+                'yan_set_name': '$result.yan_set_name'
+              }
+            }, {
+              '$unset': 'result'
+            }, {
+              '$lookup': {
+                'from': 'categories', 
+                'localField': 'yan_category', 
+                'foreignField': '_id', 
+                'as': 'result'
+              }
+            }, {
+              '$unwind': {
+                'path': '$result', 
+                'preserveNullAndEmptyArrays': false
+              }
+            }, {
+              '$set': {
+                'category': '$result.category_name'
+              }
+            }, {
+              '$unset': 'result'
+            }
+          ]
+        );
         result[level] = yanImages;
       }
   
