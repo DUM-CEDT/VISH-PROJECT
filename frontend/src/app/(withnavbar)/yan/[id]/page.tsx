@@ -9,14 +9,16 @@ import getAllYanImage from '@/app/libs/getAllYanImage'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import YanSelection from '@/components/button/YanSelection/YanSelection'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import { useParams } from 'next/navigation'
 // import { useEffect, useState } from 'react' 
 
 export default function Yan () {
-
+    const params = useParams();
     const [allYanImage, setAllYanImage] = useState({success : false, data :[[]]})
     const [stateImage, setStateImage] = useState(new Array(4).fill(null))
+    const [clearURL, setClearURL] = useState(false)
+    
 
     useEffect(() => {
         const x = async () => {
@@ -25,10 +27,36 @@ export default function Yan () {
             setAllYanImage(fetchingData)
         }
         x()
+        console.log(allYanImage)        
         
-    },[])
+    },[clearURL])
 
-    
+    if (allYanImage.success && !clearURL) {
+        const { id } = params as { id: string }
+        let param_index = id.split('-')
+        var imageState : (number | null)[] = [null,null,null,null]
+        for (let i = 0 ; i < 4 ; i++) {
+            let x = parseInt(param_index[i])
+            if(!isNaN(x))
+                imageState[i] = x
+        }
+
+        for (let i = 0 ; i < 4 ; i++) {
+            if (imageState[i] != null) {
+                console.log(allYanImage['data'][i])
+                for (let j = 0 ; j < allYanImage['data'][i].length ; j++) {
+                    if (allYanImage['data'][i][j]['yan_template_image_set_id'] == imageState[i])
+                    imageState[i] = j
+                }
+            }
+        }
+
+        console.log(imageState)
+        setClearURL(true)
+        setStateImage(imageState)
+        window.history.replaceState(null, "", `/yan`)
+    }
+
     const handleClick = (mode : string , layer : number) => {
         let newStateImage = [...stateImage]
         let nowStateImageThisLayer = newStateImage[layer]

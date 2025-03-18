@@ -17,7 +17,8 @@ const nextConfig = {
     FRONTEND_URL: process.env.FRONTEND_URL,
     BACKEND_URL: process.env.BACKEND_URL
   },
-  reactStrictMode: false
+  reactStrictMode: false,
+  devIndicators: false
 }
 
 module.exports = nextConfig
