@@ -17,8 +17,6 @@ export default function YanExport () {
     const [allYanImage, setAllYanImage] = useState({success : false, data :[]})
     const [stateImage, setStateImage] = useState(new Array(4).fill(null))
 
-    console.log(allYanImage)
-
     useEffect(() => {
         const x = async () => {
             const fetchingData = await getAllYanImage()
@@ -70,13 +68,13 @@ export default function YanExport () {
                             
                         </div>
                         <div className={styles['bottom-button-wrapper']}>
-                            <Button1 size={24} minWidth={'388'} icon='Download' front={true} text='สั่งซื้อยันต์ของคุณ'></Button1>
+                            <Button1 size={24} minWidth={'388px'} icon='Download' front={true} text='สั่งซื้อยันต์ของคุณ'></Button1>
                         </div>
                     </div>
 
                     <div className={styles['button-wrapper']}>
-                       <Button1 size={24} icon='Download' front={true} text='ดาวน์โหลด' minWidth={'240'}></Button1>
-                       <Button1 size={24} icon='Share' front={true} text='แชร์' minWidth={'240'}></Button1>
+                       <Button1 size={24} icon='Download' front={true} text='ดาวน์โหลด' minWidth={'240px'}></Button1>
+                       <Button1 size={24} icon='Share' front={true} text='แชร์' minWidth={'240px'}></Button1>
                        <Button2 size={24} text='Custom ยันต์' minWidth={240}></Button2>
                     </div>
                 </div>

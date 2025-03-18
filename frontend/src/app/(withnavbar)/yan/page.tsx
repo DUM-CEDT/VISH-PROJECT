@@ -16,8 +16,6 @@ export default function Yan () {
     const [allYanImage, setAllYanImage] = useState({success : false, data :[]})
     const [stateImage, setStateImage] = useState(new Array(4).fill(null))
 
-    console.log(allYanImage)
-
     useEffect(() => {
         const x = async () => {
             const fetchingData = await getAllYanImage()
@@ -60,8 +58,8 @@ export default function Yan () {
                             
                         </div>
                         <div className={styles['bottom-button-wrapper']}>
-                            <Button1 minWidth={'150'} icon='Download' front={true} text='เสร็จสิ้น'></Button1>
-                            <Button1 minWidth={'150'} icon='Share' text='แชร์'></Button1>
+                            <Button1 minWidth={'150px'} icon='Download' front={true} text='เสร็จสิ้น'></Button1>
+                            <Button1 minWidth={'150px'} icon='Share' text='แชร์'></Button1>
                         </div>
                     </div>
 
