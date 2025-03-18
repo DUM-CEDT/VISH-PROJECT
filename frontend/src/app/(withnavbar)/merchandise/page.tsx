@@ -157,7 +157,7 @@ export default function MerchandisePage() {
           onClick={() => handlePageChange(page - 1)}
           disabled={page === 1}
         >
-          <LessSign width={20} height={20} className="fill-white" />
+          <LessSign width={"20px"} height={"20px"} className="fill-white" />
         </button>
         <div className="font-regular text-[20px] text-white">
           หน้าที่ {pagination?.current_page || 1} / {pagination?.last_page || 1}

@@ -91,8 +91,8 @@ export default function MerchandiseDetail() {
           onClick={handleBackClick}
         >
           <LessSign
-            width={24}
-            height={24}
+            width={"24px"}
+            height={"24px"}
             className="fill-white group-hover:fill-highlight1"
           />
           <div className="text-[20px] font-light group-hover:text-highlight1">
