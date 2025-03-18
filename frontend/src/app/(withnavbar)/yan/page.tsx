@@ -162,6 +162,7 @@ export default function Yan () {
                             <YanSelection rightButtonClick={() => {handleClick('inc', 1)}} leftButtonClick={() => {handleClick('dec', 1)}} layer={2} innerText={getInnerText(1)} description={getCategory(1)}></YanSelection>
                             <YanSelection rightButtonClick={() => {handleClick('inc', 2)}} leftButtonClick={() => {handleClick('dec', 2)}} layer={3} innerText={getInnerText(2)} description={getCategory(2)}></YanSelection>
                             <YanSelection rightButtonClick={() => {handleClick('inc', 3)}} leftButtonClick={() => {handleClick('dec', 3)}} layer={4} innerText={getInnerText(3)} description={getCategory(3)}></YanSelection>
+                            <div className={styles['color-wrapper']}></div>
                         </div>
                     </div>
                 </div>
