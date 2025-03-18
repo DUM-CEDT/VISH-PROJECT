@@ -5,6 +5,8 @@ const User = require('../models/User')
 const { updateUser } = require('../utils/updateUser')
 const Transaction = require('../models/Transaction')
 const rewardUtil = require('../utils/rewardUtils')
+const VishCategory = require('../models/Category')
+const Category = require('../models/Category')
 
 
 //@desc         Any thing about Vish
@@ -516,4 +518,68 @@ exports.deleteVish = async (req, res, next) => {
     }
 
 
+}
+
+
+// @desc      Get all Vish categories
+// @route     GET /api/vish/categories
+// @access    Public
+exports.getVishCategories = async (req, res, next) => {
+    try {
+        const categories = await VishCategory.find({}, {
+            _id: 1, 
+            category_name: 1,
+            color: 1
+        })
+
+        return res.status(200).json({
+            success: true,
+            count: categories.length,
+            categories: categories
+        })
+    } catch (err) {
+        return res.status(400).json({
+            success: false,
+            msg: err.message
+        })
+    }
+}
+
+//@desc         Get Single Category By ID
+//@route        GET /api/vish/category/:id
+//@access       Public
+exports.getCategoryById = async (req, res, next) => {
+    try {
+        const categoryId = req.params.id
+
+        if (!mongoose.Types.ObjectId.isValid(categoryId)) {
+            return res.status(400).json({
+                success: false,
+                msg: "Invalid category ID"
+            })
+        }
+
+        const category = await Category.findById(categoryId)
+
+        if (!category) {
+            return res.status(404).json({
+                success: false,
+                msg: `Category with ID ${categoryId} not found`
+            })
+        }
+
+        return res.status(200).json({
+            success: true,
+            category: {
+                _id: category._id,
+                category_name: category.category_name,
+                color: category.color
+            }
+        })
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            msg: err.message
+        })
+    }
 }
