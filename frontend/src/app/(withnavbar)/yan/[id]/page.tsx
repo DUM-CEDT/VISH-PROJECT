@@ -9,14 +9,16 @@ import getAllYanImage from '@/app/libs/getAllYanImage'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import YanSelection from '@/components/button/YanSelection/YanSelection'
-import { useRouter } from 'next/router'
-import { redirect, useParams } from 'next/navigation'
+import { redirect, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 // import { useEffect, useState } from 'react' 
 
-export default function Yan () {
-
+export default function Yan_ID () {
+    const params = useParams();
+    
     const [allYanImage, setAllYanImage] = useState({success : false, data :[[]]})
     const [stateImage, setStateImage] = useState(new Array(4).fill(null))
+    const [clearURL, setClearURL] = useState('')
     const [backgroundColor, setBackgroundColor] = useState('#112141')
 
     useEffect(() => {
@@ -26,8 +28,42 @@ export default function Yan () {
             setAllYanImage(fetchingData)
         }
         x()
-        
+
+        if (clearURL == '') {
+            window.history.replaceState(null, "", `/yan`)
+            const { id } = params as { id: string }
+            console.log(id);
+            setClearURL(id);
+        }
+
     },[])
+
+    if (allYanImage.success && clearURL != 'null') {
+        
+        let param_index = clearURL.split('-')
+        var imageState : (number | null)[] = [null,null,null,null]
+        for (let i = 0 ; i < 4 ; i++) {
+            let x = parseInt(param_index[i])
+            if(!isNaN(x))
+                imageState[i] = x
+        }
+        
+        for (let i = 0 ; i < 4 ; i++) {
+            if (imageState[i] != null) {
+                console.log(allYanImage['data'][i])
+                for (let j = 0 ; j < allYanImage['data'][i].length ; j++) {
+                    if (allYanImage['data'][i][j]['yan_template_image_set_id'] == imageState[i])
+                    imageState[i] = j
+                }
+            }
+        }
+
+        setClearURL('null')
+        setBackgroundColor ('#' + param_index[4]);
+        setStateImage(imageState);
+        
+        
+    }
 
     const handleClick = (mode : string , layer : number) => {
         let newStateImage = [...stateImage]
@@ -46,6 +82,7 @@ export default function Yan () {
                 newStateImage[layer] = null
             else newStateImage[layer] = newStateImage[layer] - 1
         }
+        console.log(newStateImage)
         setStateImage(newStateImage)
 
     }
@@ -101,6 +138,9 @@ export default function Yan () {
         else
             return
     }
+
+    
+
     return (
         <div className={styles['wrapper']}>
                 <Image
@@ -120,7 +160,15 @@ export default function Yan () {
                         <div className={styles['yan-scope']}>
                             <div className={styles['yan-boarder']}>
                                 <div id='yan-background' style={{backgroundColor : `${backgroundColor}`}} className={styles['yan-background']}>
-                                   
+                                    {/* <div style={{backgroundColor : 'aqua'}} className={styles['yan-inner-first']}>
+                                        <div style={{backgroundColor : 'black'}} className={styles['yan-inner'] + " z-2"}>
+                                            <div style={{backgroundColor : 'green'}} className={styles['yan-inner'] + " z-3"}>
+                                                <div style={{backgroundColor : 'pink'}} className={styles['yan-inner'] + " z-4"}>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> */}
                                     {allYanImage['data'][0][stateImage[0]] != null && (
                                     <Image
                                         src={`data:image/jpeg;base64, ${allYanImage['data'][0][stateImage[0]]['yan_image_base64']}`}

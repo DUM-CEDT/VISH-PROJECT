@@ -17,6 +17,7 @@ const app = express()
 
 const yanTemplateImage = require('./routes/YanTemplateImage')
 const yanTemplate = require('./routes/YanTemplate')
+const YanSetName = require('./models/YanSetName')
 
 app.use(express.json())
 app.use('/api/yan/image', yanTemplateImage)
@@ -35,4 +36,5 @@ app.use('/api/user', user)
 
 const PORT = process.env.PORT || 1234
 
+//module.exports = app;
 const server = app.listen(PORT, console.log('Server running in ', process.env.NODE_ENV, 'mode on port', PORT))
