@@ -4,7 +4,6 @@ const userRegister = async (
   name: string,
   email: string,
   password: string,
-  tel: string
 ) => {
   const BACKEND_URL = process.env.BACKEND_URL
   const response = await fetch(
@@ -18,7 +17,6 @@ const userRegister = async (
         name: name,
         email: email,
         password: password,
-        tel: tel,
         role: "user",
       }),
     }
