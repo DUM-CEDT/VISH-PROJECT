@@ -7,6 +7,7 @@ import Google from "../svg/Google";
 import Check from "../svg/Check";
 import Edit from "../svg/Edit";
 import Bin from "../svg/Bin";
+import Home from "../svg/Home";
 
 export default function Button2({
     size = 16,
@@ -56,7 +57,8 @@ export default function Button2({
         {icon === 'Check' ? <Check width={size} height={size} className="fill-white group-hover:fill-black transition-all duration-300 ease-in-out"/> : null}
         {icon === 'Edit' ? <Edit width={size} height={size} className="fill-white group-hover:fill-black transition-all duration-300 ease-in-out"/> : null}
         {icon === 'Bin' ? <Bin width={size} height={size} className="fill-white group-hover:fill-black transition-all duration-300 ease-in-out"/> : null}
-
+        {icon === 'Home' ? <Home width={size} height={size} className="fill-white group-hover:fill-black transition-all duration-300 ease-in-out"/> : null}
+        
 
         {front === true ? text : null}
       </button>
