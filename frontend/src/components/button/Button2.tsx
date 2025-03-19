@@ -4,6 +4,9 @@ import Share from "../svg/Share";
 import Buy from "../svg/Buy";
 import Download from "../svg/Download";
 import Google from "../svg/Google";
+import Check from "../svg/Check";
+import Edit from "../svg/Edit";
+import Bin from "../svg/Bin";
 
 export default function Button2({
     size = 16,
@@ -50,7 +53,10 @@ export default function Button2({
         {icon === 'Download' ? <Download width={size} height={size} className="fill-white group-hover:fill-black transition-all duration-300 ease-in-out"/> : null}
         {icon === 'Buy' ? <Buy width={size} height={size} className="fill-white group-hover:fill-black transition-all duration-300 ease-in-out"/> : null}
         {icon === 'Google' ? <Google width={size} height={size} className="group-hover:fill-black transition-all duration-300 ease-in-out"/> : null}
-        
+        {icon === 'Check' ? <Check width={size} height={size} className="fill-white group-hover:fill-black transition-all duration-300 ease-in-out"/> : null}
+        {icon === 'Edit' ? <Edit width={size} height={size} className="fill-white group-hover:fill-black transition-all duration-300 ease-in-out"/> : null}
+        {icon === 'Bin' ? <Bin width={size} height={size} className="fill-white group-hover:fill-black transition-all duration-300 ease-in-out"/> : null}
+
 
         {front === true ? text : null}
       </button>
