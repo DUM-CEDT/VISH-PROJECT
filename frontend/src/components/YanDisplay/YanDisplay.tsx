@@ -6,7 +6,7 @@ export default function YanDisplay ({layer, backgroundColor, yanWidth, borderWid
     return (
         <div className={styles['content-wrapper']}>
                     <div className={styles['left-side-wrapper']}>
-                        <div className={styles['yan-scope']}>
+                        <div style={{width: `${yanWidth * 100 / 70}px`}} className={styles['yan-scope']}>
                             <div className={styles['yan-boarder']}>
                                 
 
@@ -26,8 +26,8 @@ export default function YanDisplay ({layer, backgroundColor, yanWidth, borderWid
                                     <Image
                                         src={`data:image/jpeg;base64, ${layer[0]}`}
                                         alt=""
-                                        width={10000}
-                                        height={10000}
+                                        width={yanWidth}
+                                        height={yanWidth * 43 / 29}
                                         className={`absolute w-[${yanWidth}px] z-0 opacity-[100%]`}
                                     />)}
                                     
@@ -35,8 +35,8 @@ export default function YanDisplay ({layer, backgroundColor, yanWidth, borderWid
                                     <Image
                                         src={`data:image/jpeg;base64, ${layer[1]}`}
                                         alt=""
-                                        width={10000}
-                                        height={10000}
+                                        width={yanWidth}
+                                        height={yanWidth * 43 / 29}
                                         className={`absolute w-[${yanWidth}px] z-0 opacity-[100%]`}
                                     />)}
 
@@ -44,8 +44,8 @@ export default function YanDisplay ({layer, backgroundColor, yanWidth, borderWid
                                     <Image
                                         src={`data:image/jpeg;base64, ${layer[2]}`}
                                         alt=""
-                                        width={10000}
-                                        height={10000}
+                                        width={yanWidth}
+                                        height={yanWidth * 43 / 29}
                                         className={`absolute w-[${yanWidth}px] z-0 opacity-[100%]`}
                                     />)}
 
@@ -53,8 +53,8 @@ export default function YanDisplay ({layer, backgroundColor, yanWidth, borderWid
                                     <Image
                                         src={`data:image/jpeg;base64, ${layer[3]}`}
                                         alt=""
-                                        width={10000}
-                                        height={10000}
+                                        width={yanWidth}
+                                        height={yanWidth * 43 / 29}
                                         className={`absolute w-[${yanWidth}px] z-0 opacity-[100%]`}
                                     />)}
                                 </div>

@@ -15,14 +15,13 @@ import { getSession, useSession } from 'next-auth/react'
 export default function Yan_ID () {
     const params = useParams();
     let empty : (null | string)[] = [null, null, null, null]
-    let anyObject : any = {}
+    
     const [allYanImage, setAllYanImage] = useState({success : false, data :[[]]})
     const [layerState, setLayerState] = useState(empty)
     const [category, setCategory] = useState({text : '', category_list : []})
     const [backgroundColor, setBackgroundColor] = useState('#112141')
     const [showYan, setShowYan] = useState(false)
     const [imageId, setImageId] = useState(empty)
-    const [session , setSession] = useState(anyObject)
     
     
     useEffect(() => {
@@ -31,14 +30,9 @@ export default function Yan_ID () {
             setAllYanImage(fetchingData)
         }
         x()
-        const loadSession  = async () => {
-            const thisSession = await getSession()
-            
-        }
-        loadSession()
 
     },[])
-    console.log(session.user)
+
     if (allYanImage.success && showYan == false) {
         const { id } = params as { id: string }
         let param_index = id.split('-')
