@@ -84,10 +84,19 @@ export default function FindYourSelf () {
               className='absolute w-[120vw] z-0 opacity-[100%]'
         />
             <div className={styles['back-wrapper']}>
-                <div onClick={() => redirect('/yan_mode_select')} className='flex items-center'>
-                    <LessSign width='24px' height='24px' className=' ml-[5vw] fill-white mr-[12px]'></LessSign>
-                    <p>กลับ</p>
-                </div>
+                <button
+                    className="flex ml-[10%] justify-center items-center gap-4 group"
+                    onClick={() => {redirect('/yan_mode_select')}}
+                    >
+                    <LessSign
+                        width={"24px"}
+                        height={"24px"}
+                        className="fill-white group-hover:fill-highlight1"
+                    />
+                    <div className="text-[20px] font-light group-hover:text-highlight1">
+                        กลับ
+                    </div>
+            </button>
             </div>
 
             <div className={styles['content-wrapper']}>
