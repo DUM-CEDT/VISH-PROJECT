@@ -6,7 +6,7 @@ export default async function getAllYanImage(
   const response = await fetch(
     `${BACKEND_URL}/api/yan/image`,
     {
-      cache : 'no-store',
+      cache : 'force-cache',
       method: "GET",
       headers: {
         "Content-Type": "application/json",

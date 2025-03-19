@@ -240,7 +240,7 @@ export default function Yan_ID () {
                         </div>
                         <div className={styles['bottom-button-wrapper']}>
                             <Button1 onClick={() => {handleFinish()}} minWidth={'150px'} icon='Check' front={true} text='เสร็จสิ้น'></Button1>
-                            <Button1 onClick={() => {navigator.clipboard.writeText(genURL())}} minWidth={'150px'} icon='Share' text='คัดลองลิงก์'></Button1>
+                            <Button1 onClick={() => {navigator.clipboard.writeText(genURL())}} minWidth={'150px'} icon='Share' text='คัดลอกลิงก์'></Button1>
                         </div>
                     </div>
 
