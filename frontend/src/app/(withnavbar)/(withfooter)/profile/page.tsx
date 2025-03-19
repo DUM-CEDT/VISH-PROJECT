@@ -138,6 +138,10 @@ export default function ProfilePage() {
     }
   };
 
+  const handleRedirectToDeposit = () => {
+    router.push("/deposit");
+  };
+
   const handleDeleteVish = async (vish_id: string) => {
     try {
       setIsDeletingVish(true);
@@ -398,10 +402,13 @@ export default function ProfilePage() {
             />
             <div className="text-[28px] font-regular">{userName}</div>
           </div>
-          <div className="z-1 mt-1">
-            <button className="bg-highlight1 px-4 py-1 text-[16px] text-black rounded-full font-regular">
+          <div className="z-1 mt-1 flex items-end gap-4">
+            <button className="bg-highlight1 px-4 py-1 text-[16px] text-black rounded-full font-regular cursor-pointer" onClick={handleRedirectToDeposit}>
               เครดิตของคุณ : {credit}
             </button>
+            <div>
+              <a href="/logout" className="underline">ออกจากระบบ</a>
+            </div>
           </div>
         </div>
         <div className="z-1 bg-[rgba(255,255,255,0.6)] p-6 h-[80%] rounded-xl">

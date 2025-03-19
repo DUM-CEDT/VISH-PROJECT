@@ -37,7 +37,7 @@ export default function DepositPage() {
     <div className="mt-[8vh] w-[100vw] h-[92vh] flex flex-col gap-4 justify-center items-center">
       <div className="font-light text-[28px]">ขั้นตอนที่ 1</div>
       <div className="font-regular text-[28px] mb-8">ระบุจำนวนเครดิต</div>
-      <div className="mb-12">
+      <div className="mb-8">
         <div className="flex items-end">
           <h3>ระบุจำนวนเครดิตที่ต้องการฝาก</h3>
         </div>
@@ -53,7 +53,7 @@ export default function DepositPage() {
       </div>
       {message && (
         <div
-          className={`text-[16px] ${
+          className={`text-[20px] ${
             message.includes("สำเร็จ") ? "text-green-500" : "text-red-500"
           }`}
         >

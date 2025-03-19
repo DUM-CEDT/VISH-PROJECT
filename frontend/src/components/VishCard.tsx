@@ -10,7 +10,7 @@ interface VishCardProps {
   bon_condition: number;
   bon_credit: number;
   bon_vish_target: number;
-  onClick: () => void;
+  onClick?: () => void;
 }
 
 export default function VishCard({
