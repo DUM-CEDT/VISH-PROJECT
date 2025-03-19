@@ -34,6 +34,10 @@ interface VishProp {
   vish_count: number;
   id: string;
   is_bon: boolean;
+  bon_condition: number;
+  bon_vish_target: number;
+  is_success: boolean;
+  bon_credit: number;
 }
 
 export default function ProfilePage() {
@@ -173,18 +177,30 @@ export default function ProfilePage() {
       is_bon: true,
       text: "Ve vish u a merry christmas",
       vish_count: 278,
+      bon_condition: 1,
+      bon_vish_target: 3,
+      is_success: false,
+      bon_credit: 300,
     },
     {
       id: "1234123",
       is_bon: false,
       text: "Ve dont vish u a merry christmas",
       vish_count: 15,
+      bon_condition: 0,
+      is_success: false,
+      bon_vish_target: 0,
+      bon_credit: 0,
     },
     {
       id: "91200120",
       is_bon: true,
       text: "what are ve u a merry christmas",
       vish_count: 9,
+      bon_condition: 1,
+      is_success: true,
+      bon_vish_target: 4,
+      bon_credit: 1000,
     },
   ];
 
@@ -252,11 +268,18 @@ export default function ProfilePage() {
           <div className="w-[85%] h-full flex items-center justify-center">
             {selectedYanStarItem === "ดวงดาวของฉัน" ? (
               <div className="flex items-center justify-center flex-col gap-4 w-full">
+                <div className="mb-8">
                   <VishCard
                     text={vishArray[starSliderPos].text}
                     vish_count={vishArray[starSliderPos].vish_count}
+                    bon_condition={vishArray[starSliderPos].bon_condition}
+                    is_bon={vishArray[starSliderPos].is_bon}
+                    bon_vish_target={vishArray[starSliderPos].bon_vish_target}
+                    bon_credit={vishArray[starSliderPos].bon_credit}
                   />
-                {vishArray[starSliderPos].is_bon === true ? (
+                </div>
+                {vishArray[starSliderPos].is_bon === true &&
+                vishArray[starSliderPos].is_success === false ? (
                   <Button2
                     text="บนสำเร็จ"
                     size={16}
