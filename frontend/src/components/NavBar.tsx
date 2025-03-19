@@ -36,9 +36,6 @@ export default async function NavBar() {
                 <li>
                     <Link href="/merchandise" className="hover:text-highlight1">ร้านค้า</Link>
                 </li>
-                <li>
-                    <Link href="/about" className="hover:text-highlight1">วิธีการใช้งาน</Link>
-                </li>
                 
                 {session ? (
                     <>

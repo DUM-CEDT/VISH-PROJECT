@@ -481,7 +481,6 @@ export default function ProfilePage() {
                       front={true}
                     />
                   ) : null}
-                  <Button2 text="แก้ไข" size={16} icon="Edit" front={true} />
                   {vishArray[starSliderPos].is_bon === false ? (
                     <Button2
                       text={isDeletingVish ? "กำลังลบ..." : "ลบ"}
