@@ -117,7 +117,7 @@ export default function Yan_ID () {
                     <YanDisplay
                          layer={layerState} backgroundColor={backgroundColor} yanWidth={364} borderWidth={396}
                     />
-                    <Button1 front={true} icon='Buy' text='สั่งซื้อยันต์ของคุณ' size={24}/>
+                    <Button1 onClick={() => redirect('/payment/ยันต์-100')} front={true} icon='Buy' text='สั่งซื้อยันต์ของคุณ' size={24}/>
                 </div>
                
             )}

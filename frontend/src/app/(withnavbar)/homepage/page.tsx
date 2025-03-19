@@ -1,6 +1,9 @@
+'use client'
+
 import Button1 from "@/components/button/Button1";
 import Image from "next/image";
 import styles from './page.module.css'
+import { redirect } from "next/navigation";
 export default function Home() {
   return (
     <div className="absolute h-[100vh] w-[100vw] overflow-hidden">
@@ -19,7 +22,7 @@ export default function Home() {
               className="ml-[24%] object-contain w-[70%] aspect-square"
             />
             <div className="pt-12">
-              <Button1 text="สร้างยันต์ของคุณ" size={16} minWidth="250px"/>
+              <Button1 onClick={() => redirect('/yan_mode_select')} text="สร้างยันต์ของคุณ" size={16} minWidth="250px"/>
             </div>
           </div>
           <div className={styles.content}>
@@ -32,7 +35,7 @@ export default function Home() {
               className="object-contain w-[70%] aspect-square"
             />
             <div className="pt-12">
-              <Button1 text="ขอพรกับพระวิษณุกรรม" size={16} minWidth="250px"/>
+              <Button1 onClick={() => redirect('/vish')} text="ขอพรกับพระวิษณุกรรม" size={16} minWidth="250px"/>
             </div>
           </div>
         </div>
