@@ -32,7 +32,7 @@ const LogoutPage = () => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white p-12 rounded-lg w-96">
         <div className="flex flex-col items-center mb-8">
-          <h2 className="text-2xl font-bold">Are you sure you want to logout?</h2>
+          <h2 className="text-2xl text-black font-bold text-center">Are you sure you want to logout?</h2>
         </div>
         <div className="flex justify-center space-x-10">
           <button
