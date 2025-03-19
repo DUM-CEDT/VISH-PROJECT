@@ -46,7 +46,7 @@ export default function FindYourSelf () {
             </div>
 
 
-            <div className='mt-[96px] z-1'>
+            <div className='mt-[48px] z-1'>
             <Button1
             onClick={() => redirect('/yan')}
             text='Custom ยันต์ด้วยตัวเอง'
