@@ -487,6 +487,7 @@ export default function ProfilePage() {
                       is_bon={vishArray[starSliderPos].is_bon}
                       bon_vish_target={vishArray[starSliderPos].bon_vish_target}
                       bon_credit={vishArray[starSliderPos].bon_credit}
+                      distribution={vishArray[starSliderPos].bon_distribution}
                     />
                   </div>
                   {vishArray[starSliderPos].is_bon === true &&

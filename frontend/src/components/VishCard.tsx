@@ -12,7 +12,7 @@ interface VishCardProps {
   bon_vish_target: number;
   distribution?: number;
   is_success?: boolean;
-  onClick: () => void;
+  onClick?: () => void;
 }
 
 export default function VishCard({
