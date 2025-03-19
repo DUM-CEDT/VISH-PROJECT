@@ -1,6 +1,7 @@
-import type { AuthOptions } from "next-auth";
+import NextAuth from "next-auth/next";
+import { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import userLogin from "@/app/libs/userLogIn"; // ตรวจสอบ path ให้ถูกต้อง
+import userLogIn from "./userLogIn";
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -11,8 +12,8 @@ export const authOptions: AuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials, req) {
-        if (!credentials?.email || !credentials?.password) return null;
-        const user = await userLogin(credentials.email, credentials.password);
+        if (!credentials) return null;
+        const user = await userLogIn(credentials.email, credentials.password);
 
         if (user) {
           return user;
@@ -29,18 +30,14 @@ export const authOptions: AuthOptions = {
   },
   callbacks: {
     async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        token.email = user.email;
-      }
-      return token;
+      return { ...token, ...user };
     },
-    async session({ session, token }) {
-      if (session.user) {
-        session.user._id = token.id as string;
-        session.user.email = token.email as string;
-      }
+    async session({ session, token, user }) {
+      session.user = token as any;
       return session;
     },
   },
 };
+
+const handler = NextAuth(authOptions);
+export { handler as GET, handler as POST };

@@ -583,3 +583,36 @@ exports.getCategoryById = async (req, res, next) => {
         })
     }
 }
+
+//@desc     Get liked vishes for a user
+//@route    GET /api/vish/vishstatus
+//@access   Private
+exports.getVishStatus = async (req, res, next) => {
+    try {
+      const userId = req.user._id;
+  
+      // ดึงข้อมูลจาก VishTimeStamp ที่ user นี้กดไลค์
+      const likedVishes = await VishTimeStamp.find(
+        {
+          user_id: userId,
+          status: true,
+          point: 1,
+        },
+        { vish_id: 1, _id: 0 } // ดึงเฉพาะ vish_id
+      );
+  
+      // แปลงผลลัพธ์ให้เป็น array ของ vish_id
+      const vishIds = likedVishes.map((vish) => vish.vish_id.toString());
+  
+      return res.status(200).json({
+        success: true,
+        likedVishes: vishIds, // ส่ง array ของ vish_id ที่ user นี้กดไลค์
+      });
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json({
+        success: false,
+        msg: err.message,
+      });
+    }
+  };
