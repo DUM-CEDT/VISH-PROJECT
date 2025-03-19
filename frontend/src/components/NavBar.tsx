@@ -49,7 +49,7 @@ export default async function NavBar() {
                     </>
                 ) : (
                     <li className="group flex items-center space-x-2">
-                        <Link href="/contact" className="group-hover:text-highlight1">เริ่มต้น</Link>
+                        <Link href="/login" className="group-hover:text-highlight1">เริ่มต้น</Link>
                         <ArrowForward width="29" height="29" className="fill-white group-hover:fill-highlight1"/>
                     </li>
                 )}

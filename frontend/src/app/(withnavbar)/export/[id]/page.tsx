@@ -1,43 +1,44 @@
 'use client'
 
-import LessSign from '@/components/svg/LessSign'
 import styles from './page.module.css'
 import Button1 from '@/components/button/Button1'
 import Button2 from '@/components/button/Button2'
-import ChoiceQuiz from '@/components/button/ChoiceQuiz'
 import getAllYanImage from '@/app/libs/getAllYanImage'
 
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
-import YanSelection from '@/components/button/YanSelection/YanSelection'
-import { redirect, useRouter } from 'next/navigation'
 import { useParams } from 'next/navigation'
 import YanDisplay from '@/components/YanDisplay/YanDisplay'
 import downloadYan from '@/app/libs/downloadYan'
-import { useSession } from 'next-auth/react'
-// import { useEffect, useState } from 'react' 
+import { getSession, useSession } from 'next-auth/react'
 
 export default function Yan_ID () {
     const params = useParams();
     let empty : (null | string)[] = [null, null, null, null]
+    let anyObject : any = {}
     const [allYanImage, setAllYanImage] = useState({success : false, data :[[]]})
     const [layerState, setLayerState] = useState(empty)
     const [category, setCategory] = useState({text : '', category_list : []})
     const [backgroundColor, setBackgroundColor] = useState('#112141')
     const [showYan, setShowYan] = useState(false)
     const [imageId, setImageId] = useState(empty)
-
-    const session : any = useSession()
-    console.log(session)
+    const [session , setSession] = useState(anyObject)
+    
+    
     useEffect(() => {
         const x = async () => {
             const fetchingData = await getAllYanImage()
             setAllYanImage(fetchingData)
         }
         x()
+        const loadSession  = async () => {
+            const thisSession = await getSession()
+            
+        }
+        loadSession()
 
     },[])
-    
+    console.log(session.user)
     if (allYanImage.success && showYan == false) {
         const { id } = params as { id: string }
         let param_index = id.split('-')
