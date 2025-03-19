@@ -15,9 +15,9 @@ const VishPopup: React.FC<VishPopupProps> = ({ text = "", onClose }) => {
   const [categories, setCategories] = useState<{ id: string, name: string }[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [bonType, setBonType] = useState<string>("");
-  const [bonCredit, setBonCredit] = useState<string>(""); // ล้าง default value
-  const [distribution, setDistribution] = useState<string>(""); // ล้าง default value
-  const [vishTarget, setVishTarget] = useState<string>(""); // ล้าง default value
+  const [bonCredit, setBonCredit] = useState<string>("");
+  const [distribution, setDistribution] = useState<string>("");
+  const [vishTarget, setVishTarget] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   

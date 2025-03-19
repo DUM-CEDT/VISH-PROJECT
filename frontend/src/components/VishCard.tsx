@@ -10,6 +10,8 @@ interface VishCardProps {
   bon_condition: number;
   bon_credit: number;
   bon_vish_target: number;
+  distribution: number;
+  is_success: boolean;
   onClick: () => void;
 }
 
@@ -20,6 +22,8 @@ export default function VishCard({
   bon_condition,
   bon_credit,
   bon_vish_target,
+  distribution,
+  is_success,
   onClick,
 }: VishCardProps) {
   const textRef = useRef<HTMLParagraphElement>(null);
@@ -38,7 +42,7 @@ export default function VishCard({
         isTextClamped ? "cursor-pointer" : "cursor-default"
       }`}
       style={{ width: "320px", height: "190px" }}
-      onClick={isTextClamped ? onClick : undefined} // เปิด popup เฉพาะข้อความที่ถูกตัด
+      onClick={isTextClamped ? onClick : undefined}
     >
       <img
         src="/VishCardFrame3.png"
@@ -46,21 +50,18 @@ export default function VishCard({
         className="absolute top-0 left-1/2 h-auto"
         style={{ transform: "translate(-50%, -50%)" }}
       />
-
       <img
         src="/VishCardFrame3.png"
         alt="frame bottom"
         className="absolute bottom-0 left-1/2 h-auto"
         style={{ transform: "translate(-50%, 50%) rotate(180deg)" }}
       />
-
       <img
         src="/VishCardFrame1.png"
         alt="frame left"
         className="absolute left-0 top-0 h-full w-auto"
         style={{ transform: "translateX(-50%)" }}
       />
-
       <img
         src="/VishCardFrame2.png"
         alt="frame right"
@@ -73,21 +74,27 @@ export default function VishCard({
           {text}
         </p>
 
-        <div className="flex justify-center items-center mt-4">
-          {is_bon ? (
-            bon_condition === 1 ? (
-              <span className="flex items-center gap-2" style={{ color: "#F9DFA1" }}>
-                <Lamp width={24} height={24} />
-                {bon_credit} BATH
-              </span>
-            ) : (
-              <span className="flex items-center gap-2" style={{ color: "#F9DFA1" }}>
-                <Lamp width={24} height={24} />
-                {bon_vish_target} VISHES
-              </span>
-            )
-          ) : null}
-        </div>
+        {is_bon && (
+          <div className="flex flex-col justify-center items-center mt-4 gap-2">
+            {/* ส่วนบน: จำนวนเงินและจำนวนคน */}
+            <span className="flex items-center gap-2" style={{ color: "#F9DFA1" }}>
+              <Lamp width={24} height={24} />
+              {bon_credit} CREDITS / {distribution} PEOPLE
+            </span>
+
+            {/* ส่วนล่าง: เงื่อนไขและสถานะ */}
+            <span className="text-sm" style={{ color: is_success ? "#A1F9A1" : "#F9A1A1" }}>
+              {bon_condition === 1 ? (
+                <>
+                  TARGET: {bon_vish_target} VISHES -{" "}
+                  {is_success ? "SUCCESS" : "IN PROGRESS"}
+                </>
+              ) : (
+                <>{is_success ? "SUCCESS" : "IN PROGRESS"}</>
+              )}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
