@@ -38,7 +38,7 @@ export default function Home() {
         </div>
       </div>
       <Image
-            src="/Cloud.png"
+            src="/cloud.png"
             alt="cloud"
             width={0}
             height={0}
