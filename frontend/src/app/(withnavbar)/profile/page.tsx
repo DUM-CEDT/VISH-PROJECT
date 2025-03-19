@@ -71,6 +71,7 @@ export default function ProfilePage() {
   const [vishArray, setVishArray] = useState<VishProp[]>([]); 
   const [vishLoading, setVishLoading] = useState(false); 
   const [isDeletingVish, setIsDeletingVish] = useState(false); // Loading state for deleteVish
+  const [userName, setUserName] = useState("Username");
 
   const handleNotificationSelection = (selected: string) => {
     setSelectedNotificationItem(selected);
@@ -219,6 +220,9 @@ export default function ProfilePage() {
         const data = await getMe(token);
         if (data.data.credit){
           setCredit(data.data.credit);
+        }
+        if (data.data.name){
+          setUserName(data.data.name);
         }
       }catch(err){
         console.error(err);
@@ -385,7 +389,7 @@ export default function ProfilePage() {
               sizes="100vw"
               className="object-contain w-[48px] opacity-100"
             />
-            <div className="text-[28px] font-regular">Username</div>
+            <div className="text-[28px] font-regular">{userName}</div>
           </div>
           <div className="mt-1">
             <button className="bg-highlight1 px-4 py-1 text-[16px] text-black rounded-full font-regular">
