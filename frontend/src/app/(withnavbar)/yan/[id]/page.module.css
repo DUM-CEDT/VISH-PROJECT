@@ -152,22 +152,22 @@
     display: flex;
 }
 
-::placeholder {
+.color-wrapper ::placeholder {
     color: #e2e2e2;
     opacity: 1; /* Firefox */
     font-size: 20;
     font-weight: 400;
   }
   
-::-ms-input-placeholder { /* Edge 12 -18 */
+.color-wrapper ::-ms-input-placeholder { /* Edge 12 -18 */
     color: #A1A1A1;
     font-size: 20;
     font-weight: 300;
 }
 
-input[type=text]:focus {
+.color-wrapper input[type=text]:focus {
     border: None;
     outline: None;
   }
 
-textarea:focus, input:focus{ border: None; outline: None;}
+.color-wrapper textarea:focus, .color-wrapper input:focus{ border: None; outline: None;}
