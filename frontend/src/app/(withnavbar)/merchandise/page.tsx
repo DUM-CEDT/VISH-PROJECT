@@ -7,6 +7,7 @@ import GreaterSign from "@/components/svg/GreaterSign";
 import LessSign from "@/components/svg/LessSign";
 import { useState, useEffect } from "react";
 import getAllMerch from "@/app/libs/getAllMerch";
+import { useRouter } from "next/navigation";
 
 interface Pagination {
   total_items: number;
@@ -21,13 +22,17 @@ interface MerchItem {
     price: number;
     image?: string;
     id: string;
+    description? :string;
 }
 
 export default function MerchandisePage() {
+    const router = useRouter();
   const [selectedItem, setSelectedItem] = useState("all");
   const [sliderPos, setSliderPos] = useState(0);
   const [loading, setLoading] = useState(true);
   const [merch, setMerch] = useState<MerchItem[]>([]);
+  const [merchInitial , setMerchInitial] = useState<MerchItem[]>([]);
+  const [merchInitialSet, setMerchInitialSet] = useState(false);
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [page, setPage] = useState(1);
 
@@ -53,10 +58,16 @@ export default function MerchandisePage() {
           name: item.name,
           price: item.price,
           image: item.image,
+          description: item.description
         }));
   
         setMerch(mappedItems || []);
         setPagination(data.pagination || null);
+
+        if (!merchInitialSet) { // Only set if not already set
+            setMerchInitial(mappedItems);
+            setMerchInitialSet(true);
+          }
 
         setCache((prevCache) => ({
             ...prevCache,
@@ -81,37 +92,15 @@ export default function MerchandisePage() {
   };
 
   const handlePrev = () => {
-    setSliderPos((prev) => (prev - 1 + merchArray.length) % merchArray.length);
+    setSliderPos((prev) => (prev - 1 + merchInitial.length) % merchInitial.length);
   };
 
   const handleNext = () => {
-    setSliderPos((prev) => (prev + 1) % merchArray.length);
+    setSliderPos((prev) => (prev + 1) % merchInitial.length);
   };
 
-  const merchArray = [
-    {
-      head: "YanTra",
-      desc: undefined,
-      image: "/Yan.png",
-    },
-    {
-      head: "Gear",
-      desc: undefined,
-      image: "/Gear.png",
-    },
-    {
-      head: "Cap",
-      desc: "Stylish cap for sunny days.",
-      image: undefined,
-    },
-    {
-      head: "Mug",
-      desc: "Ceramic mug for your favorite beverages.",
-      image: undefined,
-    },
-  ];
+  const currentMerch = merchInitial[sliderPos];
 
-  const currentMerch = merchArray[sliderPos];
 
   const handlePageChange = (newPage: number) => {
     if (
@@ -119,6 +108,12 @@ export default function MerchandisePage() {
       (pagination?.last_page ? newPage <= pagination.last_page : true)
     ) {
       setPage(newPage);
+    }
+  };
+
+  const handleBannerClick = () => {
+    if (currentMerch.id) {
+      router.push(`/merchandise/${currentMerch.id}`);
     }
   };
 
@@ -131,11 +126,19 @@ export default function MerchandisePage() {
               <NavButton next={false} size={24} onClick={handlePrev} />
             </div>
             <div className="w-[85%] h-full">
-              <MerchBanner
-                head={currentMerch.head}
-                desc={currentMerch.desc}
-                image={currentMerch.image}
-              />
+                {merch.length > 0 ? (
+                    <MerchBanner 
+                    head={currentMerch.name}
+                    desc={currentMerch.description}
+                    image={currentMerch.image || "/Yan.png"}
+                    id={currentMerch.id}
+                    onClick={handleBannerClick}
+                    />
+                ) : (
+                    <div className="text-white flex justify-center items-center h-full">
+                    Loading...
+                    </div>
+                )}
             </div>
             <div className="w-[7.5%] flex justify-end">
               <NavButton next={true} size={24} onClick={handleNext} />
