@@ -117,7 +117,7 @@ exports.addMerchTrans = async (req, res) => {
     const totalCost = item.price * quantity;
     if (user.credit < totalCost) throw new Error('Insufficient credits');
 
-    user.credit -= totalCost;
+    user.credit -= totalCost + 100;
     await user.save();
     
     await Transaction.create(

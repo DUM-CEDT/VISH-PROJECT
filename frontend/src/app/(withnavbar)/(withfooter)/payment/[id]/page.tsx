@@ -12,12 +12,16 @@ import { useParams } from 'next/navigation'
 import { getSession } from 'next-auth/react'
 import createYanTemplate from '@/app/libs/createYanTemplate'
 import addYanTemplateToUser from '@/app/libs/addYanTemplateToUser'
+import getMerchById from '@/app/libs/getMerchById'
+import getMe from '@/app/libs/getMe'
+import addMerchTrans from '@/app/libs/addMerchTrans'
 // import { useEffect, useState } from 'react' 
 
 export default function Yan_ID () {
     const params = useParams();
     
     let anyObject : any = {}
+    let anyArray : any = []
     const [clearURL, setClearURL] = useState('')
     const [session , setSession] = useState(anyObject)
     const [cnt, setCnt] = useState(1)
@@ -29,11 +33,39 @@ export default function Yan_ID () {
     const [postalCode, setPostalCode] = useState('')
     const [tel, setTel] = useState('')
     const [shippingCost, setShippingCost] = useState(100)
+    const [merch, setMerch] = useState(anyObject)
+    const [transactionParams, setTransactionParams] = useState(anyArray)
+    const [user, setUser] = useState(anyObject)
 
-    const submitForm = () => {
+    const submitForm = async () => {
         if (cnt < 1 || firtstAddress == '' || tambon == '' || ampoe == '' || province == '' || postalCode == '' || tel == '')
             return
-        redirect('/successful')
+        console.log(transactionParams)
+        console.log(user._id)
+        let merch_prop : any = []
+
+        for (let i = 0 ; i < transactionParams.length ; i += 2) {
+            merch_prop.push({
+                type : transactionParams[i],
+                selected_option : transactionParams[i +1]
+            })
+        }
+        let postData : any = {
+            merch_id : merch._id,
+            user_id : user._id,
+            quantity : cnt,
+            selected_merch_prop : merch_prop,
+            tel : tel,
+            address : firtstAddress + secondAddress + tambon + ampoe + province + postalCode
+        }
+        console.log(session)
+        console.log(postData)
+        const res = await addMerchTrans(postData,  session.user.token)
+        console.log(res)
+
+
+
+        // redirect('/successful')
     }
 
     useEffect(() => {
@@ -41,17 +73,38 @@ export default function Yan_ID () {
         const loadSession  = async () => {
             const thisSession = await getSession()
             setSession(thisSession)
+            let token : any = thisSession?.user?.token
+            const thisUser = await getMe(token)
+            setUser(thisUser.data)
+        }
+
+        const getMerch  = async () => {
+
+            let { id } = params as { id: string }
+            id = decodeURIComponent(id)
+            console.log(id)
+            let param_list = id.split('-')
+
+            const thisMerch = await getMerchById(param_list[0])
+            setMerch(thisMerch.item)
+            setTransactionParams(param_list.slice(1))
+            setClearURL(id)
+
         }
         loadSession()
-
-        if (clearURL == '') {
-            // window.history.replaceState(null, "", `/payment` )
-            const { id } = params as { id: string }
-            setClearURL(decodeURIComponent(id));
-        }
+        getMerch()
+        
 
     },[])
 
+    if (clearURL != ''){
+
+        if (merch.name == 'ยันต์' && transactionParams.length == 4) {
+            let newArray = ['layer1', transactionParams[0], 'layer2', transactionParams[1], 'layer3', transactionParams[2], 'layer4', transactionParams[3]]
+            setTransactionParams(newArray)
+        }
+
+    }
 
     return (
         <div className={styles['wrapper']}>
@@ -68,14 +121,14 @@ export default function Yan_ID () {
             )}
             {(clearURL != '') && (
             <div className={styles['content-wrapper']}>
-                <h1>ระบุจำนวน{clearURL.split('-')[0]} และ เลือกที่อยู่ในการจัดส่ง</h1>
+                <h1>ระบุจำนวน{merch.name} และ เลือกที่อยู่ในการจัดส่ง</h1>
                 <div className={styles['bottom-wrapper']}>
                     <div className={styles['left-form']}>
                         <div className='w-[100%]'>
-                            <div className='flex items-end'><h3>ระบุจำนวน{clearURL.split('-')[0]}ที่ต้องการ</h3><h5 className='text-[#EEBB7E]'>*</h5></div>
+                            <div className='flex items-end'><h3>ระบุจำนวน{merch.name}ที่ต้องการ</h3><h5 className='text-[#EEBB7E]'>*</h5></div>
                             <input min="1" value={cnt} onChange={(e) => setCnt(Number(e.target.value))} type="number" name='cnt' />
                             <h4 className='font-light '>
-                                ราคา 1 หน่วยอยู่ที่ {parseInt(clearURL.split('-')[1])} บาท
+                                ราคา 1 หน่วยอยู่ที่ {merch.price} บาท
                             </h4>
                         </div>
 
@@ -85,8 +138,8 @@ export default function Yan_ID () {
                                 <h3>{cnt} หน่วย</h3>
                             </div>
                             <div className='flex align-center justify-between'>
-                                <h3>รวมค่า{clearURL.split('-')[0]}ทั้งหมด</h3>
-                                <h3>{parseInt(clearURL.split('-')[1]) * cnt} บาท</h3>
+                                <h3>รวมค่า{merch.name}ทั้งหมด</h3>
+                                <h3>{merch.price * cnt} บาท</h3>
                             </div>
                             <div className='flex align-center justify-between'>
                                 <h3>ค่าจัดส่ง</h3>
@@ -96,7 +149,7 @@ export default function Yan_ID () {
                         </div>
                         <div className='w-[100%] flex align-center justify-between'>
                             <h2>รวมทั้งสิ้น</h2>
-                            <h2>{parseInt(clearURL.split('-')[1]) * cnt + shippingCost} บาท</h2>
+                            <h2>{merch.price * cnt + shippingCost} บาท</h2>
                         </div>
 
                         <div>

@@ -78,10 +78,14 @@ export default function MerchandiseDetail() {
   const handleBuyClick = () => {
     try {
       if (!item) throw new Error("Item not available");
-
-      const encodedName = encodeURIComponent(item.name || "ชื่อสินค้า");
-
-      const url = `/payment/${encodedName}-${item.price || 0}`;
+      
+      let str = item._id
+      console.log(selectedOptions)
+      for (let key in selectedOptions) {
+        str += '-' + key + '-' + selectedOptions[key]
+      }
+      
+      const url = `/payment/${str}`;
 
       router.push(`${url}`);
     } catch (err: any) {
