@@ -1,16 +1,22 @@
 .wrapper {
     /* height: 256px; */
     padding-bottom: 24px;
-    width: 100%;
+    width: 100vw;
     background-color: #FAFAFA;
     display: flex;
     align-items: center;
     flex-direction: column;
     gap: 12;
+    position: relative;
+    overflow: hidden;
+    z-index: 10;
+    box-sizing: border-box;
+    
 }
 
 .nav {
     padding-top: 24px;
+    box-sizing: border-box;
     padding-bottom: 26px;
     display: flex;
     gap: 96px;

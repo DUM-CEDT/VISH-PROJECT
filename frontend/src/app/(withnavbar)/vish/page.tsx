@@ -208,6 +208,8 @@ export default function AllWishesPage() {
                     bon_condition={vish.bon_condition}
                     bon_credit={vish.bon_credit}
                     bon_vish_target={vish.bon_vish_target}
+                    distribution={vish.distribution}
+                    is_success={vish.is_success}
                     onClick={() => handleVishCardClick(vish.text)}
                   />
                 </div>
@@ -247,6 +249,8 @@ export default function AllWishesPage() {
                     bon_condition={vish.bon_condition}
                     bon_credit={vish.bon_credit}
                     bon_vish_target={vish.bon_vish_target}
+                    distribution={vish.distribution}
+                    is_success={vish.is_success}
                     onClick={() => handleVishCardClick(vish.text)}
                   />
                 </div>
