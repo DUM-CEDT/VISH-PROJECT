@@ -61,8 +61,7 @@ export default function DepositPage() {
         </div>
       )}
       <Button1
-        text={loading ? "กำลังดำเนินการ..." : "ต่อไป"}
-        icon="GreaterSign"
+        text={loading ? "กำลังดำเนินการ..." : "เติมเครดิต"}
         size={20}
         onClick={handleDeposit}
       />

@@ -130,8 +130,7 @@ export default function WithDrawPage() {
         </div>
       )}
       <Button1
-        text={loading ? "กำลังดำเนินการ..." : "ต่อไป"}
-        icon="GreaterSign"
+        text={loading ? "กำลังดำเนินการ..." : "ถอนเครดิต"}
         size={20}
         onClick={handleWithdraw}
       />
