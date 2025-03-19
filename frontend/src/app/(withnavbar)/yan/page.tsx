@@ -1,23 +1,22 @@
 'use client'
 
-import LessSign from '@/components/svg/LessSign'
 import styles from './page.module.css'
 import Button1 from '@/components/button/Button1'
-import ChoiceQuiz from '@/components/button/ChoiceQuiz'
 import getAllYanImage from '@/app/libs/getAllYanImage'
 
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import YanSelection from '@/components/button/YanSelection/YanSelection'
-import { useRouter } from 'next/router'
 import { redirect, useParams } from 'next/navigation'
-// import { useEffect, useState } from 'react' 
+import { getSession } from 'next-auth/react'
 
 export default function Yan () {
 
+    let anyObject : any = {}
     const [allYanImage, setAllYanImage] = useState({success : false, data :[[]]})
     const [stateImage, setStateImage] = useState(new Array(4).fill(null))
     const [backgroundColor, setBackgroundColor] = useState('#112141')
+    const [session , setSession] = useState(anyObject)
 
     useEffect(() => {
         const x = async () => {
@@ -26,6 +25,11 @@ export default function Yan () {
             setAllYanImage(fetchingData)
         }
         x()
+        const loadSession  = async () => {
+            const thisSession = await getSession()
+            setSession(thisSession)
+        }
+        loadSession()
         
     },[])
 
@@ -101,6 +105,16 @@ export default function Yan () {
         else
             return
     }
+
+    const handleFinish = async (a : any) => {
+        if (session && session.user) {
+            console.log(allYanImage['data'][0][stateImage[0]])
+            // const yanTemplate = await createYanTemplate()
+            // const saveYanToUser = await addYanTemplateToUser()
+        }
+        redirect(`/export/` + genID())
+    }
+    
     return (
         <div className={styles['wrapper']}>
                 <Image
@@ -166,7 +180,7 @@ export default function Yan () {
                             
                         </div>
                         <div className={styles['bottom-button-wrapper']}>
-                            <Button1 onClick={() => {redirect(`/export/` + genID())}} minWidth={'150px'} icon='Download' front={true} text='เสร็จสิ้น'></Button1>
+                            <Button1 onClick={() => {handleFinish()}} minWidth={'150px'} icon='Download' front={true} text='เสร็จสิ้น'></Button1>
                             <Button1 onClick={() => {console.log(navigator.clipboard.writeText(genURL()))}} minWidth={'150px'} icon='Share' text='คัดลองลิงก์'></Button1>
                         </div>
                     </div>

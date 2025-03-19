@@ -112,7 +112,7 @@ export default function LoginPage() {
                 />
               </div>
               <div className="mt-[24px] w-[100%] flex justify-end">
-                <a href="/api/auth/register">สร้างบัญชีใหม่</a>
+                <a href="/register">สร้างบัญชีใหม่</a>
               </div>
               <div className="mt-[24px] w-[100%] flex justify-center">
                 <Button2 text="เข้าสู่ระบบ" size={16} />
