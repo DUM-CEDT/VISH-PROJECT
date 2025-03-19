@@ -1,0 +1,24 @@
+.wrapper {
+    position: absolute;
+    margin-top: 8vh;
+    height: 92vh;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.wrapper h2{
+    font-size: 28px;
+}
+
+.wrapper h3 {
+    font-size: 24;
+    font-weight: 200;
+    max-width: 400px;
+    padding: 0px 20px;
+    text-align: center;
+}

@@ -43,6 +43,7 @@ export default function Button1({
         justify-center
         gap-2
       "
+      type="submit"
       style={{ fontSize: `${size}px`, minWidth: minWidth ? `${minWidth}` : undefined }} 
       onClick={onClick}>
 

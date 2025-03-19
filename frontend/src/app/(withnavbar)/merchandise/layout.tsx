@@ -19,10 +19,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div>
-      <link rel="icon" href="/Vish_Icon.png" sizes="4x4"></link>
-      <NavBar></NavBar>
-      {children}
-    </div>
+      <div>
+
+        <NavBar></NavBar>
+        {children}
+      </div>
   );
 }

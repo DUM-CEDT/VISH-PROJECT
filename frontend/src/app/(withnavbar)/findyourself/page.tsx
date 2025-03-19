@@ -8,6 +8,9 @@ import ChoiceQuiz from '@/components/button/ChoiceQuiz'
 
 import Image from 'next/image'
 import { useEffect, useState } from 'react' 
+import { redirect } from 'next/navigation'
+import calculateYanLayer from '@/app/libs/calculateYanLayer'
+import getAllYanImage from '@/app/libs/getAllYanImage'
 
 export default function FindYourSelf () {
     const questionList = Q['question_list']
@@ -31,6 +34,45 @@ export default function FindYourSelf () {
         buttonStatus[i] = thisQuestionObject['choices'][i]['field'] == questionAnswer[questionIndex - 1]
     }
     
+    const handleFinish = async () => {
+        const count : any = {};
+        questionAnswer.forEach(item => {
+            count[item] = (count[item] || 0) + 1;
+        })
+        let field = ['การเรียน', 'การงาน', 'การเงิน', 'ความรัก', 'สุขภาพ', 'ครอบครัว']
+        let postArray = []
+
+        for (let i = 0 ; i < field.length ; i++) {
+            if (!count[field[i]])
+                postArray.push(0)
+            else
+            postArray.push(count[field[i]])
+        }
+
+        let s = await calculateYanLayer(postArray)
+        let targetField = s.layers
+        for (let i = 0 ; i < 4 ; i++) {
+            targetField[i] = field[targetField[i] - 1]
+        }
+
+        const allYanImage = await getAllYanImage()
+
+        let tokenParam = ''
+
+        for (let i = 0 ; i < 4 ; i++) {
+            let n = allYanImage['data'][i].length
+            for (let j = 0 ; j < n; j++) {
+                if (allYanImage['data'][i][j]['category'] == targetField[i])
+                    tokenParam += allYanImage['data'][i][j]['yan_template_image_set_id'].toString() + '-'
+            }   
+        }
+        tokenParam = tokenParam + '112141'
+        redirect(`/yan/${tokenParam}`)
+
+
+    }
+
+
     return (
         <div className={styles.wrapper}>
             <Image
@@ -42,7 +84,7 @@ export default function FindYourSelf () {
               className='absolute w-[120vw] z-0 opacity-[100%]'
         />
             <div className={styles['back-wrapper']}>
-                <div className='flex items-center'>
+                <div onClick={() => redirect('/yan_mode_select')} className='flex items-center'>
                     <LessSign width='24px' height='24px' className=' ml-[5vw] fill-white mr-[12px]'></LessSign>
                     <p>กลับ</p>
                 </div>
@@ -64,7 +106,7 @@ export default function FindYourSelf () {
                 {(questionIndex != questionCount && questionIndex == 1)  &&
                     <div className={styles['op-wrapper']}>
                         <div className={styles['op-button-wrapper']}>
-                            <Button1 onClick={() => {setQuestionIndex(questionIndex + 1)}} icon='GreaterSign' size={24} text = {"ไปกันต่อ"}></Button1>
+                            <Button1 onClick={() => {if(questionAnswer[questionIndex - 1] != null) setQuestionIndex(questionIndex + 1)}} icon='GreaterSign' size={24} text = {"ไปกันต่อ"}></Button1>
                         </div>
                     </div>
                 }
@@ -75,7 +117,7 @@ export default function FindYourSelf () {
                             <Button1 onClick={() => {setQuestionIndex(questionIndex - 1)}} icon='LessSign' front={true} size={24} text = {"ย้อนกลับ"}></Button1>
                         </div>
                         <div className={styles['op-button-wrapper']}>
-                            <Button1 onClick={() => {setQuestionIndex(questionIndex + 1)}} icon='GreaterSign' size={24} text = {"ไปกันต่อ"}></Button1>
+                            <Button1 onClick={() => {if(questionAnswer[questionIndex - 1] != null) setQuestionIndex(questionIndex + 1)}} icon='GreaterSign' size={24} text = {"ไปกันต่อ"}></Button1>
                         </div>
                     </div>
                 )
@@ -87,7 +129,7 @@ export default function FindYourSelf () {
                             <Button1 onClick={() => {setQuestionIndex(questionIndex - 1)}} icon='LessSign' front={true} size={24} text = {"ย้อนกลับ"}></Button1>
                         </div>
                         <div className={styles['op-button-wrapper']}>
-                            <Button1 onClick={() => {console.log(questionAnswer)}} icon='GreaterSign' size={24} text = {"ส่งคำตอบ"}></Button1>
+                            <Button1 onClick={() => {handleFinish()}} icon='GreaterSign' size={24} text = {"ส่งคำตอบ"}></Button1>
                         </div>
                     </div>
                 )
