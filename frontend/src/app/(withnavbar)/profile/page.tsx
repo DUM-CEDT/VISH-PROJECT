@@ -81,8 +81,10 @@ export default function ProfilePage() {
   };
 
   const handlePrevClick = () => {
-    if (selectedYanStarItem == "ยันต์ของฉัน")
+    if (selectedYanStarItem == "ยันต์ของฉัน"){
       setYanSliderPos((prev) => (prev > 0 ? prev - 1 : yanArray.length - 1));
+      console.log(yanArray[yanSliderPos]);
+    }
     else
       setStarSliderPos((prev) => (prev > 0 ? prev - 1 : vishArray.length - 1));
   };
@@ -303,7 +305,7 @@ export default function ProfilePage() {
         const data = await getMyYanTemplate(token);
         if (data.success && Array.isArray(data.data)) {
           const mappedYanArray: YanProp[] = data.data.map((yan: any) => {
-            const layer: string[] = ["", "", "", ""];
+            const layer: (string|null)[] = [null, null, null, null];
             const setid: string[] = ["","","",""]
             yan.yan_template_image_list.forEach((image: any) => {
               const level = image.yan_level;
