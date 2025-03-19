@@ -1,12 +1,14 @@
 .wrapper {
     /* height: 256px; */
     padding-bottom: 24px;
-    width: 100%;
+    width: 100vh;
     background-color: #FAFAFA;
     display: flex;
     align-items: center;
     flex-direction: column;
     gap: 12;
+    position: relative;
+    overflow: hidden;
     z-index: 10;
 }
 
