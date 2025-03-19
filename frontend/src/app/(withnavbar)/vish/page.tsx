@@ -6,9 +6,9 @@ import VishFooter from "@/components/VishFooter";
 import Star from "@/components/svg/Star";
 import HeartUnliked from "@/components/svg/HeartUnliked";
 import HeartLiked from "@/components/svg/HeartLiked";
-import { Vish } from "../../../../interface";
+import { Vish, VishCategory } from "../../../../interface"; // เพิ่ม VishCategory ใน interface
 import getAllVishes from "@/app/libs/getAllVishes";
-import getVishCategoryById from "@/app/libs/getVishCategoryById";
+import getAllVishCategories from "@/app/libs/getAllVishCategories"; // นำเข้า getAllVishCategories
 import vishVish from "@/app/libs/vishVish";
 import getVishStatus from "@/app/libs/getVishStatus";
 import { getSession } from "next-auth/react";
@@ -19,6 +19,7 @@ interface VishWithColor extends Vish {
 
 export default function AllWishesPage() {
   const [vishes, setVishes] = useState<VishWithColor[]>([]);
+  const [categories, setCategories] = useState<VishCategory[]>([]); // เพิ่ม state สำหรับเก็บ categories
   const [isVishLoading, setIsVishLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'popular' | 'latest'>('popular');
@@ -26,21 +27,33 @@ export default function AllWishesPage() {
   const router = useRouter();
 
   useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const categoryData = await getAllVishCategories();
+        setCategories(categoryData.categories || []);
+      } catch (err) {
+        console.error("Failed to fetch categories:", err);
+        setError("Failed to load categories");
+      }
+    }
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
     async function fetchVishes() {
       try {
         setIsVishLoading(true);
 
         const data = await getAllVishes(0, 24, filter);
-        const vishesWithColors = await Promise.all(
-          data.vishes.map(async (vish: Vish) => {
-            let color = "#FFFFFF";
-            if (vish.category_list && vish.category_list.length > 0) {
-              const categoryData = await getVishCategoryById(vish.category_list[0]);
-              color = categoryData.category.color;
-            }
-            return { ...vish, color };
-          })
-        );
+        const vishesWithColors = data.vishes.map((vish: Vish) => {
+          let color = "#FFFFFF";
+          if (vish.category_list && vish.category_list.length > 0) {
+            const categoryId = vish.category_list[0];
+            const category = categories.find((cat: VishCategory) => cat._id === categoryId);
+            color = category ? category.color : "#FFFFFF";
+          }
+          return { ...vish, color };
+        });
         setVishes(vishesWithColors);
 
         const session = await getSession();
@@ -55,7 +68,7 @@ export default function AllWishesPage() {
           if (vishStatus.success) {
             const likedVishes = vishStatus.likedVishes || [];
             const initialLikedStates: { [key: string]: boolean } = {};
-            vishesWithColors.forEach((vish) => {
+            vishesWithColors.forEach((vish: Vish) => {
               initialLikedStates[vish._id] = likedVishes.includes(vish._id);
             });
             setLikedStates(initialLikedStates);
@@ -64,7 +77,7 @@ export default function AllWishesPage() {
           }
         } else {
           const initialLikedStates: { [key: string]: boolean } = {};
-          vishesWithColors.forEach((vish) => {
+          vishesWithColors.forEach((vish: Vish) => {
             initialLikedStates[vish._id] = false;
           });
           setLikedStates(initialLikedStates);
@@ -72,12 +85,14 @@ export default function AllWishesPage() {
 
         setIsVishLoading(false);
       } catch (err) {
-        setError("Failed to load vishes or categories");
+        setError("Failed to load vishes");
         setIsVishLoading(false);
       }
     }
-    fetchVishes();
-  }, [filter]);
+    if (categories.length > 0) {
+      fetchVishes();
+    }
+  }, [filter, categories]);
 
   const handleFilterChange = (newFilter: 'popular' | 'latest') => {
     setFilter(newFilter);
