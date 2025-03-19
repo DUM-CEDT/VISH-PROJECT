@@ -104,11 +104,11 @@ export default function MerchandiseDetail() {
                     alt="star"
                     width={2000}
                     height={2000}
-                    className='absolute z-0 opacity-[100%]'
+                    className='absolute z-0 opacity-[100%] object-cover pointer-events-none'
       />
       <div className="w-full p-16 h-[92vh]">
         <button
-          className="flex justify-center items-center gap-4 group"
+          className="flex justify-center items-center gap-4 group z-[10]"
           onClick={handleBackClick}
         >
           <LessSign
