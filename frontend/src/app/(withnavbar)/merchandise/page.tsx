@@ -153,7 +153,7 @@ export default function MerchandisePage() {
           </div>
         </div>
       </div>
-      <div className="w-full h-[16vh] flex items-center justify-center">
+      <div className="z-1 w-full h-[16vh] flex items-center justify-center">
         <MerchandiseChoice onSelect={handleSelection} />
       </div>
       <div className="z-1 w-full px-16">
