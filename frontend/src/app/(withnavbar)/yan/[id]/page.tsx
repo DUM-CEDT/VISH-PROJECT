@@ -1,9 +1,7 @@
 'use client'
 
-import LessSign from '@/components/svg/LessSign'
 import styles from './page.module.css'
 import Button1 from '@/components/button/Button1'
-import ChoiceQuiz from '@/components/button/ChoiceQuiz'
 import getAllYanImage from '@/app/libs/getAllYanImage'
 
 import Image from 'next/image'
@@ -11,28 +9,37 @@ import { useEffect, useState } from 'react'
 import YanSelection from '@/components/button/YanSelection/YanSelection'
 import { redirect, useRouter } from 'next/navigation'
 import { useParams } from 'next/navigation'
+import { getSession } from 'next-auth/react'
+import createYanTemplate from '@/app/libs/createYanTemplate'
+import addYanTemplateToUser from '@/app/libs/addYanTemplateToUser'
 // import { useEffect, useState } from 'react' 
 
 export default function Yan_ID () {
     const params = useParams();
     
+    let anyObject : any = {}
     const [allYanImage, setAllYanImage] = useState({success : false, data :[[]]})
     const [stateImage, setStateImage] = useState(new Array(4).fill(null))
     const [clearURL, setClearURL] = useState('')
     const [backgroundColor, setBackgroundColor] = useState('#112141')
+    const [session , setSession] = useState(anyObject)
 
     useEffect(() => {
         const x = async () => {
             const fetchingData = await getAllYanImage()
-            console.log(fetchingData)
             setAllYanImage(fetchingData)
         }
         x()
 
+        const loadSession  = async () => {
+            const thisSession = await getSession()
+            setSession(thisSession)
+        }
+        loadSession()
+
         if (clearURL == '') {
             window.history.replaceState(null, "", `/yan`)
             const { id } = params as { id: string }
-            console.log(id);
             setClearURL(id);
         }
 
@@ -50,7 +57,6 @@ export default function Yan_ID () {
         
         for (let i = 0 ; i < 4 ; i++) {
             if (imageState[i] != null) {
-                console.log(allYanImage['data'][i])
                 for (let j = 0 ; j < allYanImage['data'][i].length ; j++) {
                     if (allYanImage['data'][i][j]['yan_template_image_set_id'] == imageState[i])
                     imageState[i] = j
@@ -82,7 +88,6 @@ export default function Yan_ID () {
                 newStateImage[layer] = null
             else newStateImage[layer] = newStateImage[layer] - 1
         }
-        console.log(newStateImage)
         setStateImage(newStateImage)
 
     }
@@ -139,6 +144,26 @@ export default function Yan_ID () {
             return
     }
 
+    const handleFinish = async () => {
+        if (session && session.user) {
+            let imageIdList = []
+            let categoeyList : any = []
+            for (let i = 0 ; i < 4 ; i++) {
+                if (stateImage[i] != null) {
+                    imageIdList.push(allYanImage['data'][i][stateImage[i]]['_id'])
+                    if (!categoeyList.includes(allYanImage['data'][i][stateImage[i]]['yan_category'][0]))
+                        categoeyList.push(allYanImage['data'][i][stateImage[i]]['yan_category'][0])
+                }
+                else 
+                    imageIdList.push(null)
+            }
+            
+            const yanTemplate = await createYanTemplate(categoeyList, backgroundColor, imageIdList)
+            const yanTemplateId = yanTemplate.data._id
+            const saveYanToUser = await addYanTemplateToUser(session.user.token, yanTemplateId)
+        }
+        redirect(`/export/` + genID())
+    }
     
 
     return (
@@ -214,8 +239,8 @@ export default function Yan_ID () {
                             
                         </div>
                         <div className={styles['bottom-button-wrapper']}>
-                            <Button1 onClick={() => {redirect(`/export/` + genID())}} minWidth={'150px'} icon='Download' front={true} text='เสร็จสิ้น'></Button1>
-                            <Button1 onClick={() => {console.log(navigator.clipboard.writeText(genURL()))}} minWidth={'150px'} icon='Share' text='คัดลองลิงก์'></Button1>
+                            <Button1 onClick={() => {handleFinish()}} minWidth={'150px'} icon='Download' front={true} text='เสร็จสิ้นนนนน'></Button1>
+                            <Button1 onClick={() => {navigator.clipboard.writeText(genURL())}} minWidth={'150px'} icon='Share' text='คัดลองลิงก์'></Button1>
                         </div>
                     </div>
 

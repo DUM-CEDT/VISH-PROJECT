@@ -9,6 +9,8 @@ import { useEffect, useState } from 'react'
 import YanSelection from '@/components/button/YanSelection/YanSelection'
 import { redirect, useParams } from 'next/navigation'
 import { getSession } from 'next-auth/react'
+import createYanTemplate from '@/app/libs/createYanTemplate'
+import addYanTemplateToUser from '@/app/libs/addYanTemplateToUser'
 
 export default function Yan () {
 
@@ -21,7 +23,6 @@ export default function Yan () {
     useEffect(() => {
         const x = async () => {
             const fetchingData = await getAllYanImage()
-            console.log(fetchingData)
             setAllYanImage(fetchingData)
         }
         x()
@@ -106,11 +107,24 @@ export default function Yan () {
             return
     }
 
-    const handleFinish = async (a : any) => {
+    const handleFinish = async () => {
+
         if (session && session.user) {
-            console.log(allYanImage['data'][0][stateImage[0]])
-            // const yanTemplate = await createYanTemplate()
-            // const saveYanToUser = await addYanTemplateToUser()
+            let imageIdList = []
+            let categoeyList : any = []
+            for (let i = 0 ; i < 4 ; i++) {
+                if (stateImage[i] != null) {
+                    imageIdList.push(allYanImage['data'][i][stateImage[i]]['_id'])
+                    if (!categoeyList.includes(allYanImage['data'][i][stateImage[i]]['yan_category'][0]))
+                        categoeyList.push(allYanImage['data'][i][stateImage[i]]['yan_category'][0])
+                }
+                else 
+                    imageIdList.push(null)
+            }
+
+            const yanTemplate = await createYanTemplate(categoeyList, backgroundColor, imageIdList)
+            const yanTemplateId = yanTemplate.data._id
+            const saveYanToUser = await addYanTemplateToUser(session.user.token, yanTemplateId)
         }
         redirect(`/export/` + genID())
     }
@@ -181,7 +195,7 @@ export default function Yan () {
                         </div>
                         <div className={styles['bottom-button-wrapper']}>
                             <Button1 onClick={() => {handleFinish()}} minWidth={'150px'} icon='Download' front={true} text='เสร็จสิ้น'></Button1>
-                            <Button1 onClick={() => {console.log(navigator.clipboard.writeText(genURL()))}} minWidth={'150px'} icon='Share' text='คัดลองลิงก์'></Button1>
+                            <Button1 onClick={() => {navigator.clipboard.writeText(genURL())}} minWidth={'150px'} icon='Share' text='คัดลองลิงก์'></Button1>
                         </div>
                     </div>
 

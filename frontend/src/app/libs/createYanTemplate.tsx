@@ -4,7 +4,7 @@ export default async function createYanTemplate(
     category : (null | string)[], background : string, image : (null | string)[]
 ) {
   const BACKEND_URL = process.env.BACKEND_URL
-  const response = await ( await fetch(
+  const response = await fetch(
     `${BACKEND_URL}/api/yan/template`,
     {
       method: "POST",
@@ -17,8 +17,7 @@ export default async function createYanTemplate(
         image: image,
       }),
     }
-  )).json()
-
+  )
   if (!response.ok) {
     throw new Error("Failed to Get All Yan");
   }
