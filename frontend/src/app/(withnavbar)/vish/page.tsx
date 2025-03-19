@@ -128,82 +128,108 @@ export default function AllWishesPage() {
   const rightColumn = vishes.filter((_, index) => index % 2 !== 0);
 
   return (
-    <div className="min-h-screen flex flex-col pt-20 px-10 pb-24">
-      {isVishLoading ? (
-        <div className="flex-1 flex items-center justify-center">
-          Loading vishes...
-        </div>
-      ) : error ? (
-        <div className="flex-1 flex items-center justify-center">
-          {error}
-        </div>
-      ) : (
-        <div className="flex w-full h-full flex-1">
-          <div className="flex flex-col gap-6 flex-1 p-4 min-h-screen">
-            {leftColumn.map((vish, index) => (
-              <div
-                key={vish._id}
-                className={`flex items-center gap-4 p-2 rounded-lg ${
-                  index % 2 === 0 ? "flex-row" : "flex-row-reverse"
-                }`}
-              >
-                <div className="flex flex-col items-center gap-2 p-2 rounded-lg">
-                  <div className="relative">
-                    <Star width={74} height={74} fillColor={vish.color} />
-                  </div>
-                  <div className="flex items-center gap-1 cursor-pointer" onClick={() => toggleLike(vish._id)}>
-                    {likedStates[vish._id] ? (
-                      <HeartLiked width={26} height={21} fillColor="#E07CAE" />
-                    ) : (
-                      <HeartUnliked width={26} height={21} fillColor="#E0EEA5" />
-                    )}
-                    <span
-                      className="text-sm"
-                      style={{ color: likedStates[vish._id] ? "#E07CAE" : "#E0EEA5" }}
-                    >
-                      {vish.vish_count}
-                    </span>
-                  </div>
-                </div>
-                <VishCard text={vish.text} vish_count={vish.vish_count} />
-              </div>
-            ))}
+    <div className="relative min-h-screen flex flex-col pt-20 px-10 pb-24">
+      {/* พื้นหลัง */}
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: "url('/star_5.png')",
+          backgroundRepeat: "repeat-y",
+          backgroundPosition: "center top",
+          backgroundSize: "100% auto",
+        }}
+      />
+      <div className="relative z-10">
+        {isVishLoading ? (
+          <div className="flex-1 flex items-center justify-center">
+            Loading vishes...
           </div>
-
-          <div className="flex flex-col gap-6 flex-1 p-4 min-h-screen">
-            {rightColumn.map((vish, index) => (
-              <div
-                key={vish._id}
-                className={`flex items-center gap-4 p-2 rounded-lg ${
-                  index % 2 === 0 ? "flex-row" : "flex-row-reverse"
-                }`}
-              >
-                <div className="flex flex-col items-center gap-2 p-2 rounded-lg">
-                  <div className="relative">
-                    <Star width={74} height={74} fillColor={vish.color} />
-                  </div>
-                  <div className="flex items-center gap-1 cursor-pointer" onClick={() => toggleLike(vish._id)}>
-                    {likedStates[vish._id] ? (
-                      <HeartLiked width={26} height={21} fillColor="#E07CAE" />
-                    ) : (
-                      <HeartUnliked width={26} height={21} fillColor="#E0EEA5" />
-                    )}
-                    <span
-                      className="text-sm"
-                      style={{ color: likedStates[vish._id] ? "#E07CAE" : "#E0EEA5" }}
-                    >
-                      {vish.vish_count}
-                    </span>
-                  </div>
-                </div>
-                <VishCard text={vish.text} vish_count={vish.vish_count} />
-              </div>
-            ))}
+        ) : error ? (
+          <div className="flex-1 flex items-center justify-center">
+            {error}
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="flex w-full h-full flex-1">
+            <div className="flex flex-col gap-20 flex-1 p-4 min-h-screen">
+              {leftColumn.map((vish, index) => (
+                <div
+                  key={vish._id}
+                  className={`flex items-center gap-4 overflow-visible ${
+                    index % 2 === 0 ? "flex-row" : "flex-row-reverse"
+                  }`}
+                >
+                  <div className="flex flex-col items-center gap-2 p-2 rounded-lg">
+                    <div className="relative">
+                      <Star width={74} height={74} fillColor={vish.color} />
+                    </div>
+                    <div className="flex items-center gap-1 cursor-pointer" onClick={() => toggleLike(vish._id)}>
+                      {likedStates[vish._id] ? (
+                        <HeartLiked width={26} height={21} fillColor="#E07CAE" />
+                      ) : (
+                        <HeartUnliked width={26} height={21} fillColor="#E0EEA5" />
+                      )}
+                      <span
+                        className="text-sm"
+                        style={{ color: likedStates[vish._id] ? "#E07CAE" : "#E0EEA5" }}
+                      >
+                        {vish.vish_count}
+                      </span>
+                    </div>
+                  </div>
+                  <VishCard
+                    text={vish.text}
+                    vish_count={vish.vish_count}
+                    is_bon={vish.is_bon}
+                    bon_condition={vish.bon_condition}
+                    bon_credit={vish.bon_credit}
+                    bon_vish_target={vish.bon_vish_target}
+                  />
+                </div>
+              ))}
+            </div>
 
-      <VishFooter onFilterChange={handleFilterChange} />
+            <div className="flex flex-col gap-20 flex-1 p-4 min-h-screen">
+              {rightColumn.map((vish, index) => (
+                <div
+                  key={vish._id}
+                  className={`flex items-center gap-4 overflow-visible ${
+                    index % 2 === 0 ? "flex-row" : "flex-row-reverse"
+                  }`}
+                >
+                  <div className="flex flex-col items-center gap-2 p-2 rounded-lg">
+                    <div className="relative">
+                      <Star width={74} height={74} fillColor={vish.color} />
+                    </div>
+                    <div className="flex items-center gap-1 cursor-pointer" onClick={() => toggleLike(vish._id)}>
+                      {likedStates[vish._id] ? (
+                        <HeartLiked width={26} height={21} fillColor="#E07CAE" />
+                      ) : (
+                        <HeartUnliked width={26} height={21} fillColor="#E0EEA5" />
+                      )}
+                      <span
+                        className="text-sm"
+                        style={{ color: likedStates[vish._id] ? "#E07CAE" : "#E0EEA5" }}
+                      >
+                        {vish.vish_count}
+                      </span>
+                    </div>
+                  </div>
+                  <VishCard
+                    text={vish.text}
+                    vish_count={vish.vish_count}
+                    is_bon={vish.is_bon}
+                    bon_condition={vish.bon_condition}
+                    bon_credit={vish.bon_credit}
+                    bon_vish_target={vish.bon_vish_target}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <VishFooter onFilterChange={handleFilterChange} />
+      </div>
     </div>
   );
 }

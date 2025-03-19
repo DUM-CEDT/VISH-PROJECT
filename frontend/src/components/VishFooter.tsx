@@ -42,7 +42,7 @@ export default function VishFooter({ onFilterChange }: VishFooterProps) {
   }, []);
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 text-white py-1 px-6">
+    <div className="fixed bottom-0 left-0 right-0 text-white py-1 px-6 bg-primary z-50">
       <div className="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4 p-2">
         <div className="flex flex-wrap gap-4 p-1 border border-white rounded-xl">
           {starCategories.map((category, index) => (
