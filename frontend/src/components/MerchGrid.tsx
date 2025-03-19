@@ -24,7 +24,7 @@ export default function MerchGrid({
   }
 
   return (
-    <div className="grid grid-cols-3 gap-16">
+    <div className="z-10 relative grid grid-cols-3 gap-16">
       {items.map((item, index) => (
         <div key={index} className={"rounded-2xl border-white border-3 bg-primary p-12"}>
           {item.image && (

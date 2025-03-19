@@ -374,7 +374,14 @@ export default function ProfilePage() {
 
   return (
     <div className="mt-[8vh] h-[92vh] p-12 flex gap-12">
-      <div className=" w-[40%] flex flex-col justify-between">
+      <Image
+                    src="/star_5.png"
+                    alt="star"
+                    width={2000}
+                    height={2000}
+                    className='absolute z-0 opacity-[100%]'
+      />
+      <div className="z-1 w-[40%] flex flex-col justify-between">
         <div>
           <div className="flex items-baseline gap-4 bg-primary">
             <Image
@@ -387,13 +394,13 @@ export default function ProfilePage() {
             />
             <div className="text-[28px] font-regular">Username</div>
           </div>
-          <div className="mt-1">
+          <div className="z-1 mt-1">
             <button className="bg-highlight1 px-4 py-1 text-[16px] text-black rounded-full font-regular">
               เครดิตของคุณ : {credit}
             </button>
           </div>
         </div>
-        <div className="bg-[rgba(255,255,255,0.6)] p-6 h-[80%] rounded-xl">
+        <div className="z-1 bg-[rgba(255,255,255,0.6)] p-6 h-[80%] rounded-xl">
           <div className="text-black font-regular text-[20px]">
             การแจ้งเตือน
           </div>
@@ -445,7 +452,7 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
-      <div className="w-[60%] border-2 border-white rounded-3xl relative p-4">
+      <div className="z-1 w-[60%] border-2 border-white rounded-3xl relative p-4">
         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-2">
           <YanStarChoice onSelect={handleYanStarSelection} />
         </div>
