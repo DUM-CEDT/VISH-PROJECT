@@ -31,7 +31,7 @@ export default async function NavBar() {
                     <Link href="/yan" className="hover:text-highlight1">ยันต์</Link>
                 </li>
                 <li>
-                    <Link href="/services" className="hover:text-highlight1">ขอพร</Link>
+                    <Link href="/vish" className="hover:text-highlight1">ขอพร</Link>
                 </li>
                 <li>
                     <Link href="/merchandise" className="hover:text-highlight1">ร้านค้า</Link>
