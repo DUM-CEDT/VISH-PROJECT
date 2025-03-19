@@ -8,7 +8,7 @@ import LessSign from "@/components/svg/LessSign";
 import { useState, useEffect } from "react";
 import getAllMerch from "@/app/libs/getAllMerch";
 import { useRouter } from "next/navigation";
-
+import Image from "next/image";
 interface Pagination {
   total_items: number;
   total_pages: number;
@@ -119,7 +119,14 @@ export default function MerchandisePage() {
 
   return (
     <div className="flex flex-col items-center">
-      <div className="w-full bg-subsecondary h-[76vh] text-white mt-[8vh] p-16">
+      <Image
+                    src="/star_5.png"
+                    alt="star"
+                    width={2000}
+                    height={2000}
+                    className='absolute z-0 opacity-[100%]'
+      />
+      <div className=" z-1 w-full bg-subsecondary h-[76vh] text-white mt-[8vh] p-16">
         <div className=" w-full h-full border-white border-3 rounded-3xl flex items-center justify-center p-12">
           <div className="w-full h-full flex items-center">
             <div className="w-[7.5%]">
@@ -149,20 +156,34 @@ export default function MerchandisePage() {
       <div className="w-full h-[16vh] flex items-center justify-center">
         <MerchandiseChoice onSelect={handleSelection} />
       </div>
-      <div className="w-full px-16">
+      <div className="z-1 w-full px-16">
+      <Image
+                    src="/star_5.png"
+                    alt="star"
+                    width={2000}
+                    height={2000}
+                    className='absolute z-0 opacity-[100%]'
+      />
         <MerchGrid
           items={merch} // Limit to 9 items for 3x3 grid
           loading={loading}
         />
       </div>
-      <div className="w-full p-16 flex justify-center items-center gap-8">
+      <div className="z-1 overflow-hidden relative  w-full p-16 flex justify-center items-center gap-8">
+          <Image
+                        src="/star_5.png"
+                        alt="star"
+                        width={3000}
+                        height={3000}
+                        className='absolute z-0 opacity-[100%]'
+          />
         <button
           onClick={() => handlePageChange(page - 1)}
           disabled={page === 1}
         >
           <LessSign width={"20px"} height={"20px"} className="fill-white" />
         </button>
-        <div className="font-regular text-[20px] text-white">
+        <div className="z-1 font-regular text-[20px] text-white">
           หน้าที่ {pagination?.current_page || 1} / {pagination?.last_page || 1}
         </div>
         <button
@@ -177,6 +198,7 @@ export default function MerchandisePage() {
       {/* <div className="text-white">
         <p>Selected: {selectedItem || "None"}</p>
       </div> */}
+      
     </div>
   );
 }

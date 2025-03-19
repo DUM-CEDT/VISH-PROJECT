@@ -99,6 +99,13 @@ export default function MerchandiseDetail() {
 
   return (
     <div className="w-full mt-[8vh]">
+      <Image
+                    src="/star_5.png"
+                    alt="star"
+                    width={2000}
+                    height={2000}
+                    className='absolute z-0 opacity-[100%]'
+      />
       <div className="w-full p-16 h-[92vh]">
         <button
           className="flex justify-center items-center gap-4 group"
@@ -120,7 +127,7 @@ export default function MerchandiseDetail() {
             width={0}
             height={0}
             sizes="100vw"
-            className="object-contain w-[37.5%] opacity-100"
+            className="z-1 object-contain w-[37.5%] opacity-100"
           />
           <div className="flex flex-col justify-between w-[62.5%]">
             <div>
@@ -155,14 +162,18 @@ export default function MerchandiseDetail() {
               </div>
             </div>
             <div className="text-white text-[32px] font-regular">{item.price} บาท</div>
-            <Button1
-              icon="Buy"
-              front={true}
-              text="สั่งซื้อสินค้า"
-              size={24}
-              minWidth="100%"
-              onClick={handleBuyClick}
-            />
+            <div className="z-1">
+              <Button1
+                
+                icon="Buy"
+                front={true}
+                text="สั่งซื้อสินค้า"
+                size={24}
+                minWidth="100%"
+                onClick={handleBuyClick}
+              />
+
+            </div>
           </div>
         </div>
         {/* <div className="text-white text-[20px] font-light mt-4">
