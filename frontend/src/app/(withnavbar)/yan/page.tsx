@@ -9,6 +9,8 @@ import { useEffect, useState } from 'react'
 import YanSelection from '@/components/button/YanSelection/YanSelection'
 import { redirect, useParams } from 'next/navigation'
 import { getSession } from 'next-auth/react'
+import createYanTemplate from '@/app/libs/createYanTemplate'
+import addYanTemplateToUser from '@/app/libs/addYanTemplateToUser'
 
 export default function Yan () {
 
@@ -21,7 +23,6 @@ export default function Yan () {
     useEffect(() => {
         const x = async () => {
             const fetchingData = await getAllYanImage()
-            console.log(fetchingData)
             setAllYanImage(fetchingData)
         }
         x()
@@ -106,8 +107,8 @@ export default function Yan () {
             return
     }
 
-    const handleFinish = async (a : any) => {
-        console.log(session)
+    const handleFinish = async () => {
+
         if (session && session.user) {
             let imageIdList = []
             let categoeyList : any = []
@@ -120,13 +121,12 @@ export default function Yan () {
                 else 
                     imageIdList.push(null)
             }
-            console.log(imageIdList)
-            console.log(backgroundColor)
-            console.log(categoeyList)
-            // const yanTemplate = await createYanTemplate()
-            // const saveYanToUser = await addYanTemplateToUser()
+
+            const yanTemplate = await createYanTemplate(categoeyList, backgroundColor, imageIdList)
+            const yanTemplateId = yanTemplate.data._id
+            const saveYanToUser = await addYanTemplateToUser(session.user.token, yanTemplateId)
         }
-        // redirect(`/export/` + genID())
+        redirect(`/export/` + genID())
     }
     
     return (
@@ -195,7 +195,7 @@ export default function Yan () {
                         </div>
                         <div className={styles['bottom-button-wrapper']}>
                             <Button1 onClick={() => {handleFinish()}} minWidth={'150px'} icon='Download' front={true} text='เสร็จสิ้น'></Button1>
-                            <Button1 onClick={() => {console.log(navigator.clipboard.writeText(genURL()))}} minWidth={'150px'} icon='Share' text='คัดลองลิงก์'></Button1>
+                            <Button1 onClick={() => {navigator.clipboard.writeText(genURL())}} minWidth={'150px'} icon='Share' text='คัดลองลิงก์'></Button1>
                         </div>
                     </div>
 

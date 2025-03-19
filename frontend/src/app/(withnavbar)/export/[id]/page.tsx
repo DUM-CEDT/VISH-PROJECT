@@ -7,13 +7,19 @@ import getAllYanImage from '@/app/libs/getAllYanImage'
 
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { redirect, useParams } from 'next/navigation'
 import YanDisplay from '@/components/YanDisplay/YanDisplay'
 import downloadYan from '@/app/libs/createYanTemplate'
 import { getSession, useSession } from 'next-auth/react'
+import createYanTemplate from '@/app/libs/createYanTemplate'
+import addYanTemplateToUser from '@/app/libs/addYanTemplateToUser'
+import downloadYanWithoutSession from '@/app/libs/downloadYanWithoutSession'
+import downloadYanWithSession from '@/app/libs/downloadYanWithSession'
 
 export default function Yan_ID () {
+    const BACKEND_URL = process.env.BACKEND_URL;
     const params = useParams();
+    let anyObject : any = {}
     let empty : (null | string)[] = [null, null, null, null]
     
     const [allYanImage, setAllYanImage] = useState({success : false, data :[[]]})
@@ -22,7 +28,8 @@ export default function Yan_ID () {
     const [backgroundColor, setBackgroundColor] = useState('#112141')
     const [showYan, setShowYan] = useState(false)
     const [imageId, setImageId] = useState(empty)
-    
+    const [session , setSession] = useState(anyObject)
+
     
     useEffect(() => {
         const x = async () => {
@@ -31,6 +38,11 @@ export default function Yan_ID () {
         }
         x()
 
+        const loadSession  = async () => {
+            const thisSession = await getSession()
+            setSession(thisSession)
+        }
+        loadSession()
     },[])
 
     if (allYanImage.success && showYan == false) {
@@ -50,12 +62,13 @@ export default function Yan_ID () {
         for (let i = 0 ; i < 4 ; i++) {
             if (indexState[i] != null) {
                 for (let j = 0 ; j < allYanImage['data'][i].length ; j++) {
-                    if (allYanImage['data'][i][j]['yan_template_image_set_id'] == indexState[i])
-                    imageState[i] = allYanImage['data'][i][j]['yan_image_base64']
-                    newImageId.push(allYanImage['data'][i][j]['_id'])
-                    if (!newCategory['category_list'].includes(allYanImage['data'][i][j]['yan_category'][0])) {
-                        newCategory['category_list'].push(allYanImage['data'][i][j]['yan_category'][0])
-                        newCategory['text'] += allYanImage['data'][i][j]['category'] + " | "
+                    if (allYanImage['data'][i][j]['yan_template_image_set_id'] == indexState[i]) {
+                        imageState[i] = allYanImage['data'][i][j]['yan_image_base64']
+                        newImageId.push(allYanImage['data'][i][j]['_id'])
+                        if (!newCategory['category_list'].includes(allYanImage['data'][i][j]['yan_category'][0])) {
+                            newCategory['category_list'].push(allYanImage['data'][i][j]['yan_category'][0])
+                            newCategory['text'] += allYanImage['data'][i][j]['category'] + " | "
+                        }
                     }
                 }
             }
@@ -69,39 +82,23 @@ export default function Yan_ID () {
     }
     
     const handleDownload = async () => {
-        await downloadYan(category['category_list'], backgroundColor, imageId)
+        const yanTemplate = await createYanTemplate(category['category_list'], backgroundColor, imageId)
+        const yanTemplateId = yanTemplate.data._id
+        let downloadYan
+        if (session && session.user) {
+            const saveYanToUser = await addYanTemplateToUser(session.user.token, yanTemplateId)            
+        }
+
+        window.open(`${BACKEND_URL}/api/yan/template/download_nosession/${yanTemplateId}`);
+ 
+        
     }
 
-    // const genURL = () => {
-    //     let str = window.location.origin + '/export/'
-    //     for (let i = 0 ; i < 4 ; i++) {
-    //         if (stateImage[i] != null)
-    //             str += ( allYanImage['data'][i][stateImage[i]]['yan_template_image_set_id'])
-    //         else
-    //             str += 'null'
-
-    //             str += '-'
-    //     }
-    //     str += backgroundColor.slice(1)
-    //     return str
-    // }
-
-    // const genID = () => {
-    //     let str = ''
-    //     for (let i = 0 ; i < 4 ; i++) {
-    //         if (stateImage[i] != null)
-    //             str += ( allYanImage['data'][i][stateImage[i]]['yan_template_image_set_id'])
-    //         else
-    //             str += 'null'
-
-    //             str += '-'
-    //     }
-    //     str += backgroundColor.slice(1)
-    //     return str
-    // }
-
+    const genURL = () => {
+        let str = window.location.href
+        return str
+    }
     
-
     return (
         <div className={styles['wrapper']}>
                 <Image
@@ -132,9 +129,9 @@ export default function Yan_ID () {
                     <h1 className='font-regular text-[28px]'>{category['text']}</h1>
                 </div>
 
-                <Button1 onClick={ async () => {await handleDownload()}} minWidth='255px' front={true} icon='Download' text='ดาวน์โหลด' size={24}/>
-                <Button1 minWidth='255px' front={true} icon='Share' text='แชร์' size={24}/>
-                <Button2 minWidth={255} text='Custom ยันต์' size={24}/>
+                <Button1 onClick={() => {handleDownload()}} minWidth='255px' front={true} icon='Download' text='ดาวน์โหลด' size={24}/>
+                <Button1 onClick={() => navigator.clipboard.writeText(genURL())} minWidth='255px' front={true} icon='Share' text='แชร์' size={24}/>
+                <Button2 onClick={() => { const { id } = params as { id: string }; window.open(window.location.origin + `/yan/${id}`)}} minWidth={255} text='Custom ยันต์' size={24}/>
             </div>
             
         </div>
