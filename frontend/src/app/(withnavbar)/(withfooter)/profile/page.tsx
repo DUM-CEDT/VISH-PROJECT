@@ -21,6 +21,7 @@ import getMyVishes from "@/app/libs/getMyVishes";
 import setVishSuccess from "@/app/libs/setVishSuccess";
 import deleteVish from "@/app/libs/deleteVishSuccess";
 import getMe from "@/app/libs/getMe";
+import Button1 from "@/components/button/Button1";
 interface Transaction {
   amount: number;
   category: string;
@@ -70,8 +71,9 @@ export default function ProfilePage() {
   const [credit, setCredit] = useState(null);
   const [vishArray, setVishArray] = useState<VishProp[]>([]); 
   const [vishLoading, setVishLoading] = useState(false); 
-  const [isDeletingVish, setIsDeletingVish] = useState(false); // Loading state for deleteVish
+  const [isDeletingVish, setIsDeletingVish] = useState(false);
   const [userName, setUserName] = useState("Username");
+  const [showPopup, setShowPopup] = useState(false); 
 
   const handleNotificationSelection = (selected: string) => {
     setSelectedNotificationItem(selected);
@@ -213,6 +215,15 @@ export default function ProfilePage() {
     } finally {
       setIsDeletingVish(false);
     }
+  };
+
+  const handleCreditClick = () => {
+    setShowPopup(true); // Show the popup when clicking the credit button
+  };
+
+  const handlePopupChoice = (choice: "deposit" | "withdraw") => {
+    setShowPopup(false); // Close the popup
+    router.push(choice === "deposit" ? "/deposit" : "/withdraw"); // Redirect based on choice
   };
 
   useEffect(() => {
@@ -403,8 +414,8 @@ export default function ProfilePage() {
             <div className="text-[28px] font-regular">{userName}</div>
           </div>
           <div className="z-1 mt-1 flex items-end gap-4">
-            <button className="bg-highlight1 px-4 py-1 text-[16px] text-black rounded-full font-regular cursor-pointer" onClick={handleRedirectToDeposit}>
-              เครดิตของคุณ : {credit}
+            <button className="bg-highlight1 px-4 py-1 text-[16px] text-black rounded-full font-regular" onClick={handleCreditClick}>
+              เครดิตของคุณ : {credit ?? "Loading..."}
             </button>
             <div>
               <a href="/logout" className="underline">ออกจากระบบ</a>
@@ -537,6 +548,21 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+      {showPopup && (
+        <div className="fixed inset-0  flex items-center justify-center z-50 bg-[rgba(255,255,255,0.7)]">
+          <div className="bg-white p-8 px-12 rounded-lg shadow-lg flex flex-col gap-4 w-[400px]">
+            <h3 className="text-[20px] font-regular text-black text-center">เลือกการดำเนินการ</h3>
+            <Button1 text="ฝากเครดิต" onClick={() => handlePopupChoice("deposit")}/>
+            <Button1 text="ถอนเครดิต" onClick={() => handlePopupChoice("withdraw")}/>
+            <button
+              className="text-[16px] text-gray-500 hover:text-gray-700"
+              onClick={() => setShowPopup(false)}
+            >
+              ยกเลิก
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
