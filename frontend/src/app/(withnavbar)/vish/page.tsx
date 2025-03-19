@@ -6,12 +6,13 @@ import VishFooter from "@/components/VishFooter";
 import Star from "@/components/svg/Star";
 import HeartUnliked from "@/components/svg/HeartUnliked";
 import HeartLiked from "@/components/svg/HeartLiked";
-import { Vish, VishCategory } from "../../../../interface"; // เพิ่ม VishCategory ใน interface
+import { Vish, VishCategory } from "../../../../interface";
 import getAllVishes from "@/app/libs/getAllVishes";
-import getAllVishCategories from "@/app/libs/getAllVishCategories"; // นำเข้า getAllVishCategories
+import getAllVishCategories from "@/app/libs/getAllVishCategories";
 import vishVish from "@/app/libs/vishVish";
 import getVishStatus from "@/app/libs/getVishStatus";
 import { getSession } from "next-auth/react";
+import VishPopup from "@/components/VishPopupText";
 
 interface VishWithColor extends Vish {
   color: string;
@@ -19,11 +20,12 @@ interface VishWithColor extends Vish {
 
 export default function AllWishesPage() {
   const [vishes, setVishes] = useState<VishWithColor[]>([]);
-  const [categories, setCategories] = useState<VishCategory[]>([]); // เพิ่ม state สำหรับเก็บ categories
+  const [categories, setCategories] = useState<VishCategory[]>([]);
   const [isVishLoading, setIsVishLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'popular' | 'latest'>('popular');
   const [likedStates, setLikedStates] = useState<{ [key: string]: boolean }>({});
+  const [selectedVishText, setSelectedVishText] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -139,6 +141,14 @@ export default function AllWishesPage() {
     }
   };
 
+  const handleVishCardClick = (text: string) => {
+    setSelectedVishText(text);
+  };
+
+  const closePopup = () => {
+    setSelectedVishText(null);
+  };
+
   const leftColumn = vishes.filter((_, index) => index % 2 === 0);
   const rightColumn = vishes.filter((_, index) => index % 2 !== 0);
 
@@ -198,6 +208,7 @@ export default function AllWishesPage() {
                     bon_condition={vish.bon_condition}
                     bon_credit={vish.bon_credit}
                     bon_vish_target={vish.bon_vish_target}
+                    onClick={() => handleVishCardClick(vish.text)}
                   />
                 </div>
               ))}
@@ -236,11 +247,17 @@ export default function AllWishesPage() {
                     bon_condition={vish.bon_condition}
                     bon_credit={vish.bon_credit}
                     bon_vish_target={vish.bon_vish_target}
+                    onClick={() => handleVishCardClick(vish.text)}
                   />
                 </div>
               ))}
             </div>
           </div>
+        )}
+
+        {/* ใช้ VishPopup */}
+        {selectedVishText && (
+          <VishPopup text={selectedVishText} onClose={closePopup} />
         )}
 
         <VishFooter onFilterChange={handleFilterChange} />

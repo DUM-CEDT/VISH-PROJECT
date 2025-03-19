@@ -20,7 +20,7 @@ export default async function NavBar() {
     // console.log("User profile:", userProfile);
 
     return (
-        <nav className="h-[8vh] absolute top-0 left-0 z-10 w-full flex justify-between items-center px-16 bg-primary text-white">
+        <nav className="h-[8vh] absolute top-0 left-0 z-[100] w-full flex justify-between items-center px-16 bg-primary text-white">
             <div>
                 <Link href="/">
                     <Vish width={149} height={29} className="fill-white hover:fill-highlight1 transition-all duration-300 ease-in-out"/>
