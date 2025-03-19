@@ -4,6 +4,7 @@ import NotifcationChoice from "@/components/button/NotificationChoice";
 import { useState } from "react";
 import TransactionBlock from "@/components/TransactionBlock";
 import MerchTransactionBlock from "@/components/MerchTransactionBlock";
+import YanStarChoice from "@/components/button/YanStarChoice";
 
 interface Transaction {
   amount: number;
@@ -19,10 +20,14 @@ interface MerchTransaction {
 
 export default function ProfilePage() {
   const [selectedNotificationItem, setSelectedNotificationItem] = useState("เครดิต");
+  const [selectedYanStarItem, setSelectedYanStarItem] = useState("ยันต์ของฉัน");
 
   const handleNotificationSelection = (selected: string) => {
-    console.log("Selected merchandise type:", selected);
     setSelectedNotificationItem(selected);
+  };
+
+  const handleYanStarSelection = (selected: string) => {
+    setSelectedYanStarItem(selected);
   };
 
   const transactionArray: Transaction[] = [
@@ -159,7 +164,12 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
-      <div className="bg-highlight2 w-[60%]">bcs</div>
+      <div className="w-[60%] border-2 border-white rounded-3xl relative p-4">
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-2">
+          <YanStarChoice onSelect={handleYanStarSelection}/>
+        </div>
+        
+      </div>
     </div>
   );
 }
