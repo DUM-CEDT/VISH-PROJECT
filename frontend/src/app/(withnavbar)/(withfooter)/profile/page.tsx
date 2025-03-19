@@ -377,7 +377,7 @@ export default function ProfilePage() {
   }, []);
 
   return (
-    <div className="mt-[8vh] h-[92vh] p-12 flex gap-12">
+    <div className="relative overflow-hidden mt-[8vh] h-[92vh] p-12 flex gap-12">
       <Image
                     src="/star_5.png"
                     alt="star"

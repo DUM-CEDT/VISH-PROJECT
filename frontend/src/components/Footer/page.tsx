@@ -27,6 +27,7 @@ export default function Footer () {
                     height={1000}
                     alt=''
                     style={{width : '25px',height : '36px'}}
+                    onClick={() => window.open('https://thinc.in.th/')}
                 ></Image>
             </div>
             <div className={styles['line']}></div>
