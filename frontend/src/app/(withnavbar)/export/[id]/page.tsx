@@ -9,7 +9,7 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import YanDisplay from '@/components/YanDisplay/YanDisplay'
-import downloadYan from '@/app/libs/downloadYan'
+import downloadYan from '@/app/libs/createYanTemplate'
 import { getSession, useSession } from 'next-auth/react'
 
 export default function Yan_ID () {

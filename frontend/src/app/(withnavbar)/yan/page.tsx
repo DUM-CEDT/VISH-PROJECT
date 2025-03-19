@@ -107,12 +107,26 @@ export default function Yan () {
     }
 
     const handleFinish = async (a : any) => {
+        console.log(session)
         if (session && session.user) {
-            console.log(allYanImage['data'][0][stateImage[0]])
+            let imageIdList = []
+            let categoeyList : any = []
+            for (let i = 0 ; i < 4 ; i++) {
+                if (stateImage[i] != null) {
+                    imageIdList.push(allYanImage['data'][i][stateImage[i]]['_id'])
+                    if (!categoeyList.includes(allYanImage['data'][i][stateImage[i]]['yan_category'][0]))
+                        categoeyList.push(allYanImage['data'][i][stateImage[i]]['yan_category'][0])
+                }
+                else 
+                    imageIdList.push(null)
+            }
+            console.log(imageIdList)
+            console.log(backgroundColor)
+            console.log(categoeyList)
             // const yanTemplate = await createYanTemplate()
             // const saveYanToUser = await addYanTemplateToUser()
         }
-        redirect(`/export/` + genID())
+        // redirect(`/export/` + genID())
     }
     
     return (
