@@ -75,6 +75,20 @@ export default function MerchandiseDetail() {
     return prop?.options || []; // Return empty array if no options found
   };
 
+  const handleBuyClick = () => {
+    try {
+      if (!item) throw new Error("Item not available");
+
+      const encodedName = encodeURIComponent(item.name || "ชื่อสินค้า");
+
+      const url = `/payment/${encodedName}-${item.price || 0}`;
+
+      router.push(`${url}`);
+    } catch (err: any) {
+      console.error(err);
+    }
+  };
+
   if (loading) {
     return <div className="text-white p-4">Loading...</div>;
   }
@@ -147,6 +161,7 @@ export default function MerchandiseDetail() {
               text="สั่งซื้อสินค้า"
               size={24}
               minWidth="100%"
+              onClick={handleBuyClick}
             />
           </div>
         </div>
