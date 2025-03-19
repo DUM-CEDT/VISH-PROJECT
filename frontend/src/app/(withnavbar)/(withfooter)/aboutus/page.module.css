@@ -1,0 +1,17 @@
+.wrapper {
+    height: 92vh;
+    padding-top: 8vh;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.wrapper h2 {
+    text-align: justify;
+    width: 560px;
+    font-weight: 200;
+    font-size: 20;
+}

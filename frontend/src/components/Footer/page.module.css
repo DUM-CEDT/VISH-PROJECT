@@ -1,0 +1,47 @@
+.wrapper {
+    /* height: 256px; */
+    padding-bottom: 24px;
+    width: 100%;
+    background-color: #FAFAFA;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 12;
+}
+
+.nav {
+    padding-top: 24px;
+    padding-bottom: 26px;
+    display: flex;
+    gap: 96px;
+}
+
+.wrapper h2 {
+    font-size: 20;
+    font-weight: 200;
+    color : #243256
+}
+
+.wrapper h3 {
+    font-size: 16;
+    font-weight: 200;
+    color : #243256
+}
+
+.wrapper h4 {
+    
+    font-size: 12;
+    font-weight: 200;
+    color : #243256
+}
+
+.line {
+    width: 90%;
+    height: 0.5px;
+    background-color: #243256;
+    margin-bottom: 12px;
+}
+
+.wrapper  {
+    cursor: pointer;
+  }

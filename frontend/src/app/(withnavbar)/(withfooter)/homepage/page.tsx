@@ -4,9 +4,11 @@ import Button1 from "@/components/button/Button1";
 import Image from "next/image";
 import styles from './page.module.css'
 import { redirect } from "next/navigation";
+
 export default function Home() {
   return (
-    <div className="absolute h-[100vh] w-[100vw] overflow-hidden">
+    <div className="relative mt-[8vh] h-[92vh] w-[100vw] overflow-hidden">
+
       <div className={styles.wrapper}>
         <div className="text-[24px] font-light text-center">
           วันนี้คุณ “รู้สึก” อยากทำอะไร ?
