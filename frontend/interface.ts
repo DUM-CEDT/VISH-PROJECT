@@ -49,3 +49,19 @@ export interface UserJson {
     createdAt: string;
   };
 }
+
+export interface CreateVishRequest {
+  text: string;
+  category_list: string[];
+  is_bon: boolean;
+  bon_condition?: boolean;
+  bon_vish_target?: number;
+  bon_credit?: number;
+  distribution?: number;
+}
+
+export interface CreateVishResponse {
+  success: boolean;
+  vish?: Vish;
+  msg?: string;
+}

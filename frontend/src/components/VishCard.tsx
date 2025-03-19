@@ -1,6 +1,17 @@
 "use client";
 
+import { useState, useEffect, useRef } from "react";
 import Lamp from "./svg/Lamp";
+
+interface VishCardProps {
+  text: string;
+  vish_count: number;
+  is_bon: boolean;
+  bon_condition: number;
+  bon_credit: number;
+  bon_vish_target: number;
+  onClick: () => void;
+}
 
 export default function VishCard({
   text,
@@ -9,18 +20,25 @@ export default function VishCard({
   bon_condition,
   bon_credit,
   bon_vish_target,
-}: {
-  text: string;
-  vish_count: number;
-  is_bon: boolean;
-  bon_condition: number;
-  bon_credit: number;
-  bon_vish_target: number;
-}) {
+  onClick,
+}: VishCardProps) {
+  const textRef = useRef<HTMLParagraphElement>(null);
+  const [isTextClamped, setIsTextClamped] = useState(false);
+
+  useEffect(() => {
+    if (textRef.current) {
+      const element = textRef.current;
+      setIsTextClamped(element.scrollHeight > element.clientHeight);
+    }
+  }, [text]);
+
   return (
     <div
-      className="relative bg-transparent text-white text-center overflow-visible"
-      style={{ position: "relative", width: "320px", height: "190px" }}
+      className={`relative bg-transparent text-white text-center overflow-visible ${
+        isTextClamped ? "cursor-pointer" : "cursor-default"
+      }`}
+      style={{ width: "320px", height: "190px" }}
+      onClick={isTextClamped ? onClick : undefined} // เปิด popup เฉพาะข้อความที่ถูกตัด
     >
       <img
         src="/VishCardFrame3.png"
@@ -51,7 +69,10 @@ export default function VishCard({
       />
 
       <div className="relative z-10 flex flex-col justify-center items-center h-full p-8">
-        <p className="text-lg line-clamp-2">{text}</p>
+        <p ref={textRef} className="text-lg line-clamp-2">
+          {text}
+        </p>
+
         <div className="flex justify-center items-center mt-4">
           {is_bon ? (
             bon_condition === 1 ? (
