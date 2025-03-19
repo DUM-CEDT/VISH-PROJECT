@@ -3,6 +3,7 @@
 import LessSign from '@/components/svg/LessSign'
 import styles from './page.module.css'
 import Button1 from '@/components/button/Button1'
+import Button2 from '@/components/button/Button2'
 import ChoiceQuiz from '@/components/button/ChoiceQuiz'
 import getAllYanImage from '@/app/libs/getAllYanImage'
 
@@ -11,132 +12,98 @@ import { useEffect, useState } from 'react'
 import YanSelection from '@/components/button/YanSelection/YanSelection'
 import { redirect, useRouter } from 'next/navigation'
 import { useParams } from 'next/navigation'
+import YanDisplay from '@/components/YanDisplay/YanDisplay'
+import downloadYan from '@/app/libs/downloadYan'
+import { useSession } from 'next-auth/react'
 // import { useEffect, useState } from 'react' 
 
 export default function Yan_ID () {
     const params = useParams();
-    
+    let empty : (null | string)[] = [null, null, null, null]
     const [allYanImage, setAllYanImage] = useState({success : false, data :[[]]})
-    const [stateImage, setStateImage] = useState(new Array(4).fill(null))
-    const [clearURL, setClearURL] = useState('')
+    const [layerState, setLayerState] = useState(empty)
+    const [category, setCategory] = useState({text : '', category_list : []})
     const [backgroundColor, setBackgroundColor] = useState('#112141')
+    const [showYan, setShowYan] = useState(false)
+    const [imageId, setImageId] = useState(empty)
 
+    const session : any = useSession()
+    console.log(session)
     useEffect(() => {
         const x = async () => {
             const fetchingData = await getAllYanImage()
-            console.log(fetchingData)
             setAllYanImage(fetchingData)
         }
         x()
 
-        if (clearURL == '') {
-            window.history.replaceState(null, "", `/yan`)
-            const { id } = params as { id: string }
-            console.log(id);
-            setClearURL(id);
-        }
-
     },[])
+    
+    if (allYanImage.success && showYan == false) {
+        const { id } = params as { id: string }
+        let param_index = id.split('-')
 
-    if (allYanImage.success && clearURL != 'null') {
-        
-        let param_index = clearURL.split('-')
-        var imageState : (number | null)[] = [null,null,null,null]
+        var imageState : (string | null)[] = [null,null,null,null]
+        var indexState : (number | null)[] = [null,null,null,null]
         for (let i = 0 ; i < 4 ; i++) {
             let x = parseInt(param_index[i])
             if(!isNaN(x))
-                imageState[i] = x
+                indexState[i] = x
         }
-        
+
+        let newCategory = {text : '', category_list : []}
+        let newImageId : (null | string)[] = []
         for (let i = 0 ; i < 4 ; i++) {
-            if (imageState[i] != null) {
-                console.log(allYanImage['data'][i])
+            if (indexState[i] != null) {
                 for (let j = 0 ; j < allYanImage['data'][i].length ; j++) {
-                    if (allYanImage['data'][i][j]['yan_template_image_set_id'] == imageState[i])
-                    imageState[i] = j
+                    if (allYanImage['data'][i][j]['yan_template_image_set_id'] == indexState[i])
+                    imageState[i] = allYanImage['data'][i][j]['yan_image_base64']
+                    newImageId.push(allYanImage['data'][i][j]['_id'])
+                    if (!newCategory['category_list'].includes(allYanImage['data'][i][j]['yan_category'][0])) {
+                        newCategory['category_list'].push(allYanImage['data'][i][j]['yan_category'][0])
+                        newCategory['text'] += allYanImage['data'][i][j]['category'] + " | "
+                    }
                 }
             }
         }
-
-        setClearURL('null')
+        newCategory['text'] = newCategory['text'].slice(0, -2)
+        setCategory(newCategory)
+        setLayerState(imageState);
+        setImageId(newImageId)
         setBackgroundColor ('#' + param_index[4]);
-        setStateImage(imageState);
-        
+        setShowYan(true)
+    }
+    
+    const handleDownload = async () => {
+        await downloadYan(category['category_list'], backgroundColor, imageId)
     }
 
-    const handleClick = (mode : string , layer : number) => {
-        let newStateImage = [...stateImage]
-        let nowStateImageThisLayer = newStateImage[layer]
-        if (mode == "inc") {
-            if (newStateImage[layer] == null)
-                newStateImage[layer] = 0
-            else if (newStateImage[layer] == allYanImage['data'][layer].length - 1  )
-                newStateImage[layer] = null
-            else newStateImage[layer] = newStateImage[layer] + 1
-        }
-        else if (mode == "dec") {
-            if (newStateImage[layer] == null)
-                newStateImage[layer] = allYanImage['data'][layer].length - 1
-            else if (newStateImage[layer] == 0)
-                newStateImage[layer] = null
-            else newStateImage[layer] = newStateImage[layer] - 1
-        }
-        console.log(newStateImage)
-        setStateImage(newStateImage)
+    // const genURL = () => {
+    //     let str = window.location.origin + '/export/'
+    //     for (let i = 0 ; i < 4 ; i++) {
+    //         if (stateImage[i] != null)
+    //             str += ( allYanImage['data'][i][stateImage[i]]['yan_template_image_set_id'])
+    //         else
+    //             str += 'null'
 
-    }
+    //             str += '-'
+    //     }
+    //     str += backgroundColor.slice(1)
+    //     return str
+    // }
 
-    const getInnerText = (layer : number ) => {
-        if (stateImage[layer] != null)
-            return allYanImage['data'][layer][stateImage[layer]]['yan_set_name']
-        else
-            return ''
-    }
+    // const genID = () => {
+    //     let str = ''
+    //     for (let i = 0 ; i < 4 ; i++) {
+    //         if (stateImage[i] != null)
+    //             str += ( allYanImage['data'][i][stateImage[i]]['yan_template_image_set_id'])
+    //         else
+    //             str += 'null'
 
-    const getCategory = (layer : number ) => {
-        if (stateImage[layer] != null)
-            return allYanImage['data'][layer][stateImage[layer]]['category']
-        else
-            return ''
-    }
-
-    const genURL = () => {
-        let str = window.location.origin + '/yan/'
-        for (let i = 0 ; i < 4 ; i++) {
-            if (stateImage[i] != null)
-                str += ( allYanImage['data'][i][stateImage[i]]['yan_template_image_set_id'])
-            else
-                str += 'null'
-
-                str += '-'
-        }
-        str += backgroundColor.slice(1)
-        return str
-    }
-
-    const genID = () => {
-        let str = ''
-        for (let i = 0 ; i < 4 ; i++) {
-            if (stateImage[i] != null)
-                str += ( allYanImage['data'][i][stateImage[i]]['yan_template_image_set_id'])
-            else
-                str += 'null'
-
-                str += '-'
-        }
-        str += backgroundColor.slice(1)
-        return str
-    }
-
-    const handleTextInputChange = (e : any) => {
-        let txt = e.target.value 
-        const s = new Option().style;
-        s.color = txt;
-        if (s.color !== '')
-            setBackgroundColor(txt)
-        else
-            return
-    }
+    //             str += '-'
+    //     }
+    //     str += backgroundColor.slice(1)
+    //     return str
+    // }
 
     
 
@@ -153,92 +120,27 @@ export default function Yan_ID () {
             {(!allYanImage.success) && (
                 <h1 className='z-1'>กำลังดาวน์โหลด...</h1>
             )}
-            {(allYanImage.success) && (
-                <div className={styles['content-wrapper']}>
-                    <div className={styles['left-side-wrapper']}>
-                        <div className={styles['yan-scope']}>
-                            <div className={styles['yan-boarder']}>
-                                <div id='yan-background' style={{backgroundColor : `${backgroundColor}`}} className={styles['yan-background']}>
-                                    
-                                    {allYanImage['data'][0][stateImage[0]] != null && (
-                                    <Image
-                                        src={`data:image/jpeg;base64, ${allYanImage['data'][0][stateImage[0]]['yan_image_base64']}`}
-                                        alt=""
-                                        // layout="intrinsic"
-                                        width={10000}
-                                        height={10000}
-                                        className='absolute w-[364px] z-0 opacity-[100%]'
-                                    />)}
-                                    
-                                    {allYanImage['data'][1][stateImage[1]] != null && (
-                                    <Image
-                                        src={`data:image/jpeg;base64, ${allYanImage['data'][1][stateImage[1]]['yan_image_base64']}`}
-                                        alt=""
-                                        // layout="intrinsic"
-                                        width={10000}
-                                        height={10000}
-                                        className='absolute w-[364px] z-0 opacity-[100%]'
-                                    />)}
+            {(allYanImage.success && showYan) && (
+                <div className='z-10 flex flex-col gap-[48px] w-[396px]'>
+                    <YanDisplay
+                         layer={layerState} backgroundColor={backgroundColor} yanWidth={364} borderWidth={396}
+                    />
+                    <Button1 front={true} icon='Buy' text='สั่งซื้อยันต์ของคุณ' size={24}/>
+                </div>
+               
+            )}
 
-                                    {allYanImage['data'][2][stateImage[2]] != null && (
-                                    <Image
-                                        src={`data:image/jpeg;base64, ${allYanImage['data'][2][stateImage[2]]['yan_image_base64']}`}
-                                        alt=""
-                                        // layout="intrinsic"
-                                        width={10000}
-                                        height={10000}
-                                        className='absolute w-[364px] z-0 opacity-[100%]'
-                                    />)}
-
-                                    {allYanImage['data'][3][stateImage[3]] != null && (
-                                    <Image
-                                        src={`data:image/jpeg;base64, ${allYanImage['data'][3][stateImage[3]]['yan_image_base64']}`}
-                                        alt=""
-                                        // layout="intrinsic"
-                                        width={10000}
-                                        height={10000}
-                                        className='absolute w-[364px] z-0 opacity-[100%]'
-                                    />)}
-                                </div>
-                            </div>
-                            
-                            
-                        </div>
-                        <div className={styles['bottom-button-wrapper']}>
-                            <Button1 onClick={() => {redirect(`/export/` + genID())}} minWidth={'150px'} icon='Download' front={true} text='เสร็จสิ้น'></Button1>
-                            <Button1 onClick={() => {console.log(navigator.clipboard.writeText(genURL()))}} minWidth={'150px'} icon='Share' text='คัดลองลิงก์'></Button1>
-                        </div>
-                    </div>
-
-                    <div className={styles['button-wrapper']}>
-                        <div className={styles['button-wrapper-inner']}>
-                            <YanSelection rightButtonClick={() => {handleClick('inc', 0)}} leftButtonClick={() => {handleClick('dec', 0)}} layer={1} innerText={getInnerText(0)} description={getCategory(0)}></YanSelection>
-                            <YanSelection rightButtonClick={() => {handleClick('inc', 1)}} leftButtonClick={() => {handleClick('dec', 1)}} layer={2} innerText={getInnerText(1)} description={getCategory(1)}></YanSelection>
-                            <YanSelection rightButtonClick={() => {handleClick('inc', 2)}} leftButtonClick={() => {handleClick('dec', 2)}} layer={3} innerText={getInnerText(2)} description={getCategory(2)}></YanSelection>
-                            <YanSelection rightButtonClick={() => {handleClick('inc', 3)}} leftButtonClick={() => {handleClick('dec', 3)}} layer={4} innerText={getInnerText(3)} description={getCategory(3)}></YanSelection>
-                            <div className={styles['color-wrapper']}>
-                                <div onClick={() => setBackgroundColor('#EB463C')} style={{backgroundColor : '#EB463C'}} className={styles['circle']}></div>
-                                <div onClick={() => setBackgroundColor('#E07CAE')} style={{backgroundColor : '#E07CAE'}} className={styles['circle']}></div>
-                                <div onClick={() => setBackgroundColor('#8D4BF6')} style={{backgroundColor : '#8D4BF6'}} className={styles['circle']}></div>
-                                
-                                <div className='flex items-center justify-center'>
-                                    <input onChange={(e) => setBackgroundColor(e.target.value)} style={{opacity : 0, backgroundColor : 'transparent', zIndex : 10, width : '48px', height : '48px'}} type="color" name="" id="" />
-                                    <Image
-                                        src='/dropper.png'
-                                        width={10000}
-                                        height={10000}
-                                        alt=''
-                                        style={{position : 'absolute', height : '48px', width : '48px'}}
-                                    />
-                                </div>
-                                
-                                <input onChange={(e) => {handleTextInputChange(e)}} type="text" placeholder='#FFFFFF' maxLength={7}/>
-                            </div>
-                        </div>
-                    </div>
+            <div className='flex h-[100%] flex flex-col justify-center items-center gap-[24px] z-10'>
+                
+                <div className='flex flex-col justify-center items-center'>
+                    <h1 className='font-regular text-[24px]'>ยันต์นี้เด่นในด้าน</h1>
+                    <h1 className='font-regular text-[28px]'>{category['text']}</h1>
                 </div>
 
-            )}
+                <Button1 onClick={ async () => {await handleDownload()}} minWidth='255px' front={true} icon='Download' text='ดาวน์โหลด' size={24}/>
+                <Button1 minWidth='255px' front={true} icon='Share' text='แชร์' size={24}/>
+                <Button2 minWidth={255} text='Custom ยันต์' size={24}/>
+            </div>
             
         </div>
     )

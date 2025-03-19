@@ -45,13 +45,13 @@ export default function YanExport () {
                             <div className={styles['yan-boarder']}>
                                 <Image
                                     src='/Yan_Frame.png'
-                                    width={388}
+                                    width={387}
                                     height={9999}
                                     alt=''
                                     style={{marginBottom : '9px', marginRight : '1px', position : 'absolute', zIndex : 6}}
                                     className=''
-                                >
-                                </Image>
+                                />
+                                
                                 <div id='yan-background' className={styles['yan-background'] + " z-0"}>
                                     <div style={{backgroundColor : 'aqua'}} className={styles['yan-inner-first'] + " z-2"}>
                                         <div style={{backgroundColor : 'black'}} className={styles['yan-inner'] + " z-3"}>
