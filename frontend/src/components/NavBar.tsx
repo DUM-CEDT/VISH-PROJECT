@@ -1,21 +1,28 @@
+'use client'
+
 import { getServerSession } from "next-auth";
 import Link from "next/link";
 import Vish from "./svg/Vish";
 import ArrowForward from "./svg/ArrowForward";
 import getUserProfile from "@/app/libs/getUserProfile";
 import { authOptions } from "@/app/libs/authOptions";
+import { useEffect, useState } from "react";
+import { getSession } from "next-auth/react";
 
-export default async function NavBar() {
-    const session = await getServerSession(authOptions);
-
-    let userProfile = null;
-    if (session?.user?.token) {
-        try {
-        userProfile = await getUserProfile(session.user.token);
-        } catch (error) {
-        console.error("Failed to fetch user profile:", error);
+export default function NavBar() {
+    const anyObject : (any | null) = null
+    const [session, setSession] = useState(anyObject)
+    
+    useEffect(() => {
+        const getUserSession = async () => {
+            // const thisSession = await getServerSession(authOptions);
+            const thisSession = await getSession()
+            setSession(thisSession)
         }
-    }
+
+        getUserSession()
+    })
+
     // console.log("NavBar session:", session);
     // console.log("User profile:", userProfile);
 
