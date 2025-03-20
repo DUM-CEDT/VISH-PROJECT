@@ -10,8 +10,8 @@ export default async function getAllYanImage(
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "Cache-Control" : "force-cache"
-      }
+      },
+      next : {'revalidate' : 3600}
     }
   );
 
