@@ -37,7 +37,7 @@ export default async function RootLayout({
           <NextAuthProvider session={session}>{children}</NextAuthProvider>
         </div>
         <div className={styles.mobile}>
-          <div>Plase use our website in PC</div>
+          <div>Plase use our website in PC {getWindowWidth()}</div>
         </div>
       </body>
     </html>
