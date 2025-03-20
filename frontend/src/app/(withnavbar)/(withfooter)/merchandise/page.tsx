@@ -175,7 +175,7 @@ export default function MerchandisePage() {
           onClick={() => handlePageChange(page - 1)}
           disabled={page === 1}
         >
-          <LessSign width={"20px"} height={"20px"} className="fill-white" />
+          <LessSign width={"20px"} height={"20px"} className="fill-white hover:fill-highlight1 duration-300 transition-all ease-in-out" />
         </button>
         <div className="z-1 font-regular text-[20px] text-white">
           หน้าที่ {pagination?.current_page || 1} / {pagination?.last_page || 1}
@@ -186,7 +186,7 @@ export default function MerchandisePage() {
             pagination?.last_page ? page >= pagination.last_page : false
           }
         >
-          <GreaterSign width={20} height={20} className="fill-white" />
+          <GreaterSign width={20} height={20} className="fill-white hover:fill-highlight1 duration-300 transition-all ease-in-out" />
         </button>
       </div>
       {/* <div className="text-white">

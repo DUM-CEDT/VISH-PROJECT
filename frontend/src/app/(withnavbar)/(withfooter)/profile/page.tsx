@@ -531,7 +531,7 @@ export default function ProfilePage() {
                   ) : null}
                 </div>
               ) : (
-                <div className="text-black">No Vish data available</div>
+                <div className="text-white">No Vish data available</div>
               )
             ) : yanLoading ? (
               <div className="text-white">Loading Yan templates...</div>
@@ -547,7 +547,7 @@ export default function ProfilePage() {
                 />
               </div>
             ) : (
-              <div className="text-black">No Yan templates available</div>
+              <div className="text-white">No Yan templates available</div>
             )}
           </div>
           <div className="w-[7.5%] flex justify-end">
