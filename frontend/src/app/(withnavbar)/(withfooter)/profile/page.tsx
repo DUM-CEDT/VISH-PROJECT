@@ -74,6 +74,7 @@ export default function ProfilePage() {
   const [isDeletingVish, setIsDeletingVish] = useState(false);
   const [userName, setUserName] = useState("Username");
   const [showPopup, setShowPopup] = useState(false); 
+  const [showDeletePopup , setShowDeletePopup] = useState(false);
 
   const handleNotificationSelection = (selected: string) => {
     setSelectedNotificationItem(selected);
@@ -140,10 +141,6 @@ export default function ProfilePage() {
     }
   };
 
-  const handleRedirectToDeposit = () => {
-    router.push("/deposit");
-  };
-
   const handleDeleteVish = async (vish_id: string) => {
     try {
       setIsDeletingVish(true);
@@ -189,6 +186,7 @@ export default function ProfilePage() {
       } else {
         throw new Error("Unexpected API response structure for Vish data");
       }
+      setShowDeletePopup(false);
     } catch (err) {
       setError("Failed to delete Vish");
       console.error(err);
@@ -225,6 +223,10 @@ export default function ProfilePage() {
     setShowPopup(false); // Close the popup
     router.push(choice === "deposit" ? "/deposit" : "/withdraw"); // Redirect based on choice
   };
+
+  const handleDeletePopup = () => {
+    setShowDeletePopup(true);
+  }
 
   useEffect(() => {
     const fetchCredit = async() =>{
@@ -499,6 +501,7 @@ export default function ProfilePage() {
                       bon_vish_target={vishArray[starSliderPos].bon_vish_target}
                       bon_credit={vishArray[starSliderPos].bon_credit}
                       distribution={vishArray[starSliderPos].bon_distribution}
+                      is_success={vishArray[starSliderPos].is_success}
                     />
                   </div>
                   {vishArray[starSliderPos].is_bon === true &&
@@ -519,7 +522,7 @@ export default function ProfilePage() {
                       size={16}
                       icon="Bin"
                       front={true}
-                      onClick={() => handleDeleteVish(vishArray[starSliderPos].id)}
+                      onClick={handleDeletePopup}
                     />
                   ) : null}
                 </div>
@@ -560,6 +563,19 @@ export default function ProfilePage() {
             >
               ยกเลิก
             </button>
+          </div>
+        </div>
+      )}
+      {showDeletePopup && (
+        <div className="fixed inset-0  flex items-center justify-center z-50 bg-[rgba(255,255,255,0.7)]">
+          <div className="bg-white p-12 px-12 rounded-lg shadow-lg flex flex-col gap-4 w-[500px]">
+            <h3 className="text-[20px] font-regular text-black text-center">คุณต้องการลบดวงดาวใช่หรือไม่</h3>
+            <div className="flex justify-between gap-8">
+              <Button1 text="ยืนยัน" onClick={() => handleDeleteVish(vishArray[starSliderPos].id)} minWidth="175px"/>
+              <Button2 text="ยกเลิก" minWidth={175}
+                onClick={() => setShowDeletePopup(false)}
+              />
+            </div>
           </div>
         </div>
       )}
