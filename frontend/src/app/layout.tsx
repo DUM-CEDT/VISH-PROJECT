@@ -24,9 +24,6 @@ export default async function RootLayout({
 }>) {
   const session = await getServerSession(authOptions);
 
-  const getWindowWidth = () => {
-    return window.innerWidth
-  }
   return (
     
     <html lang="en">
@@ -37,7 +34,7 @@ export default async function RootLayout({
           <NextAuthProvider session={session}>{children}</NextAuthProvider>
         </div>
         <div className={styles.mobile}>
-          <div>Plase use our website in PC {getWindowWidth()}</div>
+          <div>Plase use our website in PC</div>
         </div>
       </body>
     </html>
