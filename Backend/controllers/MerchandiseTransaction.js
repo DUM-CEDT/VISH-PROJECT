@@ -114,10 +114,10 @@ exports.addMerchTrans = async (req, res) => {
       throw new Error(`Missing selection for properties: ${missingProps.join(', ')}`);
     }
 
-    const totalCost = item.price * quantity;
+    const totalCost = item.price * quantity + 100;
     if (user.credit < totalCost) throw new Error('Insufficient credits');
 
-    user.credit -= totalCost + 100;
+    user.credit -= totalCost;
     await user.save();
     
     await Transaction.create(

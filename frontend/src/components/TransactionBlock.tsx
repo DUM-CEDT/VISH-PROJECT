@@ -60,7 +60,16 @@ export default function TransactionBlock({
                     {frontText} {amount} เครดิต จาก{backText}
                 </div>
                 <div>
-                    {new Date(created_at).toLocaleString()}
+                {new Date(created_at).toLocaleString('en-US', {
+                    timeZone: 'UTC',
+                    year: 'numeric',
+                    month: 'numeric',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false,
+                })}
                 </div>
             </div>
         </div>

@@ -5,8 +5,6 @@ import { useState } from "react";
 import TransactionBlock from "@/components/TransactionBlock";
 import MerchTransactionBlock from "@/components/MerchTransactionBlock";
 import YanStarChoice from "@/components/button/YanStarChoice";
-import LessSign from "@/components/svg/LessSign";
-import GreaterSign from "@/components/svg/GreaterSign";
 import NavButton from "@/components/button/NavButton";
 import YanDisplay from "@/components/YanDisplay/YanDisplay";
 import VishCard from "@/components/VishCard";
@@ -75,6 +73,7 @@ export default function ProfilePage() {
   const [userName, setUserName] = useState("Username");
   const [showPopup, setShowPopup] = useState(false); 
   const [showDeletePopup , setShowDeletePopup] = useState(false);
+  const [showVishSuccessPopup , setShowVishSuccessPopup] = useState(false);
 
   const handleNotificationSelection = (selected: string) => {
     setSelectedNotificationItem(selected);
@@ -135,6 +134,7 @@ export default function ProfilePage() {
         }));
         setVishArray(mappedVishArray);
       }
+      setShowVishSuccessPopup(false);
     } catch (err) {
       setError("Failed to mark Vish as successful");
       console.error(err);
@@ -226,6 +226,10 @@ export default function ProfilePage() {
 
   const handleDeletePopup = () => {
     setShowDeletePopup(true);
+  }
+
+  const handleVishSuccessPopup = () => {
+    setShowVishSuccessPopup(true);
   }
 
   useEffect(() => {
@@ -509,7 +513,7 @@ export default function ProfilePage() {
                   vishArray[starSliderPos].bon_condition === 0 &&
                   vishArray[starSliderPos].bon_distribution <= vishArray[starSliderPos].vish_count ? (
                     <Button2
-                      onClick={() => handleSetVishSuccess(vishArray[starSliderPos].id)}
+                      onClick={handleVishSuccessPopup}
                       text="บนสำเร็จ"
                       size={16}
                       icon="Check"
@@ -574,6 +578,19 @@ export default function ProfilePage() {
               <Button1 text="ยืนยัน" onClick={() => handleDeleteVish(vishArray[starSliderPos].id)} minWidth="175px"/>
               <Button2 text="ยกเลิก" minWidth={175}
                 onClick={() => setShowDeletePopup(false)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+      {showVishSuccessPopup && (
+        <div className="fixed inset-0  flex items-center justify-center z-50 bg-[rgba(255,255,255,0.7)]">
+          <div className="bg-white p-12 px-12 rounded-lg shadow-lg flex flex-col gap-4 w-[500px]">
+            <h3 className="text-[20px] font-regular text-black text-center">คำขอแห่งดวงดาวของคุณกลายเป็นจริงแล้ว</h3>
+            <div className="flex justify-between gap-8">
+              <Button1 text="ยืนยัน" onClick={() => handleSetVishSuccess(vishArray[starSliderPos].id)} minWidth="175px"/>
+              <Button2 text="ยกเลิก" minWidth={175}
+                onClick={() => setShowVishSuccessPopup(false)}
               />
             </div>
           </div>

@@ -61,11 +61,10 @@ export default function Yan_ID () {
         console.log(session)
         console.log(postData)
         const res = await addMerchTrans(postData,  session.user.token)
-        console.log(res)
+        if (res.success == true){
+            redirect('/successful')
+        }
 
-
-
-        // redirect('/successful')
     }
 
     useEffect(() => {
