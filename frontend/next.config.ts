@@ -18,7 +18,10 @@ const nextConfig = {
     BACKEND_URL: process.env.BACKEND_URL
   },
   reactStrictMode: false,
-  devIndicators: false
+  devIndicators: false,
+  experimental : {
+    fetchCache : true
+  }
 }
 
 module.exports = nextConfig

@@ -124,7 +124,7 @@ export default function MerchandisePage() {
                     alt="star"
                     width={2000}
                     height={2000}
-                    className='absolute z-0 opacity-[100%]'
+                    className='absolute z-0 opacity-[100%] pointer-events-none'
       />
       <div className=" z-1 w-full bg-subsecondary h-[76vh] text-white mt-[8vh] p-16">
         <div className=" w-full h-full border-white border-3 rounded-3xl flex items-center justify-center p-12">
@@ -162,21 +162,15 @@ export default function MerchandisePage() {
                     alt="star"
                     width={2000}
                     height={2000}
-                    className='absolute z-0 opacity-[100%]'
+                    className='absolute z-0 opacity-[100%] pointer-events-none'
       />
         <MerchGrid
           items={merch} // Limit to 9 items for 3x3 grid
           loading={loading}
         />
       </div>
-      <div className="z-1 overflow-hidden relative  w-full p-16 flex justify-center items-center gap-8">
-          <Image
-                        src="/star_5.png"
-                        alt="star"
-                        width={3000}
-                        height={3000}
-                        className='absolute z-0 opacity-[100%]'
-          />
+      <div className="z-2 overflow-hidden relative  w-full p-16 flex justify-center items-center gap-8">
+         
         <button
           onClick={() => handlePageChange(page - 1)}
           disabled={page === 1}
