@@ -1,3 +1,4 @@
+import CustomYanButton from '../CustomYanButton'
 import styles from './page.module.css'
 import Image from 'next/image'
 
@@ -9,14 +10,15 @@ export default function YanSelection ({layer, innerText, description, leftButton
                 <h1>ชั้นที่ {layer}</h1>
             </div>
             <div className={styles['center-wrapper']}>
-                <div className='flex items-center' onClick={() => leftButtonClick()}>
-                    <Image
+                <div className='flex items-center'>
+                    {/* <Image
                         src='/Left_Tri.png'
                         width={32}
                         height={32}
                         objectFit='cover'
                         alt=''
-                    ></Image>
+                    ></Image> */}
+                    <CustomYanButton icon='ThickLeft' text='' size={32} onClick={() => leftButtonClick()}/>
                 </div>
             
                 <div className={styles['center-text-wrapper']}>
@@ -24,14 +26,15 @@ export default function YanSelection ({layer, innerText, description, leftButton
                 </div>
 
                 
-                <div className='flex items-center' onClick={() => rightButtonClick()}>
-                    <Image
+                <div className='flex items-center'>
+                    {/* <Image
                         src='/Right_Tri.png'
                         width={32}
                         height={32}
                         objectFit='cover'
                         alt=''
-                    ></Image>
+                    ></Image> */}
+                    <CustomYanButton icon='ThickRight' text='' size={32} onClick={()=>rightButtonClick()}/>
                 </div>
 
             </div>

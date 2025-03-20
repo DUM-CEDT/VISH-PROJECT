@@ -414,11 +414,11 @@ export default function ProfilePage() {
             <div className="text-[28px] font-regular">{userName}</div>
           </div>
           <div className="z-1 mt-1 flex items-end gap-4">
-            <button className="bg-highlight1 px-4 py-1 text-[16px] text-black rounded-full font-regular" onClick={handleCreditClick}>
+            <button className="bg-highlight1 px-4 py-1 text-[16px] text-black rounded-full font-regular hover:bg-secondary hover:text-white transition-all duration-300" onClick={handleCreditClick}>
               เครดิตของคุณ : {credit ?? "Loading..."}
             </button>
             <div>
-              <a href="/logout" className="underline">ออกจากระบบ</a>
+              <a href="/logout" className="underline hover:text-highlight1 transition-all duration-300 ease-in-out">ออกจากระบบ</a>
             </div>
           </div>
         </div>
@@ -439,7 +439,7 @@ export default function ProfilePage() {
                     <TransactionBlock
                       key={index}
                       category={transaction.category}
-                      amount={transaction.amount}
+                      amount={Math.abs(transaction.amount)}
                       created_at={transaction.created_at}
                     />
                   ))
