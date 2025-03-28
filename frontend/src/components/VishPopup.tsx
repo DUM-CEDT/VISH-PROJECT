@@ -78,7 +78,11 @@ const VishPopup: React.FC<VishPopupProps> = ({ text = "", onClose }) => {
     };
     
     if (isBon) {
-      vishData.bon_condition = true;
+      if(bonType === "ขอพร"){
+        vishData.bon_condition = false;
+      }else if(bonType === "จำนวน VISH"){
+        vishData.bon_condition = true;
+      }
       
       if (vishTarget) {
         vishData.bon_vish_target = parseInt(vishTarget, 10);
