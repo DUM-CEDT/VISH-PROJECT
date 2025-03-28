@@ -6,7 +6,7 @@ import NavBar from "@/components/NavBar";
 import NextAuthProvider from "./provider/NextAuthProvider";
 import { getServerSession } from "next-auth";
 import { authOptions } from "./libs/authOptions";
-
+import styles from './layout.module.css'
 const mitr = Mitr({
   subsets: ["latin", "thai"],
   weight: ["200", "300", "400", "500", "600", "700"],
@@ -30,7 +30,12 @@ export default async function RootLayout({
       <link rel="icon" href="/Vish_Icon.png" sizes="4x4"></link>
       
       <body className={mitr.className}>
-        <NextAuthProvider session={session}>{children}</NextAuthProvider>
+        <div className={styles.pc}>
+          <NextAuthProvider session={session}>{children}</NextAuthProvider>
+        </div>
+        <div className={styles.mobile}>
+          <div>Plase use our website in PC</div>
+        </div>
       </body>
     </html>
   );
